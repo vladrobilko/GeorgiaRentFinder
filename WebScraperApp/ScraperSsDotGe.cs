@@ -2,81 +2,108 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Xml.Linq;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace WebScraperApp
 {
     public class ScraperSsDotGe
     {
-        public List<Info> GetInfos(string url)
+        public List<RealtyInfo> GetInfos(string url)
         {
-            List<Info> infos = new List<Info>();
+            var infos = new List<RealtyInfo>();
 
-            HtmlWeb web = new HtmlWeb();
+            var web = new HtmlWeb();
 
             var doc = web.Load(url);
 
             for (int i = 0, j = 0; i < 20; j++)
             {
-                var inputTitle = doc.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{j}]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span")?.InnerText;
+                var inputTitle = GetTitle(doc, j);
+
                 if (inputTitle != null)
                 {
-                    var inputCost = doc.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{j}]/div[1]/div[1]/div[2]/div[2]/div[1]/text()")?.InnerText ?? "Zero";
-                    var cost = int.TryParse(inputCost.Replace(" ", ""), out int number) == true ? number : 0;
+                    var inputDescription = GetValidDescriptionForShow(doc, j, 150);
 
-                    var inputDate = doc.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{j}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text()")?.InnerText.Replace(" ", "").Replace("\r\n","") ?? "Zero";
+                    var cost = GetCost(doc, j);
 
-                    var date = DateTime.ParseExact(inputDate, "dd.MM.yyyy/HH:mm", CultureInfo.InvariantCulture);
+                    if (cost == 0 || cost > 351)
+                    {
+                        i++;
+                        continue;
+                    }
 
-                    infos.Add(new Info() { Title = inputTitle, Cost = cost, Data = date });
+                    var date = GetDate(doc, j);
+
+                    infos.Add(new RealtyInfo()
+                    {
+                        Title = inputTitle,
+                        Cost = cost,
+                        Data = date,
+                        Description = inputDescription
+                    });
                     i++;
-                    continue;
                 }
             }
- 
 
             return infos;
         }
 
-        public List<string> GetImages(HtmlDocument doc)
+        public List<string> GetImages(string linkAd)
         {
-            var images = new List<string>();
+            HtmlWeb web = new HtmlWeb();
 
-            var input = doc.DocumentNode.SelectSingleNode("")?.InnerText;
+            var doc = web.Load("https://ss.ge/en/real-estate/3-room-flat-for-sale-saburtalo-6644529"); // link of ad
 
-
-            return images;
+            var imagesUrl = doc.DocumentNode.Descendants("img")
+                .Where(e => e.Attributes["class"]?.Value == "img-responsive")
+                .Select(e => e.GetAttributeValue("src", null))
+                .Where(s => !String.IsNullOrEmpty(s) && !s.Contains("Thumb") && s.Contains("static.ss.ge"))
+                .ToList();
+            return imagesUrl;
         }
-        //////*[@id="list"]/div[5]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/div/div[1]/a - href
-        //1 //*[@id="list"]/div[5]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //////*[@id="list"]/div[5]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span - title
-        //////*[@id="list"]/div[5]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text() - date
-        //
-        //////*[@id="list"]/div[6]/div[1]/div[1]/div[1]/div[1]/div/div[1]/div/div[1]/a/img
-        //2 //*[@id="list"]/div[6]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //////*[@id="list"]/div[6]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span
-        //////*[@id="list"]/div[6]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text() - date
-        //3 //*[@id="list"]/div[7]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //4 //*[@id="list"]/div[10]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //////*[@id="list"]/div[10]/div[1]/div[1]/div[1]/div[1]/div/a/img
-        /// 
-        //5 //*[@id="list"]/div[11]/div[1]/div[1]/div[2]/div[1]/div - по соглашению
-        /// //*[@id="list"]/div[12]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span
-        //6 //*[@id="list"]/div[12]/div[1]/div[1]/div[2]/div[2]/div - по соглашению
-        //7 //*[@id="list"]/div[15]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //8 //*[@id="list"]/div[16]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //9 //*[@id="list"]/div[17]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //10//*[@id="list"]/div[20]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //11//*[@id="list"]/div[21]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //12//*[@id="list"]/div[22]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //13//*[@id="list"]/div[25]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //14//*[@id="list"]/div[26]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //15//*[@id="list"]/div[27]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //16//*[@id="list"]/div[28]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //17//*[@id="list"]/div[29]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //18//*[@id="list"]/div[30]/div[1]/div[1]/div[2]/div[2]/div - по соглашению
-        //19//*[@id="list"]/div[31]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
-        //20//*[@id="list"]/div[32]/div[1]/div[1]/div[2]/div[2]/div[1]/text()
+
+        private string GetTitle(HtmlDocument doc, int number)
+        {
+            return doc.DocumentNode
+                .SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span")
+                ?.InnerText;
+        }
+
+        private string GetValidDescriptionForShow(HtmlDocument doc, int number, int descriptionLength)
+        {
+            var input = doc.DocumentNode
+                .SelectSingleNode(
+                    $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[1]/text()")?.InnerText
+                .Replace("\r\n", "");
+
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return "No description";
+            }
+
+            var removeWhitespace = Regex.Replace(input, @"\s{2,}", " ");
+
+            if (removeWhitespace.Length <= descriptionLength) return removeWhitespace;
+
+            return string.Concat(removeWhitespace.Substring(0, descriptionLength - 3) + "...");
+        }
+
+        private int GetCost(HtmlDocument doc, int number)
+        {
+            var inputCost = doc.DocumentNode.SelectSingleNode(
+                $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[2]/div[2]/div[1]/text()")?.InnerText;
+            return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : 0;
+        }
+
+        private DateTime GetDate(HtmlDocument doc, int number)
+        {
+            var inputDate = doc.DocumentNode.SelectSingleNode(
+                    $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text()")?
+                .InnerText.Replace(" ", "")
+                .Replace("\r\n", "") ?? "Zero";
+
+            return DateTime.ParseExact(inputDate, "dd.MM.yyyy/HH:mm", CultureInfo.InvariantCulture);
+        }
     }
 }
