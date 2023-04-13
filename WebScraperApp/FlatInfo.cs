@@ -1,10 +1,9 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 
 namespace WebScraperApp
 {
-    public class RealtyInfo
+    public class FlatInfo
     {
         public string Title { get; set; }
 
@@ -20,7 +19,7 @@ namespace WebScraperApp
 
         public string AdLink { get; set; }
 
-        public RealtyInfo(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink)
+        public FlatInfo(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink)
         {
             Title = title ?? "No title";
             Cost = cost;
@@ -32,9 +31,9 @@ namespace WebScraperApp
 
         }
 
-        public RealtyInfo GetDefaultAd()
+        public FlatInfo GetDefaultAd()
         {
-            return new RealtyInfo(
+            return new FlatInfo(
                 "No title",
                 default,
                 default,

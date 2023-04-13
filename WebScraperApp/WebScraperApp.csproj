@@ -46,8 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdjaraMunicipallyLinksSsDotGe.cs" />
     <Compile Include="AdScraperSsDotGe.cs" />
-    <Compile Include="RealtyInfo.cs" />
+    <Compile Include="FlatInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
