@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
@@ -11,26 +10,22 @@ namespace WebScraperApp.SsDotGe
     public class AdScraperSsDotGe
     {
         private const int FlatsOnPage = 20;
-        private const int FlatLowestPrice = 70; 
+        private const int FlatLowestPrice = 70;
         private const int FlatHighestPrice = 360;
 
         public List<FlatInfo> ScrapPageWithAllFlats(string url)
         {
             var flats = new List<FlatInfo>();
 
-            var htmlWeb = new HtmlWeb();
-
-            var htmlDocument = htmlWeb.Load(url);
-
-            for (int i = 0, j = 0; i < FlatsOnPage; j++,i++)
+            for (int i = 0, j = 0; i < FlatsOnPage; j++, i++)
             {
-                var flatTitle = GetFlatTitle(htmlDocument, j);
+                var flatTitle = GetFlatTitle(url, j);
 
-                var flatCost = GetFlatCost(htmlDocument, j);
+                var flatCost = GetFlatCost(url, j);
 
                 if (IsFlatValid(flatTitle, flatCost))
                 {
-                    var flatLink = GetFLatLink(htmlDocument, j, url);
+                    var flatLink = GetFLatLink(url, j);
 
                     var flatCreationDate = GetFlatCreationDate(flatLink);
 
@@ -40,8 +35,9 @@ namespace WebScraperApp.SsDotGe
                         flatTitle,
                         flatCost,
                         flatCreationDate,
-                        GetValidDescriptionForShow(htmlDocument, j, 150),
-                        flatOwnerPhoneNumber, GetFirstTenImages(flatLink),
+                        GetValidDescriptionForShow(url, j, 150),
+                        flatOwnerPhoneNumber,
+                        GetFirstTenImages(flatLink),
                         flatLink,
                         10000));// ad views
                 }
@@ -66,9 +62,12 @@ namespace WebScraperApp.SsDotGe
                 ?.InnerText ?? "No number";
         }
 
-        private string GetFLatLink(HtmlDocument document, int number, string url)
+        private string GetFLatLink(string url, int number)
         {
-            HtmlNode nextPage = document.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a");
+            var htmlWeb = new HtmlWeb();
+            var htmlDocument = htmlWeb.Load(url);
+
+            HtmlNode nextPage = htmlDocument.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a");
             var uri = new Uri(url);
             return uri.Scheme + "://" + uri.Authority + nextPage.GetAttributeValue<string>("href", null);
         }
@@ -88,23 +87,29 @@ namespace WebScraperApp.SsDotGe
             return imagesUrl;
         }
 
-        private string GetFlatTitle(HtmlDocument document, int number)
+        private string GetFlatTitle(string url, int number)
         {
-            return document.DocumentNode
+            var htmlWeb = new HtmlWeb();
+            var htmlDocument = htmlWeb.Load(url);
+
+            return htmlDocument.DocumentNode
                 .SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span")
                 ?.InnerText;
         }
 
-        private string GetValidDescriptionForShow(HtmlDocument document, int number, int descriptionLength)
+        private string GetValidDescriptionForShow(string url, int number, int descriptionLength)
         {
-            var input = document.DocumentNode
+            var htmlWeb = new HtmlWeb();
+            var htmlDocument = htmlWeb.Load(url);
+
+            var input = htmlDocument.DocumentNode
                 .SelectSingleNode(
                     $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[1]/text()")?.InnerText
                 .Replace("\r\n", "");
 
             if (string.IsNullOrWhiteSpace(input))
             {
-                input = document.DocumentNode
+                input = htmlDocument.DocumentNode
                     .SelectSingleNode(
                         $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/text()")?.InnerText
                     .Replace("\r\n", "");
@@ -119,20 +124,24 @@ namespace WebScraperApp.SsDotGe
             return string.Concat(removeWhitespace.Substring(0, descriptionLength - 3) + "...");
         }
 
-        private int GetFlatCost(HtmlDocument document, int number)
+        private int GetFlatCost(string url, int number)
         {
-            var inputCost = document.DocumentNode.SelectSingleNode(
+            var htmlWeb = new HtmlWeb();
+            var htmlDocument = htmlWeb.Load(url);
+
+            var inputCost = htmlDocument.DocumentNode.SelectSingleNode(
                 $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[2]/div[2]/div[1]/text()")?.InnerText;
             return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : 0;
         }
 
-        private DateTime GetFlatCreationDate(string flatLink)
+        private DateTime GetFlatCreationDate(string flatLink)// test it
         {
             var htmlWeb = new HtmlWeb();
             var htmlDocument = htmlWeb.Load(flatLink);
             var formatInputDate = "dd.MM.yyyy/HH:mm";
             var maxDateInFormat = "31.12.9999/23:59";
-            var inputDate = htmlDocument.DocumentNode.SelectSingleNode("//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[1]/div[2]/div[2]/text()")?
+            var inputDate = htmlDocument.DocumentNode.SelectSingleNode(
+                    "//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[1]/div[2]/div[2]/text()")?
                 .InnerText.Replace(" ", "")
                 .Replace("\r\n", "") ?? maxDateInFormat;
 
