@@ -19,8 +19,9 @@ namespace WebScraperApp
                                       $"\n\t Cost: {item.Cost}$" +
                                       $"\n\t Date: {item.Date}" +
                                       $"\n\t Description: {item.Description}" +
-                                      $"\n\t AdLink: {item.AdLink}" +
+                                      $"\n\t Link: {item.AdLink}" +
                                       $"\n\t Phone: {item.PhoneNumber}" +
+                                      $"\n\t Views: {item.PageViews}" +
                                       "\n\t");
                 });
             }
@@ -32,12 +33,13 @@ namespace WebScraperApp
                 apartmentPageOne.ForEach(item =>
                 {
                     Console.WriteLine($"{item.Title} " +
-                                                    $"\n\t Cost: {item.Cost}$" +
-                                                    $"\n\t Date: {item.Date}" +
-                                                    $"\n\t Description: {item.Description}" +
-                                                    $"\n\t AdLink: {item.AdLink}" +
-                                                    $"\n\t Phone: {item.PhoneNumber}" +
-                                                    "\n\t");
+                                      $"\n\t Cost: {item.Cost}$" +
+                                      $"\n\t Date: {item.Date}" +
+                                      $"\n\t Description: {item.Description}" +
+                                      $"\n\t Link: {item.AdLink}" +
+                                      $"\n\t Phone: {item.PhoneNumber}" +
+                                      $"\n\t Views: {item.PageViews}" +
+                                      "\n\t");
                 });
             }
 
@@ -51,8 +53,9 @@ namespace WebScraperApp
                                       $"\n\t Cost: {item.Cost}$" +
                                       $"\n\t Date: {item.Date}" +
                                       $"\n\t Description: {item.Description}" +
-                                      $"\n\t AdLink: {item.AdLink}" +
+                                      $"\n\t Link: {item.AdLink}" +
                                       $"\n\t Phone: {item.PhoneNumber}" +
+                                      $"\n\t Views: {item.PageViews}" +
                                       "\n\t");
                 });
             }

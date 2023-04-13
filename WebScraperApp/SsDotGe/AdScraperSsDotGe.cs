@@ -44,7 +44,7 @@ namespace WebScraperApp.SsDotGe
                         flatOwnerPhoneNumber,
                         GetFirstTenImagesFromFlatPage(flatPage),
                         flatLink,
-                        10000));// ad views
+                        GetPageViewsFromFlatPage(flatPage)));
                     i++;
                 }
 
@@ -52,6 +52,15 @@ namespace WebScraperApp.SsDotGe
             }
 
             return flats;
+        }
+
+        private int GetPageViewsFromFlatPage(HtmlDocument flatPage)
+        {
+            var viewsFromPage = flatPage.DocumentNode
+                .SelectSingleNode("//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[1]/div[2]/div[1]/span")
+                ?.InnerText;
+
+            return int.TryParse(viewsFromPage?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
         private HtmlDocument GetHtmlDocumentForPage(string pageUrl)
@@ -127,7 +136,7 @@ namespace WebScraperApp.SsDotGe
         {
             var inputCost = mainPage.DocumentNode.SelectSingleNode(
                 $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[2]/div[2]/div[1]/text()")?.InnerText;
-            return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : 0;
+            return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
         private DateTime GetFlatCreationDateFromFlatPage(HtmlDocument flatPage)
