@@ -19,7 +19,9 @@ namespace WebScraperApp
 
         public string AdLink { get; set; }
 
-        public FlatInfo(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink)
+        public int PageViews { get; set; }
+
+        public FlatInfo(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink, int pageViews)
         {
             Title = title ?? "No title";
             Cost = cost;
@@ -28,19 +30,20 @@ namespace WebScraperApp
             PhoneNumber = phoneNumber ?? "No phone number";
             LinksOfImages = linksOfImage;
             AdLink = adLink ?? "No link";
-
+            PageViews = pageViews;
         }
 
         public FlatInfo GetDefaultAd()
         {
             return new FlatInfo(
                 "No title",
-                default,
-                default,
+                int.MaxValue,
+                DateTime.MaxValue, 
                 "No description",
                 "No phone number",
                 null,
-                "No link");
+                "No link",
+                int.MaxValue);
         }
     }
 }

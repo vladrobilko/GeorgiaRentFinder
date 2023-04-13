@@ -46,8 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdjaraMunicipallyLinksSsDotGe.cs" />
-    <Compile Include="AdScraperSsDotGe.cs" />
+    <Compile Include="SsDotGe\AdjaraMunicipallyLinksSsDotGe.cs" />
+    <Compile Include="SsDotGe\AdScraperSsDotGe.cs" />
     <Compile Include="FlatInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -56,5 +56,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

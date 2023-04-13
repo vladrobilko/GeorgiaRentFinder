@@ -1,4 +1,5 @@
 ﻿using System;
+using WebScraperApp.SsDotGe;
 
 namespace WebScraperApp
 {
