@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
@@ -11,7 +10,9 @@ namespace WebScraperApp.SsDotGe
     public class AdScraperSsDotGe
     {
         private const int FlatsOnPage = 20;
+
         private const int FlatLowestPrice = 70;
+
         private const int FlatHighestPrice = 360;
 
         public List<FlatInfo> ScrapPageWithAllFlats(string url)
@@ -29,29 +30,41 @@ namespace WebScraperApp.SsDotGe
                 if (IsFlatSuit(flatTitle, flatCost))
                 {
                     var flatLink = GetFLatLinkFromMainPage(mainPage, url, j);
-                    
-                    HtmlDocument flatPage = GetHtmlDocumentForPage(flatLink);
 
-                    var flatCreationDate = GetFlatCreationDateFromFlatPage(flatPage);
+                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 150);
 
-                    var flatOwnerPhoneNumber = GetFlatOwnerPhoneNumberFromFlatPage(flatPage);
-
-                    flats.Add(new FlatInfo(
-                        flatTitle,
-                        flatCost,
-                        flatCreationDate,
-                        GetValidDescriptionFromMainPage(mainPage, j, 150),
-                        flatOwnerPhoneNumber,
-                        GetFirstTenImagesFromFlatPage(flatPage),
-                        flatLink,
-                        GetPageViewsFromFlatPage(flatPage)));
+                    flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription));
                     i++;
                 }
 
-                if (flatTitle != null) i++;
+                if (flatTitle != null && !IsFlatSuit(flatTitle, flatCost)) i++;
             }
 
             return flats;
+        }
+
+        private FlatInfo GetFlatPage(string flatLink, string flatTitle, int flatCost, string flatDescription)
+        {
+            HtmlDocument flatPage = GetHtmlDocumentForPage(flatLink);
+
+            var flatCreationDate = GetFlatCreationDateFromFlatPage(flatPage);
+
+            var flatOwnerPhoneNumber = GetFlatOwnerPhoneNumberFromFlatPage(flatPage);
+
+            var firstTenImagesFromFlatPage = GetFirstTenImagesFromFlatPage(flatPage);
+
+            var pageViews = GetPageViewsFromFlatPage(flatPage);
+
+            return new FlatInfo(
+                flatTitle,
+                flatCost,
+                flatCreationDate,
+                flatDescription,
+                flatOwnerPhoneNumber,
+                firstTenImagesFromFlatPage,
+                flatLink,
+                pageViews
+            );
         }
 
         private int GetPageViewsFromFlatPage(HtmlDocument flatPage)
