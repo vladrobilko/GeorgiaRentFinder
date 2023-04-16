@@ -1,6 +1,6 @@
-using Telegram.Bot.Abstract;
+using TelegramBotApi.Abstract;
 
-namespace Telegram.Bot.Services;
+namespace TelegramBotApi.Services;
 
 public class PollingService : PollingServiceBase<ReceiverService>
 {

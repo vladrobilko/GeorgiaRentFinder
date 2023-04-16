@@ -1,6 +1,6 @@
 using Telegram.Bot;
-using Telegram.Bot.Examples.Polling;
-using Telegram.Bot.Services;
+using TelegramBotApi;
+using TelegramBotApi.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>

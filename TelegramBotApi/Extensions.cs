@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace TelegramBotApi;
 
 public static class Extensions
 {

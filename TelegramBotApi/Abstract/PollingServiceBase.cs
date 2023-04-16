@@ -1,4 +1,4 @@
-namespace Telegram.Bot.Abstract;
+namespace TelegramBotApi.Abstract;
 
 public abstract class PollingServiceBase<TReceiverService> : BackgroundService
     where TReceiverService : IReceiverService

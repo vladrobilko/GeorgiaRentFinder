@@ -1,3 +1,4 @@
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -6,7 +7,7 @@ using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace Telegram.Bot.Services;
+namespace TelegramBotApi.Services;
 
 public class UpdateHandler : IUpdateHandler
 {
@@ -21,19 +22,13 @@ public class UpdateHandler : IUpdateHandler
         _configuration = configuration;
     }
 
-    public async Task HandleUpdateAsync(ITelegramBotClient _, Update update, CancellationToken cancellationToken)
+    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        if (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
-            || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"])
+        if (update.Message != null && (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
+                                       || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"]))
         {
             var handler = update switch
             {
-                // UpdateType.Unknown:
-                // UpdateType.ChannelPost:
-                // UpdateType.EditedChannelPost:
-                // UpdateType.ShippingQuery:
-                // UpdateType.PreCheckoutQuery:
-                // UpdateType.Poll:
                 { Message: { } message } => BotOnMessageReceived(message, cancellationToken),
                 { EditedMessage: { } message } => BotOnMessageReceived(message, cancellationToken),
                 { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),
@@ -44,7 +39,9 @@ public class UpdateHandler : IUpdateHandler
 
             await handler;
         }
-        else await _.SendTextMessageAsync(update.Message.Chat.Id, "Sorry, you are not admin to use this bot.");
+        else if (update.Message != null)
+            await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Sorry, you are not admin to use this bot.",
+                cancellationToken: cancellationToken);
     }
 
     private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
@@ -61,7 +58,7 @@ public class UpdateHandler : IUpdateHandler
             "/photo" => SendFile(_botClient, message, cancellationToken),
             "/request" => RequestContactAndLocation(_botClient, message, cancellationToken),
             "/inline_mode" => StartInlineQuery(_botClient, message, cancellationToken),
-            "/throw" => FailingHandler(_botClient, message, cancellationToken),
+            "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
         Message sentMessage = await action;
@@ -151,7 +148,7 @@ public class UpdateHandler : IUpdateHandler
 
         static async Task<Message> RequestContactAndLocation(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
-            ReplyKeyboardMarkup RequestReplyKeyboard = new(
+            ReplyKeyboardMarkup requestReplyKeyboard = new(
                 new[]
                 {
                     KeyboardButton.WithRequestLocation("Location"),
@@ -163,7 +160,7 @@ public class UpdateHandler : IUpdateHandler
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Location and contact",
-                replyMarkup: RequestReplyKeyboard,
+                replyMarkup: requestReplyKeyboard,
                 cancellationToken: cancellationToken);
         }
 
@@ -196,14 +193,10 @@ public class UpdateHandler : IUpdateHandler
                 cancellationToken: cancellationToken);
         }
 
-#pragma warning disable RCS1163 // Unused parameter.
-#pragma warning disable IDE0060 // Remove unused parameter
-        static Task<Message> FailingHandler(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static Task<Message> FailingHandler(Message message, CancellationToken cancellationToken)
         {
             throw new IndexOutOfRangeException();
         }
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore RCS1163 // Unused parameter.
     }
 
     // Process Inline Keyboard callback data
@@ -263,13 +256,13 @@ public class UpdateHandler : IUpdateHandler
 
     public async Task HandlePollingErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
     {
-        var ErrorMessage = exception switch
+        var errorMessage = exception switch
         {
             ApiRequestException apiRequestException => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
             _ => exception.ToString()
         };
 
-        _logger.LogInformation("HandleError: {ErrorMessage}", ErrorMessage);
+        _logger.LogInformation("HandleError: {ErrorMessage}", errorMessage);
 
         // Cooldown in case of network connection error
         if (exception is RequestException)
