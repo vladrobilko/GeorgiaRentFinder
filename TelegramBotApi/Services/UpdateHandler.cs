@@ -56,6 +56,7 @@ public class UpdateHandler : IUpdateHandler
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
+
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
 
@@ -116,13 +117,14 @@ public class UpdateHandler : IUpdateHandler
             throw new IndexOutOfRangeException();
         }
     }
-    
+
 
 
     private bool IsAdmin(Update update)
     {
-        return update.Message != null && (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
-                                          || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"]);
+        return update.Message != null
+               && (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
+                   || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"]);
     }
 
     // Process Inline Keyboard callback data
