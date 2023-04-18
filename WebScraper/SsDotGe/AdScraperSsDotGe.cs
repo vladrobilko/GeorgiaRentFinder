@@ -28,7 +28,7 @@ namespace WebScraper.SsDotGe
                 {
                     var flatLink = GetFLatLinkFromMainPage(mainPage, url, j);
 
-                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 300);
+                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 200);
 
                     flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription));
                     i++;
@@ -60,7 +60,8 @@ namespace WebScraper.SsDotGe
                 flatOwnerPhoneNumber,
                 firstTenImagesFromFlatPage,
                 flatLink,
-                pageViews
+                pageViews,
+                null
             );
         }
 
