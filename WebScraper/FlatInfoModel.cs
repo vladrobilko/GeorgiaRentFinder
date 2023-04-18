@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace WebScraperApp
+﻿namespace WebScraper
 {
-    public class FlatInfo
+    public class FlatInfoModel
     {
         public string Title { get; set; }
 
@@ -21,7 +18,7 @@ namespace WebScraperApp
 
         public int PageViews { get; set; }
 
-        public FlatInfo(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink, int pageViews)
+        public FlatInfoModel(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink, int pageViews)
         {
             Title = title ?? "No title";
             Cost = cost;
@@ -33,9 +30,9 @@ namespace WebScraperApp
             PageViews = pageViews;
         }
 
-        public FlatInfo GetDefaultAd()
+        public FlatInfoModel GetDefaultAd()
         {
-            return new FlatInfo(
+            return new FlatInfoModel(
                 "No title",
                 int.MaxValue,
                 DateTime.MaxValue, 

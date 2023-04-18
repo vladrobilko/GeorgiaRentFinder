@@ -4,8 +4,9 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
+using WebScraper;
+using WebScraper.SsDotGe;
 
 namespace TelegramBotApi.Services;
 
@@ -24,8 +25,7 @@ public class UpdateHandler : IUpdateHandler
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        if (update.Message != null && (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
-                                       || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"]))
+        if (IsAdmin(update))
         {
             var handler = update switch
             {
@@ -39,7 +39,7 @@ public class UpdateHandler : IUpdateHandler
 
             await handler;
         }
-        else if (update.Message != null)
+        else
             await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Sorry, you are not admin to use this bot.",
                 cancellationToken: cancellationToken);
     }
@@ -66,22 +66,36 @@ public class UpdateHandler : IUpdateHandler
                 ChatAction.UploadPhoto,
                 cancellationToken: cancellationToken);
 
-            var photos = new IAlbumInputMedia[]
+            var htmlScraper = new AdScraperSsDotGe();
+            var apartmentPageOne = htmlScraper.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(1));
+
+            var countLinks = apartmentPageOne[0].LinksOfImages.Count;
+
+            var photos = new IAlbumInputMedia[countLinks];
+
+            for (var i = 0; i < countLinks; i++)
             {
-                new InputMediaPhoto("https://static.ss.ge/20230415/10_766bcca2-3243-4733-8db0-70d730be44d8.jpg")
+                if (i == 0)
                 {
-                    Caption = "Is it a good apartment?"
-                },
-                new InputMediaPhoto("https://static.ss.ge/20230415/10_766bcca2-3243-4733-8db0-70d730be44d8.jpg"),
-                new InputMediaPhoto("https://static.ss.ge/20230415/10_766bcca2-3243-4733-8db0-70d730be44d8.jpg"),
-            };
+                    photos[i] = new InputMediaPhoto(apartmentPageOne[0].LinksOfImages[i])
+                    {
+                        Caption = $"Description: {apartmentPageOne[0].Description}\n" +
+                                  $"Phone: {apartmentPageOne[0].PhoneNumber} \n" +
+                                  $"Views: {apartmentPageOne[0].PageViews}\n" +
+                                  $"Cost: {apartmentPageOne[0].Cost}\n" +
+                                  $"Date: {apartmentPageOne[0].Date}\n"
+                    };
+                }
+
+                else photos[i] = new InputMediaPhoto(apartmentPageOne[0].LinksOfImages[i]);
+            }
 
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
                 photos,
                 cancellationToken: cancellationToken);
 
-            return await botClient.SendTextMessageAsync(message.Chat.Id, "It's post description", cancellationToken: cancellationToken);
+            return await botClient.SendTextMessageAsync(message.Chat.Id, "All apartments in list", cancellationToken: cancellationToken);
 
         }
 
@@ -101,6 +115,14 @@ public class UpdateHandler : IUpdateHandler
         {
             throw new IndexOutOfRangeException();
         }
+    }
+    
+
+
+    private bool IsAdmin(Update update)
+    {
+        return update.Message != null && (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
+                                          || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"]);
     }
 
     // Process Inline Keyboard callback data
@@ -170,6 +192,6 @@ public class UpdateHandler : IUpdateHandler
 
         // Cooldown in case of network connection error
         if (exception is RequestException)
-            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            await Task.Delay(TimeSpan.FromSeconds(20), cancellationToken);
     }
 }

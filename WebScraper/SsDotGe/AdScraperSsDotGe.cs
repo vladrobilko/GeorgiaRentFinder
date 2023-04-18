@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
-namespace WebScraperApp.SsDotGe
+namespace WebScraper.SsDotGe
 {
     public class AdScraperSsDotGe
     {
@@ -15,9 +12,9 @@ namespace WebScraperApp.SsDotGe
 
         private const int FlatHighestPrice = 360;
 
-        public List<FlatInfo> ScrapPageWithAllFlats(string url)
+        public List<FlatInfoModel> ScrapPageWithAllFlats(string url)
         {
-            var flats = new List<FlatInfo>();
+            var flats = new List<FlatInfoModel>();
 
             HtmlDocument mainPage = GetHtmlDocumentForPage(url);
 
@@ -31,7 +28,7 @@ namespace WebScraperApp.SsDotGe
                 {
                     var flatLink = GetFLatLinkFromMainPage(mainPage, url, j);
 
-                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 150);
+                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 300);
 
                     flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription));
                     i++;
@@ -43,7 +40,7 @@ namespace WebScraperApp.SsDotGe
             return flats;
         }
 
-        private FlatInfo GetFlatPage(string flatLink, string flatTitle, int flatCost, string flatDescription)
+        private FlatInfoModel GetFlatPage(string flatLink, string flatTitle, int flatCost, string flatDescription)
         {
             HtmlDocument flatPage = GetHtmlDocumentForPage(flatLink);
 
@@ -55,7 +52,7 @@ namespace WebScraperApp.SsDotGe
 
             var pageViews = GetPageViewsFromFlatPage(flatPage);
 
-            return new FlatInfo(
+            return new FlatInfoModel(
                 flatTitle,
                 flatCost,
                 flatCreationDate,

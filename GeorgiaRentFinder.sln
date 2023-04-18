@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraperApp", "WebScraperApp\WebScraperApp.csproj", "{8BF8DDC1-4BDE-4EB6-A757-EB97CE666527}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBotApi", "TelegramBotApi\TelegramBotApi.csproj", "{4A6E7B9E-37E2-4BE0-A9DE-A5EAE19B4191}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebScraper", "WebScraper\WebScraper.csproj", "{31096713-2B03-4230-9D16-22399DB8443C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8BF8DDC1-4BDE-4EB6-A757-EB97CE666527}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8BF8DDC1-4BDE-4EB6-A757-EB97CE666527}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8BF8DDC1-4BDE-4EB6-A757-EB97CE666527}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8BF8DDC1-4BDE-4EB6-A757-EB97CE666527}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4A6E7B9E-37E2-4BE0-A9DE-A5EAE19B4191}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4A6E7B9E-37E2-4BE0-A9DE-A5EAE19B4191}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A6E7B9E-37E2-4BE0-A9DE-A5EAE19B4191}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A6E7B9E-37E2-4BE0-A9DE-A5EAE19B4191}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31096713-2B03-4230-9D16-22399DB8443C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31096713-2B03-4230-9D16-22399DB8443C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31096713-2B03-4230-9D16-22399DB8443C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31096713-2B03-4230-9D16-22399DB8443C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

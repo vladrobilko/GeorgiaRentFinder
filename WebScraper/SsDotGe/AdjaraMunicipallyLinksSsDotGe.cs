@@ -1,4 +1,4 @@
-﻿namespace WebScraperApp
+﻿namespace WebScraper.SsDotGe
 {
     public static class AdjaraMunicipallyLinksSsDotGe
     {
