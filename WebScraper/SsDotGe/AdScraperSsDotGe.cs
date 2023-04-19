@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
+using WebScraper.Models;
 
 namespace WebScraper.SsDotGe
 {
@@ -28,7 +29,7 @@ namespace WebScraper.SsDotGe
                 {
                     var flatLink = GetFLatLinkFromMainPage(mainPage, url, j);
 
-                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 300);
+                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 200);
 
                     flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription));
                     i++;
@@ -57,10 +58,11 @@ namespace WebScraper.SsDotGe
                 flatCost,
                 flatCreationDate,
                 flatDescription,
-                flatOwnerPhoneNumber,
+                new FlatPhoneTracker() { PhoneNumber = flatOwnerPhoneNumber },
                 firstTenImagesFromFlatPage,
                 flatLink,
-                pageViews
+                pageViews,
+                null
             );
         }
 
@@ -86,7 +88,7 @@ namespace WebScraper.SsDotGe
                 .SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span")
                 ?.InnerText;
         }
-        
+
         public bool IsFlatSuit(string flatTitle, int flatCost)
         {
             return flatTitle != null && flatCost > FlatLowestPrice && flatCost < FlatHighestPrice;

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -6,6 +7,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using WebScraper;
+using WebScraper.Models;
 using WebScraper.SsDotGe;
 
 namespace TelegramBotApi.Services;
@@ -67,10 +69,35 @@ public class UpdateHandler : IUpdateHandler
                 ChatAction.UploadPhoto,
                 cancellationToken: cancellationToken);
 
-            var htmlScraper = new AdScraperSsDotGe();
-            var apartmentPageOne = htmlScraper.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(1));
+            //var htmlScraper = new AdScraperSsDotGe();
+            // var apartmentPageOne = htmlScraper.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(1));
+            // make an example for test
 
-            var countLinks = apartmentPageOne[0].LinksOfImages.Count;
+            var images = new List<string>
+            {
+                "https://static.ss.ge/15_661e24c3-fc19-4847-ae52-9c03785ee18b.jpg",
+                "https://static.ss.ge/0_6d6e818b-5f24-4abb-b228-3ee73f878e35.jpg",
+                "https://static.ss.ge/1_9d6570a4-2ca8-49df-87da-5728eb9702f8.jpg",
+                "https://static.ss.ge/13_16f7fe52-2b82-49ea-aa7d-aa06b7bc0404.jpg",
+                "https://static.ss.ge/8_2c22368e-7489-4ec7-a7a7-b815f17d5445.jpg",
+                "https://static.ss.ge/7_5bd8d93e-7dc0-48cc-8755-dcfe7cbbf205.jpg",
+                "https://static.ss.ge/19_fe5efea4-b0c8-4296-8bfd-69c7cd4cb4a3.jpg",
+                "https://static.ss.ge/20210630/1_e2b99903-867d-4b5f-8301-9fde7ae3376e.jpg",
+                "https://static.ss.ge/20210630/13_251f32ee-b5a8-46a5-aea9-fbcb9deb3b22.jpg",
+                "https://static.ss.ge/20210630/16_3e25d727-f39a-42b0-a158-57ad2d52f10d.jpg"
+            };
+
+            var testFlat = new FlatInfoModel("1 room Flat for rent.  Kobulet",
+                300,
+                new DateTime(2023, 11, 12),
+                " For rent in Kobuleti, 100 meters from the sea, on Davit Aghmashenebeli Street, in Pichvnar, a 36 sq.m. isolated studio apartment. with kitchen, furniture and appliances. With 40-inch LED TV, cable channels, wi-fi, air conditioner. With 24-hour security. This price includes utility bills. ",
+           new FlatPhoneTracker(){PhoneNumber = "557 73 72 21", CountMentionsOnSites = 35},
+                images,
+                "https://ss.ge/en/real-estate/1-room-flat-for-rent-kobuleti-3320498",
+                4089,
+                new Coordinate(43.33, 44.77));
+
+            var countLinks = testFlat.LinksOfImages.Count;
 
             var photos = new IAlbumInputMedia[countLinks];
 
@@ -78,17 +105,25 @@ public class UpdateHandler : IUpdateHandler
             {
                 if (i == 0)
                 {
-                    photos[i] = new InputMediaPhoto(apartmentPageOne[0].LinksOfImages[i])
+                    photos[i] = new InputMediaPhoto(testFlat.LinksOfImages[i])
                     {
-                        Caption = $"Description: {apartmentPageOne[0].Description}\n" +
-                                  $"Phone: {apartmentPageOne[0].PhoneNumber} \n" +
-                                  $"Views: {apartmentPageOne[0].PageViews}\n" +
-                                  $"Cost: {apartmentPageOne[0].Cost}\n" +
-                                  $"Date: {apartmentPageOne[0].Date}\n"
+                        Caption = $"{testFlat.Title}\n\n" +
+
+                                  $"<strong>Cost:</strong> {testFlat.Cost} $\n\n" +
+
+                                  $"<strong>Views on site:</strong> {testFlat.ViewsOnSite}\n" +
+                                  $"<strong>Date of public:</strong> {testFlat.Date:dd/MM/yyyy HH:mm}\n" +
+                                  $"<strong>Description:</strong> {testFlat.Description}\n\n" +
+
+                                  $"<strong>Location:</strong><a href=\"https://www.google.com/maps/search/?api=1&query={testFlat.Coordinate.Latitude},{testFlat.Coordinate.Longitude}\"> link</a>\n" +
+                                  $"<strong>Web page:</strong><a href=\"{testFlat.PageLink}\"> link</a>\n" +
+                                  $"<strong>Mobile phone:</strong> {testFlat.FlatPhoneTracker.PhoneNumber}\n\n" +
+                                  $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {testFlat.FlatPhoneTracker.CountMentionsOnSites} times</ins>",
+                        ParseMode = ParseMode.Html
                     };
                 }
 
-                else photos[i] = new InputMediaPhoto(apartmentPageOne[0].LinksOfImages[i]);
+                else photos[i] = new InputMediaPhoto(testFlat.LinksOfImages[i]);
             }
 
             await botClient.SendMediaGroupAsync(
