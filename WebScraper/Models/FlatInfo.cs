@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebScraper
+namespace WebScraper.Models
 {
     public class FlatInfoModel
     {
@@ -14,7 +14,7 @@ namespace WebScraper
 
         public string Description { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public FlatPhoneTracker FlatPhoneTracker { get; set; }
 
         public List<string> LinksOfImages { get; set; }
 
@@ -24,13 +24,13 @@ namespace WebScraper
 
         public Coordinate Coordinate { get; set; }
 
-        public FlatInfoModel(string title, int cost, DateTime date, string description, string phoneNumber, List<string> linksOfImage, string adLink, int viewsOnSite, Coordinate coordinate)
+        public FlatInfoModel(string title, int cost, DateTime date, string description, FlatPhoneTracker flatPhoneTracker, List<string> linksOfImage, string adLink, int viewsOnSite, Coordinate coordinate)
         {
             Title = title;
             Cost = cost;
             Date = date;
             Description = description ?? "No description";
-            PhoneNumber = phoneNumber ?? "No phone number";
+            FlatPhoneTracker = flatPhoneTracker ?? new FlatPhoneTracker() { PhoneNumber = "No phone number", CountMentionsOnSites = 0 };
             LinksOfImages = linksOfImage;
             PageLink = adLink ?? "No link";
             ViewsOnSite = viewsOnSite;
@@ -44,9 +44,9 @@ namespace WebScraper
             return new FlatInfoModel(
                 "Default",
                 int.MaxValue,
-                DateTime.MaxValue, 
+                DateTime.MaxValue,
                 "No description",
-                "No phone number",
+                new FlatPhoneTracker(){PhoneNumber = "No phone number", CountMentionsOnSites = 0},
                 null,
                 "No link",
                 int.MaxValue,

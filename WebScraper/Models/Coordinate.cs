@@ -1,4 +1,4 @@
-﻿namespace WebScraper;
+﻿namespace WebScraper.Models;
 
 public class Coordinate
 {
