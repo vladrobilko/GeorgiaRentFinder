@@ -22,9 +22,9 @@ namespace WebScraper.Models
 
         public int ViewsOnSite { get; set; }
 
-        public Coordinate Coordinate { get; set; }
+        public FlatCoordinate FlatCoordinate { get; set; }
 
-        public FlatInfoModel(string title, int cost, DateTime date, string description, FlatPhoneTracker flatPhoneTracker, List<string> linksOfImage, string adLink, int viewsOnSite, Coordinate coordinate)
+        public FlatInfoModel(string title, int cost, DateTime date, string description, FlatPhoneTracker flatPhoneTracker, List<string> linksOfImage, string adLink, int viewsOnSite, FlatCoordinate flatCoordinate)
         {
             Title = title;
             Cost = cost;
@@ -34,7 +34,7 @@ namespace WebScraper.Models
             LinksOfImages = linksOfImage;
             PageLink = adLink ?? "No link";
             ViewsOnSite = viewsOnSite;
-            Coordinate = coordinate ?? new Coordinate().GetDefaultCoordinate();
+            FlatCoordinate = flatCoordinate ?? new FlatCoordinate().GetDefaultCoordinate();
         }
 
         public FlatInfoModel() { }
@@ -50,7 +50,7 @@ namespace WebScraper.Models
                 null,
                 "No link",
                 int.MaxValue,
-                new Coordinate().GetDefaultCoordinate());
+                new FlatCoordinate().GetDefaultCoordinate());
         }
     }
 }

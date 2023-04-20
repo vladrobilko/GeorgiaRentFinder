@@ -54,7 +54,8 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/post" => SendPost(_botClient, message, cancellationToken),
+            "FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, message, cancellationToken),
+            "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
@@ -62,14 +63,14 @@ public class UpdateHandler : IUpdateHandler
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
 
-        static async Task<Message> SendPost(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
             await botClient.SendChatActionAsync(
                 message.Chat.Id,
                 ChatAction.UploadPhoto,
                 cancellationToken: cancellationToken);
 
-            //var htmlScraper = new AdScraperSsDotGe();
+            //var htmlScraper = new FlatScraperSsDotGe();
             // var apartmentPageOne = htmlScraper.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(1));
             // make an example for test
 
@@ -95,7 +96,7 @@ public class UpdateHandler : IUpdateHandler
                 images,
                 "https://ss.ge/en/real-estate/1-room-flat-for-rent-kobuleti-3320498",
                 4089,
-                new Coordinate(43.33, 44.77));
+                new FlatCoordinate(43.33, 44.77));
 
             var countLinks = testFlat.LinksOfImages.Count;
 
@@ -115,7 +116,7 @@ public class UpdateHandler : IUpdateHandler
                                   $"<strong>Date of public:</strong> {testFlat.Date:dd/MM/yyyy HH:mm}\n" +
                                   $"<strong>Description:</strong> {testFlat.Description}\n\n" +
 
-                                  $"<strong>Location:</strong><a href=\"https://www.google.com/maps/search/?api=1&query={testFlat.Coordinate.Latitude},{testFlat.Coordinate.Longitude}\"> link</a>\n" +
+                                  $"<strong>Location:</strong><a href=\"https://www.google.com/maps/search/?api=1&query={testFlat.FlatCoordinate.Latitude},{testFlat.FlatCoordinate.Longitude}\"> link</a>\n" +
                                   $"<strong>Web page:</strong><a href=\"{testFlat.PageLink}\"> link</a>\n" +
                                   $"<strong>Mobile phone:</strong> {testFlat.FlatPhoneTracker.PhoneNumber}\n\n" +
                                   $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {testFlat.FlatPhoneTracker.CountMentionsOnSites} times</ins>",
@@ -135,10 +136,17 @@ public class UpdateHandler : IUpdateHandler
 
         }
 
+        static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, Message message,
+            CancellationToken cancellationToken)
+        {
+            throw new IndexOutOfRangeException();
+        }
+
         static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
             const string usage = "Usage:\n"
-                                 + "/post";
+                                 + "/FindSuitAdjaraFlats\n" +
+                                    "/GetLastAvailableFlat";
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,

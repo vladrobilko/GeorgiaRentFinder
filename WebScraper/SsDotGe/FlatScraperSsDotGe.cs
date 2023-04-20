@@ -5,7 +5,7 @@ using WebScraper.Models;
 
 namespace WebScraper.SsDotGe
 {
-    public class AdScraperSsDotGe
+    public class FlatScraperSsDotGe
     {
         private const int FlatsOnPage = 20;
 
