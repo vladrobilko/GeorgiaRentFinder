@@ -16,7 +16,7 @@ namespace TelegramBotApi.Services
         public Task StartAsync(CancellationToken cancellationToken)
         {
             var usage = "______________________________________\n" +
-                              $"The bot started at {DateTime.UtcNow:dd/MM/yyyy HH:mm}\n" + 
+                              $"The bot started at {DateTime.Now:dd/MM/yyyy HH:mm}\n" + 
                               "Usage:\n"
                               + "/FindSuitAdjaraFlats\n" +
                               "/GetLastAvailableFlat";
