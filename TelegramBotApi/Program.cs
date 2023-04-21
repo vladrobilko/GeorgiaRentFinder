@@ -1,5 +1,5 @@
 using Telegram.Bot;
-using TelegramBotApi;
+using TelegramBotApi.Models;
 using TelegramBotApi.Services;
 
 IHost host = Host.CreateDefaultBuilder(args)
