@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using DataManagement.Models;
+using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -19,7 +20,7 @@ public class UpdateHandler : IUpdateHandler
                          + "/FindSuitAdjaraFlats\n" +
                          "/GetLastAvailableFlat";
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, RentfinderdbContext asdf)
     {
         _botClient = botClient;
         _logger = logger;

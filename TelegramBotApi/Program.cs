@@ -1,3 +1,5 @@
+using DataManagement.Models;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using TelegramBotApi.Models;
 using TelegramBotApi.Services;
@@ -20,6 +22,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<ReceiverService>();
         services.AddHostedService<PollingService>();
         services.AddHostedService<BotStartService>();
+        services.AddDbContext<RentfinderdbContext>(options =>
+        options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));
     })
     .Build();
 

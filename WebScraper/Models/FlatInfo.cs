@@ -10,10 +10,12 @@ namespace WebScraper.Models
         [Required]
         public int Cost { get; set; }
 
+        [Required]
         public DateTime SitePublication { get; set; }
 
         public string Description { get; set; }
 
+        [Required]
         public string PhoneNumber { get; set; }
 
         public List<string> LinksOfImages { get; set; }
