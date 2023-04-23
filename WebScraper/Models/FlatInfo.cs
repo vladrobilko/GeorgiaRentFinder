@@ -10,11 +10,11 @@ namespace WebScraper.Models
         [Required]
         public int Cost { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime SitePublication { get; set; }
 
         public string Description { get; set; }
 
-        public FlatPhoneTracker FlatPhoneTracker { get; set; }
+        public string PhoneNumber { get; set; }
 
         public List<string> LinksOfImages { get; set; }
 
@@ -24,33 +24,19 @@ namespace WebScraper.Models
 
         public FlatCoordinate FlatCoordinate { get; set; }
 
-        public FlatInfoModel(string title, int cost, DateTime date, string description, FlatPhoneTracker flatPhoneTracker, List<string> linksOfImage, string adLink, int viewsOnSite, FlatCoordinate flatCoordinate)
+        public FlatInfoModel(string title, int cost, DateTime sitePublication, string description, string phoneNumber, List<string> linksOfImage, string adLink, int viewsOnSite, FlatCoordinate flatCoordinate)
         {
             Title = title;
             Cost = cost;
-            Date = date;
-            Description = description ?? "No description";
-            FlatPhoneTracker = flatPhoneTracker ?? new FlatPhoneTracker() { PhoneNumber = "No phone number", CountMentionsOnSites = 0 };
+            SitePublication = sitePublication;
+            Description = description;
+            PhoneNumber = phoneNumber;
             LinksOfImages = linksOfImage;
-            PageLink = adLink ?? "No link";
+            PageLink = adLink;
             ViewsOnSite = viewsOnSite;
-            FlatCoordinate = flatCoordinate ?? new FlatCoordinate().GetDefaultCoordinate();
+            FlatCoordinate = flatCoordinate;
         }
 
         public FlatInfoModel() { }
-
-        public FlatInfoModel GetDefaultFlatInfoModel()
-        {
-            return new FlatInfoModel(
-                "Default",
-                int.MaxValue,
-                DateTime.MaxValue,
-                "No description",
-                new FlatPhoneTracker(){PhoneNumber = "No phone number", CountMentionsOnSites = 0},
-                null,
-                "No link",
-                int.MaxValue,
-                new FlatCoordinate().GetDefaultCoordinate());
-        }
     }
 }

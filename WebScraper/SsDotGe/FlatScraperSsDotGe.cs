@@ -58,7 +58,7 @@ namespace WebScraper.SsDotGe
                 flatCost,
                 flatCreationDate,
                 flatDescription,
-                new FlatPhoneTracker() { PhoneNumber = flatOwnerPhoneNumber },
+                flatOwnerPhoneNumber,
                 firstTenImagesFromFlatPage,
                 flatLink,
                 pageViews,

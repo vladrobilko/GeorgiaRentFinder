@@ -13,7 +13,7 @@ namespace WebScraper.Converters
                 300,
                 new DateTime(2023, 11, 12),
                 " For rent in Kobuleti, 100 meters from the sea, on Davit Aghmashenebeli Street, in Pichvnar, a 36 sq.m. isolated studio apartment. with kitchen, furniture and appliances. With 40-inch LED TV, cable channels, wi-fi, air conditioner. With 24-hour security. This price includes utility bills. ",
-                new FlatPhoneTracker() { PhoneNumber = "557 73 72 21", CountMentionsOnSites = 35 },
+               "557 73 72 21",
                 images,
                 "https://ss.ge/en/real-estate/1-room-flat-for-rent-kobuleti-3320498",
                 4089,
@@ -25,13 +25,13 @@ namespace WebScraper.Converters
                           $"<strong>Cost:</strong> {testFlat.Cost} $\n\n" +
 
                           $"<strong>Views on site:</strong> {testFlat.ViewsOnSite}\n" +
-                          $"<strong>Date of public:</strong> {testFlat.Date:dd/MM/yyyy HH:mm}\n" +
+                          $"<strong>SitePublication of public:</strong> {testFlat.SitePublication}\n" +
                           $"<strong>Description:</strong> {testFlat.Description}\n\n" +
 
                           $"<strong>Location:</strong><a href=\"https://www.google.com/maps/search/?api=1&query={testFlat.FlatCoordinate.Latitude},{testFlat.FlatCoordinate.Longitude}\"> link</a>\n" +
                           $"<strong>Web page:</strong><a href=\"{testFlat.PageLink}\"> link</a>\n" +
-                          $"<strong>Mobile phone:</strong> {testFlat.FlatPhoneTracker.PhoneNumber}\n\n" +
-                          $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {testFlat.FlatPhoneTracker.CountMentionsOnSites} times</ins>";
+                          $"<strong>Mobile phone:</strong> {testFlat.PhoneNumber}\n\n" +
+                          $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {30} times</ins>";
 
             return caption;
         }
