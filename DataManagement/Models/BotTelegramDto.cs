@@ -11,7 +11,7 @@ public partial class BotTelegramDto
 
     public string? Name { get; set; }
 
-    public virtual ICollection<BotAdminDto> BotAdminDtos { get; set; } = new List<BotAdminDto>();
+    public virtual ICollection<BotAdminDto> BotAdminsDto { get; set; } = new List<BotAdminDto>();
 
-    public virtual ICollection<ChannelInfoDto> ChannelInfoDtos { get; set; } = new List<ChannelInfoDto>();
+    public virtual ICollection<ChannelInfoDto> ChannelInfosDto { get; set; } = new List<ChannelInfoDto>();
 }

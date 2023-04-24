@@ -4,32 +4,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataManagement.Models;
 
-public partial class RentfinderdbContext : DbContext
+public partial class RentFinderDbContext : DbContext
 {
-    public RentfinderdbContext()
+    public RentFinderDbContext()
     {
     }
 
-    public RentfinderdbContext(DbContextOptions<RentfinderdbContext> options)
+    public RentFinderDbContext(DbContextOptions<RentFinderDbContext> options)
         : base(options)
     {
     }
 
-    public virtual DbSet<BotAdminDto> BotAdminDtos { get; set; }
+    public virtual DbSet<BotAdminDto> BotAdminsDto { get; set; }
 
-    public virtual DbSet<BotTelegramDto> BotTelegramDtos { get; set; }
+    public virtual DbSet<BotTelegramDto> BotTelegramsDto { get; set; }
 
-    public virtual DbSet<ChannelInfoDto> ChannelInfoDtos { get; set; }
+    public virtual DbSet<ChannelInfoDto> ChannelInfosDto { get; set; }
 
-    public virtual DbSet<FlatCoordinateDto> FlatCoordinateDtos { get; set; }
+    public virtual DbSet<FlatCoordinateDto> FlatCoordinatesDto { get; set; }
 
-    public virtual DbSet<FlatDateInfoDto> FlatDateInfoDtos { get; set; }
+    public virtual DbSet<FlatDateInfoDto> FlatDateInfosDto { get; set; }
 
-    public virtual DbSet<FlatInfoDto> FlatInfoDtos { get; set; }
+    public virtual DbSet<FlatInfoDto> FlatInfosDto { get; set; }
 
     public virtual DbSet<FlatLinkImage> FlatLinkImages { get; set; }
 
-    public virtual DbSet<FlatPhoneDto> FlatPhoneDtos { get; set; }
+    public virtual DbSet<FlatPhoneDto> FlatPhonesDto { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,7 +43,7 @@ public partial class RentfinderdbContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("id");
 
-            entity.HasOne(d => d.BotTelegram).WithMany(p => p.BotAdminDtos)
+            entity.HasOne(d => d.BotTelegram).WithMany(p => p.BotAdminsDto)
                 .HasForeignKey(d => d.BotTelegramId)
                 .HasConstraintName("botadmindto_bottelegramid_foreign");
         });
@@ -65,7 +65,7 @@ public partial class RentfinderdbContext : DbContext
 
             entity.Property(e => e.Id).ValueGeneratedNever();
 
-            entity.HasOne(d => d.BotTelegram).WithMany(p => p.ChannelInfoDtos)
+            entity.HasOne(d => d.BotTelegram).WithMany(p => p.ChannelInfosDto)
                 .HasForeignKey(d => d.BotTelegramId)
                 .HasConstraintName("channelinfodto_bottelegramid_foreign");
         });
@@ -98,7 +98,7 @@ public partial class RentfinderdbContext : DbContext
             entity.Property(e => e.AdditionalInformation).HasColumnType("json");
             entity.Property(e => e.ViewsOnSite).HasColumnName("ViewsOnSIte");
 
-            entity.HasOne(d => d.FlatPhone).WithMany(p => p.FlatInfoDtos)
+            entity.HasOne(d => d.FlatPhone).WithMany(p => p.FlatsInfoDto)
                 .HasForeignKey(d => d.FlatPhoneId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flatinfodto_flatphoneid_foreign");

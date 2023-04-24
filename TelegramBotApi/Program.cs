@@ -22,7 +22,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<ReceiverService>();
         services.AddHostedService<PollingService>();
         services.AddHostedService<BotStartService>();
-        services.AddDbContext<RentfinderdbContext>(options =>
+        services.AddDbContext<RentFinderDbContext>(options =>
         options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));
     })
     .Build();

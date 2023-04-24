@@ -20,7 +20,7 @@ public class UpdateHandler : IUpdateHandler
                          + "/FindSuitAdjaraFlats\n" +
                          "/GetLastAvailableFlat";
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, RentfinderdbContext asdf)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, RentFinderDbContext asdf)
     {
         _botClient = botClient;
         _logger = logger;
