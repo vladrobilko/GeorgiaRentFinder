@@ -1,4 +1,8 @@
+using Application.Interfaces;
+using Application.Interfaces.Repository;
+using Application.Services;
 using DataManagement.Models;
+using DataManagement.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using TelegramBotApi.Models;
@@ -22,9 +26,15 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<ReceiverService>();
         services.AddHostedService<PollingService>();
         services.AddHostedService<BotStartService>();
+
+        services.AddScoped<IFlatService, FlatService>();
+        services.AddScoped<IFlatRepository, FlatRepository>();
+        services.AddScoped<IChannelInfoRepository, ChannelInfoRepository>();
+
         services.AddDbContext<RentFinderDbContext>(options =>
         options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));
     })
     .Build();
+
 
 await host.RunAsync();

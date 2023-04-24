@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DataManagement.Models;
+﻿namespace DataManagement.Models;
 
 public partial class ChannelInfoDto
 {
@@ -11,7 +8,7 @@ public partial class ChannelInfoDto
 
     public string? ChannelName { get; set; }
 
-    public DateOnly? LastCheckDate { get; set; }
+    public DateTime LastCheckDate { get; set; }
 
     public virtual BotTelegramDto? BotTelegram { get; set; }
 }

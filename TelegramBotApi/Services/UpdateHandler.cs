@@ -1,4 +1,6 @@
-﻿using DataManagement.Models;
+﻿using Application.Interfaces;
+using Application.Services;
+using DataManagement.Models;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -16,15 +18,17 @@ public class UpdateHandler : IUpdateHandler
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _configuration;
+    private readonly IFlatService _flatService;
     private const string AppUsage = "AppUsage:\n"
                          + "/FindSuitAdjaraFlats\n" +
                          "/GetLastAvailableFlat";
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, RentFinderDbContext asdf)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatService flatService)
     {
         _botClient = botClient;
         _logger = logger;
         _configuration = configuration;
+        _flatService = flatService;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -56,7 +60,7 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, message, cancellationToken),
+            "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
@@ -120,9 +124,16 @@ public class UpdateHandler : IUpdateHandler
 
         }
 
-        static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
+            IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            throw new IndexOutOfRangeException();
+            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("BotConfiguration")["ChannelId"]));
+
+            return await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: AppUsage,
+                replyMarkup: new ReplyKeyboardRemove(),
+                cancellationToken: cancellationToken);
         }
 
         static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
@@ -139,8 +150,6 @@ public class UpdateHandler : IUpdateHandler
             throw new IndexOutOfRangeException();
         }
     }
-
-
 
     private bool IsAdmin(Update update)
     {

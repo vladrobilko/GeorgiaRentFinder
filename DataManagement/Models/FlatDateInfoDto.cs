@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DataManagement.Models;
+﻿namespace DataManagement.Models;
 
 public partial class FlatDateInfoDto
 {
     public long FlatInfoId { get; set; }
 
-    public DateOnly SitePublication { get; set; }
+    public DateTime SitePublication { get; set; }
 
-    public DateOnly? TelegramPublication { get; set; }
+    public DateTime? TelegramPublication { get; set; }
 
-    public DateOnly? RefusePublication { get; set; }
+    public DateTime? RefusePublication { get; set; }
 
     public virtual FlatInfoDto? FlatInfoDto { get; set; }
 }

@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Interfaces.Repository;
+using DataManagement.Models;
 
 namespace DataManagement.Repositories
 {
-    public class FlatRepository
+    public class FlatRepository : IFlatRepository
     {
-        private readonly F
+        private readonly RentFinderDbContext _context;
+
+        public FlatRepository(RentFinderDbContext context)
+        {
+            _context = context;
+        }
+        
+        public void CreateFlat()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
