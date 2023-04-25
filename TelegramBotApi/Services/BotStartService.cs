@@ -20,7 +20,7 @@ namespace TelegramBotApi.Services
                               $"The bot started at {DateTime.Now.ToCommonViewString()}\n" + 
                               "Usage:\n"
                               + "/FindSuitAdjaraFlats\n" +
-                              "/GetLastAvailableFlat";
+                              "/GetLastAvailableAdjaraFlat";
 
             return _botClient.SendTextMessageAsync(
                 chatId: _configuration.GetSection("BotConfiguration")["BotId"],

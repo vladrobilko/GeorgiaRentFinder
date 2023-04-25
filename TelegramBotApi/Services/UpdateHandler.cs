@@ -1,6 +1,4 @@
 ﻿using Application.Interfaces;
-using Application.Services;
-using DataManagement.Models;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -21,7 +19,7 @@ public class UpdateHandler : IUpdateHandler
     private readonly IFlatService _flatService;
     private const string AppUsage = "AppUsage:\n"
                          + "/FindSuitAdjaraFlats\n" +
-                         "/GetLastAvailableFlat";
+                         "/GetLastAvailableAdjaraFlat";
 
     public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatService flatService)
     {
@@ -61,15 +59,15 @@ public class UpdateHandler : IUpdateHandler
         var action = messageText.Split(' ')[0] switch
         {
             "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, message, cancellationToken),
+            "/GetLastAvailableAdjaraFlat" => GetLastAvailableAdjaraFlat(_botClient, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
 
         Message sentMessage = await action;
-        _logger.LogInformation("The message was sent with id: {SentMessageId}", sentMessage.MessageId);
+        _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
 
-        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static async Task<Message> GetLastAvailableAdjaraFlat(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
             //test flat
             var images = new List<string>

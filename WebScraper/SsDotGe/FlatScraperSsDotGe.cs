@@ -13,7 +13,7 @@ namespace WebScraper.SsDotGe
 
         private const int FlatHighestPrice = 360;
 
-        public List<FlatInfoModel> ScrapPageWithAllFlats(string url)
+        public List<FlatInfoModel> ScrapPageWithAllFlats(string url, DateTime lastCheckDate)
         {
             var flats = new List<FlatInfoModel>();
 
@@ -21,6 +21,15 @@ namespace WebScraper.SsDotGe
 
             for (int i = 0, j = 0; i < FlatsOnPage; j++)
             {
+                if (j > FlatsOnPage * 2) break;
+
+                var flatCreationDate = GetFlatCreationDateFromFlatPage(mainPage, j);
+
+                if (flatCreationDate < lastCheckDate)
+                {
+                    break;
+                }
+
                 var flatTitle = GetFlatTitleFromMainPage(mainPage, j);
 
                 var flatCost = GetFlatCostFromMainPage(mainPage, j);
@@ -31,7 +40,7 @@ namespace WebScraper.SsDotGe
 
                     var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 200);
 
-                    flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription));
+                    flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription, flatCreationDate));
                     i++;
                 }
 
@@ -41,11 +50,9 @@ namespace WebScraper.SsDotGe
             return flats;
         }
 
-        private FlatInfoModel GetFlatPage(string flatLink, string flatTitle, int flatCost, string flatDescription)
+        private FlatInfoModel GetFlatPage(string flatLink, string flatTitle, int flatCost, string flatDescription, DateTime flatCreationDate)
         {
             HtmlDocument flatPage = GetHtmlDocumentForPage(flatLink);
-
-            var flatCreationDate = GetFlatCreationDateFromFlatPage(flatPage);
 
             var flatOwnerPhoneNumber = GetFlatOwnerPhoneNumberFromFlatPage(flatPage);
 
@@ -89,7 +96,7 @@ namespace WebScraper.SsDotGe
                 ?.InnerText;
         }
 
-        public bool IsFlatSuit(string flatTitle, int flatCost)
+        private bool IsFlatSuit(string flatTitle, int flatCost)
         {
             return flatTitle != null && flatCost > FlatLowestPrice && flatCost < FlatHighestPrice;
         }
@@ -151,15 +158,15 @@ namespace WebScraper.SsDotGe
             return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
-        private DateTime GetFlatCreationDateFromFlatPage(HtmlDocument flatPage)
+        private DateTime GetFlatCreationDateFromFlatPage(HtmlDocument page, int number)
         {
             var formatInputDate = "dd.MM.yyyy/HH:mm";
-            var maxDateInFormat = "31.12.9999/23:59";
-            var inputDate = flatPage.DocumentNode.SelectSingleNode(
-                    "//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[1]/div[2]/div[2]/text()")?
+            var maxDateInFormat = DateTime.MinValue.ToString(formatInputDate);
+            var inputDate = page.DocumentNode.SelectSingleNode(
+                    $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text()")?
                 .InnerText.Replace(" ", "")
                 .Replace("\r\n", "") ?? maxDateInFormat;
-
+            
             return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
         }
     }

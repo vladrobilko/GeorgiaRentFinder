@@ -29,6 +29,10 @@ public partial class RentFinderDbContext : DbContext
 
     public virtual DbSet<FlatPhoneDto> FlatPhonesDto { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=rentfinderdb;Username=postgres;Password=Password7349");
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BotAdminDto>(entity =>
@@ -39,7 +43,7 @@ public partial class RentFinderDbContext : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("Id");
 
             entity.HasOne(d => d.BotTelegram).WithMany(p => p.BotAdminsDto)
                 .HasForeignKey(d => d.BotTelegramId)
@@ -92,7 +96,7 @@ public partial class RentFinderDbContext : DbContext
 
             entity.ToTable("FlatInfoDto");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
             entity.Property(e => e.AdditionalInformation).HasColumnType("json");
             entity.Property(e => e.ViewsOnSite).HasColumnName("ViewsOnSIte");
 
@@ -113,7 +117,7 @@ public partial class RentFinderDbContext : DbContext
 
             entity.ToTable("FlatLinkImage");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
 
             entity.HasOne(d => d.FlatInfo).WithMany(p => p.FlatLinkImages)
                 .HasForeignKey(d => d.FlatInfoId)
@@ -128,7 +132,7 @@ public partial class RentFinderDbContext : DbContext
 
             entity.HasIndex(e => e.Number, "flatphonedto_number_unique").IsUnique();
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
         });
 
         OnModelCreatingPartial(modelBuilder);
