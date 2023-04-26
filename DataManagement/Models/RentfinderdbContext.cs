@@ -31,7 +31,6 @@ public partial class RentFinderDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=rentfinderdb;Username=postgres;Password=Password7349");
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
