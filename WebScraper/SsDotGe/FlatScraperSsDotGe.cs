@@ -158,11 +158,18 @@ namespace WebScraper.SsDotGe
         private DateTime GetFlatCreationDateFromFlatPage(HtmlDocument page, int number)
         {
             var formatInputDate = "dd.MM.yyyy/HH:mm";
-            var maxDateInFormat = DateTime.MinValue.ToString(formatInputDate);
+            var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
             var inputDate = page.DocumentNode.SelectSingleNode(
                     $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text()")?
                 .InnerText.Replace(" ", "")
-                .Replace("\r\n", "") ?? maxDateInFormat;
+                .Replace("\r\n", "");
+            if (inputDate == null)
+            {
+                inputDate = page.DocumentNode.SelectSingleNode(
+                        $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div/div[1]/text()")?
+                    .InnerText.Replace(" ", "")
+                    .Replace("\r\n", "") ?? minDateInFormat;
+            }
 
             return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
         }
