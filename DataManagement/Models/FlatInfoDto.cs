@@ -1,12 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace DataManagement.Models;
+﻿namespace DataManagement.Models;
 
 public partial class FlatInfoDto
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public long Id { get; set; }
 
     public string Title { get; set; } = null!;
@@ -23,9 +18,11 @@ public partial class FlatInfoDto
 
     public string? AdditionalInformation { get; set; }
 
+    public virtual ICollection<FlatCoordinateDto> FlatCoordinateDtos { get; set; } = new List<FlatCoordinateDto>();
+
+    public virtual ICollection<FlatDateInfoDto> FlatDateInfoDtos { get; set; } = new List<FlatDateInfoDto>();
+
     public virtual ICollection<FlatLinkImage> FlatLinkImages { get; set; } = new List<FlatLinkImage>();
 
     public virtual FlatPhoneDto FlatPhone { get; set; } = null!;
-
-    public virtual FlatDateInfoDto IdNavigation { get; set; } = null!;
 }

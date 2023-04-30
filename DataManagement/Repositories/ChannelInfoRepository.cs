@@ -12,9 +12,18 @@ namespace DataManagement.Repositories
             _context = context;
         }
 
-        public DateTime GetLastCheckDate(long channelId)
+        public DateTime ReadLastCheckDate(long channelId)
         {
             return _context.ChannelInfosDto.Single(c => c.Id == channelId).LastCheckDate;
+        }
+
+        public void UpdateLastCheckDate(long channelId, DateTime lastCheckDate)
+        {
+            var channelInfo = _context.ChannelInfosDto.Single(c => c.Id == channelId);
+
+            channelInfo.LastCheckDate = lastCheckDate;
+
+            _context.SaveChanges();
         }
     }
 }

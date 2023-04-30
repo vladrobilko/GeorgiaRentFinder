@@ -25,10 +25,7 @@ namespace WebScraper.SsDotGe
 
                 var flatCreationDate = GetFlatCreationDateFromFlatPage(mainPage, j);
 
-                if (flatCreationDate < lastCheckDate)
-                {
-                    break;
-                }
+                if (flatCreationDate < lastCheckDate) break;
 
                 var flatTitle = GetFlatTitleFromMainPage(mainPage, j);
 
@@ -69,7 +66,7 @@ namespace WebScraper.SsDotGe
                 firstTenImagesFromFlatPage,
                 flatLink,
                 pageViews,
-                null
+                new FlatCoordinate().GetDefaultCoordinate()
             );
         }
 
@@ -166,7 +163,7 @@ namespace WebScraper.SsDotGe
                     $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[2]/div/div[1]/text()")?
                 .InnerText.Replace(" ", "")
                 .Replace("\r\n", "") ?? maxDateInFormat;
-            
+
             return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
         }
     }

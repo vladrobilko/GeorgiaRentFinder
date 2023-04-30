@@ -1,4 +1,7 @@
-﻿namespace DataManagement.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace DataManagement.Models;
 
 public partial class BotAdminDto
 {

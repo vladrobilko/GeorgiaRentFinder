@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /TelegramBotApi/appsettings.json
 /TelegramBotApi/appsettings.Development.json
+/DataManagement/Models/RentfinderdbContext.cs

@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Repository;
-using System.Collections.Generic;
 using WebScraper.Models;
 using WebScraper.SsDotGe;
 
@@ -22,26 +21,27 @@ namespace Application.Services
 
         public void FindAndSaveSuitAdjaraFlats(long channelId)
         {
-            var lastCheckDate = _channelInfoRepository.GetLastCheckDate(channelId);
+            var lastCheckDate = _channelInfoRepository.ReadLastCheckDate(channelId);
 
-            var result = new List<FlatInfoModel>();
+            var newAdjaraFlats = new List<FlatInfoModel>();
 
-            for (int i = 1; i < 2; i++)
+            var countPagesForScrap = 10;
+
+            for (var i = 1; i < countPagesForScrap; i++)
             {
-                var batumi = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetBatumiLink(i), lastCheckDate);
-                result.AddRange(batumi);
+                var batumiFlats = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetBatumiLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(batumiFlats);
 
-                var kobuleti = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(i), lastCheckDate);
-                result.AddRange(kobuleti);
+                var kobuletiFlats = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(kobuletiFlats);
 
-                var khelvachauri = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKhelvachauriLink(i), lastCheckDate);
-                result.AddRange(khelvachauri);
+                var khelvachauriFlats = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKhelvachauriLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(khelvachauriFlats);
             }
 
-            _flatRepository.CreateFlats(result);
-
-            //renew time
-
+            _flatRepository.CreateFlats(newAdjaraFlats);
+            
+            _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.UtcNow);
         }
     }
 }

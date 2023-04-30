@@ -1,7 +1,12 @@
-﻿namespace DataManagement.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace DataManagement.Models;
 
 public partial class FlatDateInfoDto
 {
+    public long Id { get; set; }
+
     public long FlatInfoId { get; set; }
 
     public DateTime SitePublication { get; set; }
@@ -10,5 +15,5 @@ public partial class FlatDateInfoDto
 
     public DateTime? RefusePublication { get; set; }
 
-    public virtual FlatInfoDto? FlatInfoDto { get; set; }
+    public virtual FlatInfoDto FlatInfo { get; set; } = null!;
 }

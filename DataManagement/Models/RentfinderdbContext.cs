@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataManagement.Models;
 
@@ -25,14 +27,14 @@ public partial class RentFinderDbContext : DbContext
 
     public virtual DbSet<FlatInfoDto> FlatInfosDto { get; set; }
 
-    public virtual DbSet<FlatLinkImage> FlatLinkImages { get; set; }
+    public virtual DbSet<FlatLinkImage> FlatLinksImage { get; set; }
 
     public virtual DbSet<FlatPhoneDto> FlatPhonesDto { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=rentfinderdb;Username=postgres;Password=Password7349");
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BotAdminDto>(entity =>
@@ -43,7 +45,7 @@ public partial class RentFinderDbContext : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("Id");
+                .HasColumnName("id");
 
             entity.HasOne(d => d.BotTelegram).WithMany(p => p.BotAdminsDto)
                 .HasForeignKey(d => d.BotTelegramId)
@@ -74,20 +76,30 @@ public partial class RentFinderDbContext : DbContext
 
         modelBuilder.Entity<FlatCoordinateDto>(entity =>
         {
-            entity.HasKey(e => e.FlatInfoId).HasName("FlatCoordinateDto_pkey");
+            entity.HasKey(e => e.Id).HasName("FlatCoordinateDto_pkey");
 
             entity.ToTable("FlatCoordinateDto");
 
-            entity.Property(e => e.FlatInfoId).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+            entity.HasOne(d => d.FlatInfo).WithMany(p => p.FlatCoordinateDtos)
+                .HasForeignKey(d => d.FlatInfoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("flatcoordinatedto_flatinfoid_foreign");
         });
 
         modelBuilder.Entity<FlatDateInfoDto>(entity =>
         {
-            entity.HasKey(e => e.FlatInfoId).HasName("FlatDateInfoDto_pkey");
+            entity.HasKey(e => e.Id).HasName("FlatDateInfoDto_pkey");
 
             entity.ToTable("FlatDateInfoDto");
 
-            entity.Property(e => e.FlatInfoId).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+            entity.HasOne(d => d.FlatInfo).WithMany(p => p.FlatDateInfoDtos)
+                .HasForeignKey(d => d.FlatInfoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("flatdateinfodto_flatinfoid_foreign");
         });
 
         modelBuilder.Entity<FlatInfoDto>(entity =>
@@ -100,15 +112,10 @@ public partial class RentFinderDbContext : DbContext
             entity.Property(e => e.AdditionalInformation).HasColumnType("json");
             entity.Property(e => e.ViewsOnSite).HasColumnName("ViewsOnSIte");
 
-            entity.HasOne(d => d.FlatPhone).WithMany(p => p.FlatsInfoDto)
+            entity.HasOne(d => d.FlatPhone).WithMany(p => p.FlatInfoDtos)
                 .HasForeignKey(d => d.FlatPhoneId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("flatinfodto_flatphoneid_foreign");
-
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.FlatInfoDto)
-                .HasForeignKey<FlatInfoDto>(d => d.Id)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("flatinfodto_id_foreign");
         });
 
         modelBuilder.Entity<FlatLinkImage>(entity =>

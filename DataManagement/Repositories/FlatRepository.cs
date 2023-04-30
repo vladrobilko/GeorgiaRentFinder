@@ -23,46 +23,46 @@ namespace DataManagement.Repositories
 
         private void CreateFlat(FlatInfoModel flatInfoModel)
         {
+            var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flatInfoModel.PhoneNumber);
 
+            var flatInfoId = CreateFlatInfoAndGetHisId(flatInfoModel, phoneId);
+
+            CreateFlatImages(flatInfoModel.LinksOfImages, flatInfoId);
+
+            _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
+            { FlatInfoId = flatInfoId, SitePublication = flatInfoModel.SitePublication.ToUniversalTime() });
+            _context.SaveChanges();
+        }
+
+        private long CreateFlatInfoAndGetHisId(FlatInfoModel flatInfoModel, long phoneId)
+        {
             var flatDto = new FlatInfoDto()
             {
-                Id = default,
                 Title = flatInfoModel.Title,
                 Cost = flatInfoModel.Cost,
                 Description = flatInfoModel.Description,
                 ViewsOnSite = flatInfoModel.ViewsOnSite,
-                FlatPhoneId = 1
+                PageLink = flatInfoModel.PageLink,
+                FlatPhoneId = phoneId
             };
 
             _context.FlatInfosDto.Add(flatDto);
             _context.SaveChanges();
 
-            CreateOrUpgradePhoneNumber(flatInfoModel.PhoneNumber);
-
-            var phoneId = _context.FlatPhonesDto.Single(p => p.Number == flatInfoModel.PhoneNumber).Id;
-
-            //var flatId = flatDto.Id;
-
-            //CreateFlatImages(flatInfoModel.LinksOfImages, flatId);
-            
-           // _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
-               // { FlatInfoId = flatId, SitePublication = flatInfoModel.SitePublication });
-            //_context.SaveChanges();
-
+            return flatDto.Id;
         }
-
 
 
         private void CreateFlatImages(List<string> imageLinks, long flatId)
         {
             imageLinks.ForEach(link =>
             {
-                _context.FlatLinkImages.Add(new FlatLinkImage() { FlatInfoId = flatId, Link = link });
+                _context.FlatLinksImage.Add(new FlatLinkImage() { FlatInfoId = flatId, Link = link });
                 _context.SaveChanges();
             });
         }
 
-        private void CreateOrUpgradePhoneNumber(string number)
+        private long CreateOrUpgradePhoneNumberAndGetHisId(string number)
         {
             var phoneModel = _context.FlatPhonesDto.SingleOrDefault(p => p.Number == number);
 
@@ -71,13 +71,14 @@ namespace DataManagement.Repositories
                 var flatPhone = new FlatPhoneDto() { Number = number, NumberMentionsOnSite = 1 };
                 _context.FlatPhonesDto.Add(flatPhone);
                 _context.SaveChanges();
+                return flatPhone.Id;
             }
-            else
-            {
-                phoneModel.NumberMentionsOnSite += 1;
-                _context.FlatPhonesDto.Update(phoneModel);
-                _context.SaveChanges();
-            }
+
+            phoneModel.NumberMentionsOnSite += 1;
+            _context.FlatPhonesDto.Update(phoneModel);
+            _context.SaveChanges();
+
+            return phoneModel.Id;
         }
     }
 }

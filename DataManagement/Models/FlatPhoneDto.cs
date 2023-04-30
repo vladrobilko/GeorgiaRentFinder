@@ -1,4 +1,7 @@
-﻿namespace DataManagement.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace DataManagement.Models;
 
 public partial class FlatPhoneDto
 {
@@ -8,5 +11,5 @@ public partial class FlatPhoneDto
 
     public long NumberMentionsOnSite { get; set; }
 
-    public virtual ICollection<FlatInfoDto> FlatsInfoDto { get; set; } = new List<FlatInfoDto>();
+    public virtual ICollection<FlatInfoDto> FlatInfoDtos { get; set; } = new List<FlatInfoDto>();
 }
