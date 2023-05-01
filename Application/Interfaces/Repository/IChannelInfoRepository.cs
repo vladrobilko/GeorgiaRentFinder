@@ -7,5 +7,7 @@
         public void UpdateLastCheckDate(long channelId, DateTime lastCheckDate);
 
         public DateTime ReadLatestCheckDateFromAllChannels();
+
+        public long ReadIdChannelWithLastCheckDate();
     }
 }

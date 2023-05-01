@@ -34,5 +34,13 @@ namespace DataManagement.Repositories
                 .First()
                 .LastCheckDate;
         }
+
+        public long ReadIdChannelWithLastCheckDate()
+        {
+            return _context.ChannelInfosDto
+                .OrderByDescending(c => c.LastCheckDate)
+                .Select(i => i)
+                .First().Id;
+        }
     }
 }

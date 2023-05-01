@@ -51,6 +51,15 @@ namespace Application.Services
             _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.UtcNow);
         }
 
+        public FlatInfoModel GetAvailableFlat(long channelId)
+        {
+            if (channelId != _channelInfoRepository.ReadIdChannelWithLastCheckDate())
+            {
+                return null;
+            }
+            throw new NotImplementedException();
+        }
+
         public long GetCountNotViewedFlats()
         {
             return _flatRepository.ReadCountNotViewedFlats();

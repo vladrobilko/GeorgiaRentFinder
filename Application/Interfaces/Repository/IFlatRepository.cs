@@ -7,5 +7,7 @@ namespace Application.Interfaces.Repository
         void CreateFlats(List<FlatInfoModel> flats);
 
         long ReadCountNotViewedFlats();
+
+        FlatInfoModel ReadNotViewedFlatInfoModel();
     }
 }

@@ -8,7 +8,7 @@ namespace WebScraper.Models
         public string Title { get; set; }
 
         [Required]
-        public int Cost { get; set; }
+        public long Cost { get; set; }
 
         [Required]
         public DateTime SitePublication { get; set; }
@@ -22,11 +22,20 @@ namespace WebScraper.Models
 
         public string PageLink { get; set; }
 
-        public int ViewsOnSite { get; set; }
+        public long ViewsOnSite { get; set; }
 
         public FlatCoordinate FlatCoordinate { get; set; }
 
-        public FlatInfoModel(string title, int cost, DateTime sitePublication, string description, string phoneNumber, List<string> linksOfImage, string adLink, int viewsOnSite, FlatCoordinate flatCoordinate)
+        public FlatInfoModel(
+            string title,
+            long cost,
+            DateTime sitePublication,
+            string description,
+            string phoneNumber,
+            List<string> linksOfImage,
+            string adLink,
+            long viewsOnSite,
+            FlatCoordinate flatCoordinate)
         {
             Title = title;
             Cost = cost;

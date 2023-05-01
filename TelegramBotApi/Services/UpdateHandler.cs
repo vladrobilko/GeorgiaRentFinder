@@ -73,6 +73,10 @@ public class UpdateHandler : IUpdateHandler
         static async Task<Message> GetLastAvailableAdjaraFlat(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
+
+            // get flat     long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"])
+
+
             //test flat
             var images = new List<string>
             {
@@ -142,7 +146,7 @@ public class UpdateHandler : IUpdateHandler
                     cancellationToken: cancellationToken);
             }
 
-            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("BotConfiguration")["ChannelId"]));
+            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
 
             carNotDistributedFlats = flatService.GetCountNotViewedFlats();
 
@@ -225,7 +229,7 @@ public class UpdateHandler : IUpdateHandler
             //test flat
 
             await _botClient.SendMediaGroupAsync(
-                chatId: _configuration.GetSection("BotConfiguration")["ChannelName"],
+                chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"], // I need here give number above
                 photos,
                 cancellationToken: cancellationToken);
 

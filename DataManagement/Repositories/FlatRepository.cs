@@ -26,6 +26,21 @@ namespace DataManagement.Repositories
             return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);
         }
 
+        public FlatInfoModel ReadNotViewedFlatInfoModel()
+        {
+            var noViewedFlatDateInfoDto = _context.FlatDateInfosDto.FirstOrDefault(d => d.RefusePublication == null && d.TelegramPublication == null);
+
+            if (noViewedFlatDateInfoDto == null) return null;
+
+            var flatModelDto = _context.FlatInfosDto.First(f => f.Id == noViewedFlatDateInfoDto.FlatInfoId);
+
+            /*var flat = new FlatInfoModel(
+                flatModelDto.Title, flatModelDto.Cost, noViewedFlatDateInfoDto.SitePublication,flatModelDto.Description,flatModelDto.FlatPhone.Number, flatModelDto.FlatLinkImages,
+                flatModelDto.PageLink,flatModelDto.ViewsOnSite,flatModelDto.FlatCoordinateDtos);*/
+
+            throw new NotImplementedException();
+        }
+
         private void CreateFlat(FlatInfoModel flatInfoModel)
         {
             var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flatInfoModel.PhoneNumber);
