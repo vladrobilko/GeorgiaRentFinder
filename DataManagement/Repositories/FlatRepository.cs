@@ -21,6 +21,11 @@ namespace DataManagement.Repositories
             }
         }
 
+        public long ReadCountNotViewedFlats()
+        {
+            return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);
+        }
+
         private void CreateFlat(FlatInfoModel flatInfoModel)
         {
             var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flatInfoModel.PhoneNumber);

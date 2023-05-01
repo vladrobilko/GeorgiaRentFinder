@@ -25,5 +25,14 @@ namespace DataManagement.Repositories
 
             _context.SaveChanges();
         }
+
+        public DateTime ReadLatestCheckDateFromAllChannels()
+        {
+            return _context.ChannelInfosDto
+                .OrderByDescending(c => c.LastCheckDate)
+                .Select(i => i)
+                .First()
+                .LastCheckDate;
+        }
     }
 }

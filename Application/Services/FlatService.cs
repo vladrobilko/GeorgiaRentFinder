@@ -23,6 +23,13 @@ namespace Application.Services
         {
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDate(channelId);
 
+            var last = _channelInfoRepository.ReadLatestCheckDateFromAllChannels();
+
+            if (lastCheckDate != last)
+            {
+                throw new AggregateException();
+            }
+
             var newAdjaraFlats = new List<FlatInfoModel>();
 
             var countPagesForScrap = 10;
@@ -42,6 +49,11 @@ namespace Application.Services
             _flatRepository.CreateFlats(newAdjaraFlats);
             
             _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.UtcNow);
+        }
+
+        public long GetCountNotViewedFlats()
+        {
+            return _flatRepository.ReadCountNotViewedFlats();
         }
     }
 }

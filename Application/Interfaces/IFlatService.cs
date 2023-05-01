@@ -3,5 +3,7 @@
     public interface IFlatService
     {
         void FindAndSaveSuitAdjaraFlats(long channelId);
+
+        long GetCountNotViewedFlats();
     }
 }

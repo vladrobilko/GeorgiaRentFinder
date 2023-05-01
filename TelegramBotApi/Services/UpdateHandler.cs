@@ -1,4 +1,7 @@
 ﻿using Application.Interfaces;
+using Microsoft.Extensions.Hosting;
+using System.Net;
+using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -59,7 +62,7 @@ public class UpdateHandler : IUpdateHandler
         var action = messageText.Split(' ')[0] switch
         {
             "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/GetLastAvailableAdjaraFlat" => GetLastAvailableAdjaraFlat(_botClient, message, cancellationToken),
+            "/GetLastAvailableAdjaraFlat" => GetLastAvailableAdjaraFlat(_botClient, _flatService, _configuration, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
@@ -67,7 +70,8 @@ public class UpdateHandler : IUpdateHandler
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
 
-        static async Task<Message> GetLastAvailableAdjaraFlat(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static async Task<Message> GetLastAvailableAdjaraFlat(ITelegramBotClient botClient, IFlatService flatService,
+            IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
             //test flat
             var images = new List<string>
@@ -125,11 +129,27 @@ public class UpdateHandler : IUpdateHandler
         static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
+            var carNotDistributedFlats = flatService.GetCountNotViewedFlats();
+
+            if (carNotDistributedFlats != 0)
+            {
+                return await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: $"There are <ins><strong>{carNotDistributedFlats} NOT distributed flats.</strong></ins> \n" + 
+                $"You need to do this: /GetLastAvailableAdjaraFlat",
+                parseMode:ParseMode.Html,
+                replyMarkup: new ReplyKeyboardRemove(),
+                    cancellationToken: cancellationToken);
+            }
+
             flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("BotConfiguration")["ChannelId"]));
+
+            carNotDistributedFlats = flatService.GetCountNotViewedFlats();
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: AppUsage,
+                text: $"<ins><strong>{carNotDistributedFlats} flats founded </strong></ins> \n" +
+                      $"You need to do this: /GetLastAvailableAdjaraFlat",
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
