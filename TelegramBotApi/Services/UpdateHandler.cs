@@ -83,36 +83,20 @@ public class UpdateHandler : IUpdateHandler
                     text: "No free flats",
                     cancellationToken: cancellationToken);
             }
-
-            //test flat
-            var images = new List<string>
-            {
-                "https://static.ss.ge/15_661e24c3-fc19-4847-ae52-9c03785ee18b.jpg",
-                "https://static.ss.ge/0_6d6e818b-5f24-4abb-b228-3ee73f878e35.jpg",
-                "https://static.ss.ge/1_9d6570a4-2ca8-49df-87da-5728eb9702f8.jpg",
-                "https://static.ss.ge/13_16f7fe52-2b82-49ea-aa7d-aa06b7bc0404.jpg",
-                "https://static.ss.ge/8_2c22368e-7489-4ec7-a7a7-b815f17d5445.jpg",
-                "https://static.ss.ge/7_5bd8d93e-7dc0-48cc-8755-dcfe7cbbf205.jpg",
-                "https://static.ss.ge/19_fe5efea4-b0c8-4296-8bfd-69c7cd4cb4a3.jpg",
-                "https://static.ss.ge/20210630/1_e2b99903-867d-4b5f-8301-9fde7ae3376e.jpg",
-                "https://static.ss.ge/20210630/13_251f32ee-b5a8-46a5-aea9-fbcb9deb3b22.jpg",
-                "https://static.ss.ge/20210630/16_3e25d727-f39a-42b0-a158-57ad2d52f10d.jpg"
-            };
-            var photos = new IAlbumInputMedia[images.Count];
-            for (var i = 0; i < images.Count; i++)
+            var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
+            for (var i = 0; i < flat.LinksOfImages.Count; i++)
             {
                 if (i == 0)
                 {
-                    photos[i] = new InputMediaPhoto(images[i])
+                    photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
                     {
-                        Caption = new FlatInfoModel().ToTelegramCaption(),
+                        Caption = flat.ToTelegramCaption(),
                         ParseMode = ParseMode.Html
                     };
                 }
 
-                else photos[i] = new InputMediaPhoto(images[i]);
+                else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
             }
-            //test flat
 
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
@@ -124,8 +108,8 @@ public class UpdateHandler : IUpdateHandler
                 {
                     new []
                     {
-                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{images.Count}"),
-                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{images.Count}"),
+                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}"),
+                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}"),
                     }
                 });
 
@@ -226,8 +210,8 @@ public class UpdateHandler : IUpdateHandler
                 {
                     photos[i] = new InputMediaPhoto(images[i])
                     {
-                        Caption = new FlatInfoModel().ToTelegramCaption(),
-                        ParseMode = ParseMode.Html
+                        /*Caption = new FlatInfoModel().ToTelegramCaption(),
+                        ParseMode = ParseMode.Html*/
                     };
                 }
 
