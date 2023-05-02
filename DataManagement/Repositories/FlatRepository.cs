@@ -27,9 +27,12 @@ namespace DataManagement.Repositories
             return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);
         }
 
-        public FlatInfoClientModel ReadOldestNotViewedFlatInfoClientModel() // Oldest!!!!1
+        public FlatInfoClientModel ReadOldestNotViewedFlatInfoClientModel()
         {
-            var noViewedFlatDateInfoDto = _context.FlatDateInfosDto.FirstOrDefault(d => d.RefusePublication == null && d.TelegramPublication == null);
+            var noViewedFlatDateInfoDto = _context.FlatDateInfosDto
+                .Where(d => d.RefusePublication == null && d.TelegramPublication == null)
+                .OrderByDescending(x => x.SitePublication)
+                .LastOrDefault();
 
             if (noViewedFlatDateInfoDto == null) return null;
 
