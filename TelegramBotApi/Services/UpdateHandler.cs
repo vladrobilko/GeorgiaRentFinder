@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using System.Net;
 using System.Threading;
+using Application.Converters;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -73,9 +74,15 @@ public class UpdateHandler : IUpdateHandler
         static async Task<Message> GetLastAvailableAdjaraFlat(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
+            var flat = flatService.GetAvailableFlat(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
 
-            // get flat     long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"])
-
+            if (flat == null)
+            {
+                return await botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: "No free flats",
+                    cancellationToken: cancellationToken);
+            }
 
             //test flat
             var images = new List<string>

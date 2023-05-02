@@ -14,7 +14,7 @@ public class FlatCoordinate
 
     public FlatCoordinate() { }
 
-    public FlatCoordinate GetDefaultCoordinate()
+    public FlatCoordinate GetDefaultFlatCoordinate()
     {
         return new FlatCoordinate(0, 0);
     }

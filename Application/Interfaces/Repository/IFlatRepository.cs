@@ -1,4 +1,5 @@
-﻿using WebScraper.Models;
+﻿using Application.Models;
+using WebScraper.Models;
 
 namespace Application.Interfaces.Repository
 {
@@ -8,6 +9,6 @@ namespace Application.Interfaces.Repository
 
         long ReadCountNotViewedFlats();
 
-        FlatInfoModel ReadNotViewedFlatInfoModel();
+        FlatInfoClientModel ReadOldestNotViewedFlatInfoClientModel();
     }
 }

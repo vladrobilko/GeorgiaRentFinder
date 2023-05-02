@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Repository;
+using Application.Models;
 using WebScraper.Models;
 using WebScraper.SsDotGe;
 
@@ -51,13 +52,14 @@ namespace Application.Services
             _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.UtcNow);
         }
 
-        public FlatInfoModel GetAvailableFlat(long channelId)
+        public FlatInfoClientModel GetAvailableFlat(long channelId)
         {
             if (channelId != _channelInfoRepository.ReadIdChannelWithLastCheckDate())
             {
-                return null;
+                throw new AccessViolationException();
             }
-            throw new NotImplementedException();
+
+            return _flatRepository.ReadOldestNotViewedFlatInfoClientModel();
         }
 
         public long GetCountNotViewedFlats()

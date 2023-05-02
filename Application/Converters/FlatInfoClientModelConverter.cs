@@ -1,8 +1,8 @@
 ﻿using WebScraper.Models;
 
-namespace WebScraper.Converters
+namespace Application.Converters
 {
-    public static class FlatInfoModelConverter
+    public static class FlatInfoClientModelConverter
     {
         public static string ToTelegramCaption(this FlatInfoModel flatInfoModel)
         {

@@ -1,4 +1,5 @@
-﻿using WebScraper.Models;
+﻿using Application.Models;
+using WebScraper.Models;
 
 namespace Application.Interfaces
 {
@@ -6,7 +7,7 @@ namespace Application.Interfaces
     {
         void FindAndSaveSuitAdjaraFlats(long channelId);
 
-        FlatInfoModel GetAvailableFlat(long channelId);
+        FlatInfoClientModel GetAvailableFlat(long channelId);
 
         long GetCountNotViewedFlats();
     }

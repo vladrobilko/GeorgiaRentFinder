@@ -66,7 +66,7 @@ namespace WebScraper.SsDotGe
                 firstTenImagesFromFlatPage,
                 flatLink,
                 pageViews,
-                new FlatCoordinate().GetDefaultCoordinate()
+                new FlatCoordinate().GetDefaultFlatCoordinate()
             );
         }
 
