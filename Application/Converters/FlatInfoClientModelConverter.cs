@@ -1,29 +1,51 @@
 ﻿using Application.Models;
 using WebScraper.Converters;
-using WebScraper.Models;
-using static System.Net.WebRequestMethods;
 
 namespace Application.Converters
 {
     public static class FlatInfoClientModelConverter
     {
+        private const long CountForRealtorDetection = 10;
+
         public static string ToTelegramCaption(this FlatInfoClientModel flat)
         {
-            if (flat.FlatCoordinateClientModel.Latitude == 0 || flat.FlatCoordinateClientModel.Longitude == 0)
+            var caption = IsCoordinateExist(flat.FlatCoordinateClientModel) ? GetCaptionWithCoordinate(flat) : GetCaptionWithOutCoordinate(flat);
+
+            if (flat.FlatPhoneClientModel.MentionOnSite > CountForRealtorDetection)
             {
-                return $"{flat.Title}\n\n" +
-
-                       $"<strong>Cost:</strong> {flat.Cost} $\n\n" +
-
-                       $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
-                       $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
-                       $"<strong>Description:</strong> {flat.Description}\n\n" +
-
-                       $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
-                       $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n" +
-                       $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {flat.FlatPhoneClientModel.MentionOnSite} times</ins>";
+                caption += GetRealtorDescription(flat.FlatPhoneClientModel.MentionOnSite);
             }
 
+            return caption;
+        }
+
+        private static bool IsCoordinateExist(FlatCoordinateClientModel flatCoordinate)
+        {
+            return flatCoordinate.Latitude != 0 && flatCoordinate.Longitude != 0;
+        }
+
+        private static string GetGoogleMapLocation(double latitude, double longitude)
+        {
+            return $"https://www.google.com/maps/search/?api=1&query={latitude},{longitude}";
+        }
+
+        private static string GetCaptionWithCoordinate(FlatInfoClientModel flat)
+        {
+            return $"{flat.Title}\n\n" +
+
+                 $"<strong>Cost:</strong> {flat.Cost} $\n\n" +
+
+                 $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
+                 $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
+                 $"<strong>Description:</strong> {flat.Description}\n\n" +
+
+                 $"<strong>Location:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>\n" +
+                 $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
+                 $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n";
+        }
+
+        private static string GetCaptionWithOutCoordinate(FlatInfoClientModel flat)
+        {
             return $"{flat.Title}\n\n" +
 
                    $"<strong>Cost:</strong> {flat.Cost} $\n\n" +
@@ -32,15 +54,13 @@ namespace Application.Converters
                    $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
                    $"<strong>Description:</strong> {flat.Description}\n\n" +
 
-                   $"<strong>Location:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>\n" +
                    $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
-                   $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n" +
-                   $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {flat.FlatPhoneClientModel.MentionOnSite} times</ins>";
+                   $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n";
         }
 
-        private static string GetGoogleMapLocation(double latitude, double longitude)
+        private static string GetRealtorDescription(long mentionOnSite)
         {
-            return $"https://www.google.com/maps/search/?api=1&query={latitude},{longitude}";
+            return $"<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {mentionOnSite} times</ins>";
         }
     }
 }
