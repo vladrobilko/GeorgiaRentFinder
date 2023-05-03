@@ -1,7 +1,4 @@
 ﻿using Application.Interfaces;
-using Microsoft.Extensions.Hosting;
-using System.Net;
-using System.Threading;
 using Application.Converters;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -10,8 +7,6 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
-using WebScraper.Converters;
-using WebScraper.Models;
 
 namespace TelegramBotApi.Services;
 
@@ -75,6 +70,7 @@ public class UpdateHandler : IUpdateHandler
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
             var flat = flatService.GetAvailableFlat(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
+            // maybe need without channel ID here? to make this method common__for it I need here get last founded flat date
 
             if (flat == null)
             {
@@ -83,7 +79,9 @@ public class UpdateHandler : IUpdateHandler
                     text: "No free flats",
                     cancellationToken: cancellationToken);
             }
+
             var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
+
             for (var i = 0; i < flat.LinksOfImages.Count; i++)
             {
                 if (i == 0)
@@ -130,9 +128,9 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: $"There are <ins><strong>{carNotDistributedFlats} NOT distributed flats.</strong></ins> \n" + 
+                text: $"There are <ins><strong>{carNotDistributedFlats} NOT distributed flats.</strong></ins> \n" +
                 $"You need to do this: /GetLastAvailableAdjaraFlat",
-                parseMode:ParseMode.Html,
+                parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: cancellationToken);
             }
@@ -184,59 +182,48 @@ public class UpdateHandler : IUpdateHandler
 
         var infoData = callBackInfo[0];
         var flatId = callBackInfo[1];
+        string textResponseToBot = "Default";
 
-        string response = "Default";
+        var flat = _flatService.GetFlatById(long.Parse(flatId));
 
         if (infoData == "post")
-        {         
-            //test flat
-            var images = new List<string>
-            {
-                "https://static.ss.ge/15_661e24c3-fc19-4847-ae52-9c03785ee18b.jpg",
-                "https://static.ss.ge/0_6d6e818b-5f24-4abb-b228-3ee73f878e35.jpg",
-                "https://static.ss.ge/1_9d6570a4-2ca8-49df-87da-5728eb9702f8.jpg",
-                "https://static.ss.ge/13_16f7fe52-2b82-49ea-aa7d-aa06b7bc0404.jpg",
-                "https://static.ss.ge/8_2c22368e-7489-4ec7-a7a7-b815f17d5445.jpg",
-                "https://static.ss.ge/7_5bd8d93e-7dc0-48cc-8755-dcfe7cbbf205.jpg",
-                "https://static.ss.ge/19_fe5efea4-b0c8-4296-8bfd-69c7cd4cb4a3.jpg",
-                "https://static.ss.ge/20210630/1_e2b99903-867d-4b5f-8301-9fde7ae3376e.jpg",
-                "https://static.ss.ge/20210630/13_251f32ee-b5a8-46a5-aea9-fbcb9deb3b22.jpg",
-                "https://static.ss.ge/20210630/16_3e25d727-f39a-42b0-a158-57ad2d52f10d.jpg"
-            };
-            var photos = new IAlbumInputMedia[images.Count];
-            for (var i = 0; i < images.Count; i++)
+        {
+            var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
+
+            for (var i = 0; i < flat.LinksOfImages.Count; i++)
             {
                 if (i == 0)
                 {
-                    photos[i] = new InputMediaPhoto(images[i])
+                    photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
                     {
-                        /*Caption = new FlatInfoModel().ToTelegramCaption(),
-                        ParseMode = ParseMode.Html*/
+                        Caption = flat.ToTelegramCaption(),
+                        ParseMode = ParseMode.Html
                     };
                 }
 
-                else photos[i] = new InputMediaPhoto(images[i]);
+                else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
             }
-            //test flat
 
             await _botClient.SendMediaGroupAsync(
-                chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"], // I need here give number above
+                chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"],
                 photos,
                 cancellationToken: cancellationToken);
 
-            response = $"<ins><strong>The post has been sent!</strong></ins>\n{AppUsage}";
-            //add to db
+            _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.UtcNow);
+
+            textResponseToBot = $"<ins><strong>The post has been sent!</strong></ins>\n{AppUsage}";
         }
 
         else if (infoData == "no post")
         {
-            response = $"<ins><strong>The post has NOT been sent!</strong></ins>\n{AppUsage}";
-            //logic to db
+            textResponseToBot = $"<ins><strong>The post has NOT been sent!</strong></ins>\n{AppUsage}";
+
+            _flatService.AddDateOfRefusePublication(flat.Id, DateTime.UtcNow);
         }
 
         await _botClient.SendTextMessageAsync(
             chatId: callbackQuery.Message.Chat.Id,
-            text: response,
+            text: textResponseToBot,
             parseMode: ParseMode.Html,
             replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton[][] { }),
             cancellationToken: cancellationToken);

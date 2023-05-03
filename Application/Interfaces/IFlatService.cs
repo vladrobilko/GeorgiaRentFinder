@@ -1,5 +1,4 @@
 ﻿using Application.Models;
-using WebScraper.Models;
 
 namespace Application.Interfaces
 {
@@ -7,7 +6,13 @@ namespace Application.Interfaces
     {
         void FindAndSaveSuitAdjaraFlats(long channelId);
 
+        void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic);
+
+        void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic);
+
         FlatInfoClientModel GetAvailableFlat(long channelId);
+
+        FlatInfoClientModel GetFlatById(long flatId);
 
         long GetCountNotViewedFlats();
     }

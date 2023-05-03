@@ -52,6 +52,16 @@ namespace Application.Services
             _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.UtcNow);
         }
 
+        public void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic)
+        {
+            _flatRepository.UpdateFlatDateInfoToTelegramPublication(flatId, timeOfPublic);
+        }
+
+        public void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic)
+        {
+            _flatRepository.UpdateFlatDateInfoToRefusePublication(flatId, timeOfPublic);
+        }
+
         public FlatInfoClientModel GetAvailableFlat(long channelId)
         {
             if (channelId != _channelInfoRepository.ReadIdChannelWithLastCheckDate())
@@ -60,6 +70,11 @@ namespace Application.Services
             }
 
             return _flatRepository.ReadOldestNotViewedFlatInfoClientModel();
+        }
+
+        public FlatInfoClientModel GetFlatById(long flatId)
+        {
+            return _flatRepository.ReadFlatById(flatId);
         }
 
         public long GetCountNotViewedFlats()

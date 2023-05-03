@@ -22,6 +22,20 @@ namespace DataManagement.Repositories
             }
         }
 
+        public void UpdateFlatDateInfoToTelegramPublication(long flatId, DateTime timeOfPublic)
+        {
+            var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
+            flatDateInfoDto.TelegramPublication = timeOfPublic;
+            _context.SaveChanges();
+        }
+
+        public void UpdateFlatDateInfoToRefusePublication(long flatId, DateTime timeOfRefuse)
+        {
+            var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
+            flatDateInfoDto.RefusePublication = timeOfRefuse;
+            _context.SaveChanges();
+        }
+
         public long ReadCountNotViewedFlats()
         {
             return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);
@@ -48,16 +62,39 @@ namespace DataManagement.Repositories
                 SitePublication = noViewedFlatDateInfoDto.SitePublication,
                 Description = flatModelDto.Description,
                 FlatPhoneClientModel = new FlatPhoneClientModel() { PhoneNumber = flatPhoneModelDto.Number, MentionOnSite = flatPhoneModelDto.NumberMentionsOnSite },
-                LinksOfImages = ReadFlatImages(flatModelDto.Id),
+                LinksOfImages = ReadFlatImagesById(flatModelDto.Id),
                 PageLink = flatModelDto.PageLink,
                 ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
-                FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefault(flatModelDto.Id)
+                FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id)
             };
 
             return flatInfoClientModel;
         }
 
-        private FlatCoordinateClientModel ReadFlatCoordinateOrGetDefault(long flatId)
+        public FlatInfoClientModel ReadFlatById(long flatId)
+        {
+            var flatModelDto = _context.FlatInfosDto.First(f => f.Id == flatId);
+
+            var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
+
+            var flatPhoneModelDto = _context.FlatPhonesDto.First(p => p.Id == flatModelDto.FlatPhoneId);
+
+            return new FlatInfoClientModel
+            {
+                Id = flatModelDto.Id,
+                Title = flatModelDto.Title,
+                Cost = flatModelDto.Cost,
+                SitePublication = flatDateInfoDto.SitePublication,
+                Description = flatModelDto.Description,
+                FlatPhoneClientModel = new FlatPhoneClientModel() { PhoneNumber = flatPhoneModelDto.Number, MentionOnSite = flatPhoneModelDto.NumberMentionsOnSite },
+                LinksOfImages = ReadFlatImagesById(flatModelDto.Id),
+                PageLink = flatModelDto.PageLink,
+                ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
+                FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id)
+            };
+        }
+
+        private FlatCoordinateClientModel ReadFlatCoordinateOrGetDefaultById(long flatId)
         {
             var flatCoordinateDto = _context.FlatCoordinatesDto.FirstOrDefault(c => c.FlatInfoId == flatId);
 
@@ -69,7 +106,7 @@ namespace DataManagement.Repositories
             return new FlatCoordinateClientModel() { Latitude = flatCoordinateDto.Latitude.GetValueOrDefault(), Longitude = flatCoordinateDto.Longitude.GetValueOrDefault() };
         }
 
-        private List<string> ReadFlatImages(long flatId)
+        private List<string> ReadFlatImagesById(long flatId)
         {
             return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).ToList();
         }

@@ -7,8 +7,14 @@ namespace Application.Interfaces.Repository
     {
         void CreateFlats(List<FlatInfoModel> flats);
 
+        void UpdateFlatDateInfoToTelegramPublication(long flatId, DateTime timeOfPublic);
+
+        void UpdateFlatDateInfoToRefusePublication(long flatId, DateTime timeOfRefuse);
+
         long ReadCountNotViewedFlats();
 
         FlatInfoClientModel ReadOldestNotViewedFlatInfoClientModel();
+
+        FlatInfoClientModel ReadFlatById(long flatId);
     }
 }
