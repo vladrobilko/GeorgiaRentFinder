@@ -1,4 +1,6 @@
-﻿using Application.Models;
+﻿using System.Globalization;
+using Application.Models;
+using WebScraper;
 using WebScraper.Converters;
 
 namespace Application.Converters
@@ -33,7 +35,7 @@ namespace Application.Converters
         {
             return $"{flat.Title}\n\n" +
 
-                 $"<strong>Cost:</strong> {flat.Cost} $\n\n" +
+                 $"<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescription(flat.Cost)}\n\n" +
 
                  $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
                  $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
@@ -48,7 +50,7 @@ namespace Application.Converters
         {
             return $"{flat.Title}\n\n" +
 
-                   $"<strong>Cost:</strong> {flat.Cost} $\n\n" +
+                   $"<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescription(flat.Cost)}\n\n" +
 
                    $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
                    $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
@@ -56,6 +58,15 @@ namespace Application.Converters
 
                    $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
                    $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n";
+        }
+
+        private static string GetCostInGelOrEmptyDescription(long cost)
+        {
+            var usdToGel = UsdToGelCourseScraper.GetGelInOneDollarFromGeorgiaNationalBank();
+
+            if (usdToGel == double.MaxValue) return "";
+
+            return $"({Convert.ToInt32(usdToGel * cost)} ლ)";
         }
 
         private static string GetRealtorDescription(long mentionOnSite)
