@@ -119,7 +119,7 @@ namespace WebScraper.SsDotGe
                 .Where(e => e.Attributes["class"]?.Value == "img-responsive")
                 .Select(e => e.GetAttributeValue("src", null))
                 .Where(s => !String.IsNullOrEmpty(s) && !s.Contains("Thumb") && s.Contains("static.ss.ge"))
-                .Take(10).ToList();
+                .Take(10).ToList() ?? throw new FileNotFoundException();
 
             return imagesUrl;
         }
