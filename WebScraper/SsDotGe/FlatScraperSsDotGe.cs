@@ -25,7 +25,7 @@ namespace WebScraper.SsDotGe
 
                 var flatCreationDate = GetFlatCreationDateFromFlatPage(mainPage, j);
 
-                if (flatCreationDate < lastCheckDate) break;
+                if (flatCreationDate < lastCheckDate) continue;
 
                 var flatTitle = GetFlatTitleFromMainPage(mainPage, j);
 

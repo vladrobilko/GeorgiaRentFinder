@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Application.Models;
+﻿using Application.Models;
 using WebScraper;
 using WebScraper.Converters;
 

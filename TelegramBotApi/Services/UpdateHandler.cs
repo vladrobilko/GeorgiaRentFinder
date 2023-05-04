@@ -143,6 +143,7 @@ public class UpdateHandler : IUpdateHandler
                 chatId: message.Chat.Id,
                 text: $"<ins><strong>{countNotViewedFlats} flats founded </strong></ins> \n" +
                       $"You need to do this: /GetLastAvailableAdjaraFlat",
+                parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
