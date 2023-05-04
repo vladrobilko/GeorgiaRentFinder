@@ -111,17 +111,25 @@ namespace DataManagement.Repositories
             return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).ToList();
         }
 
-        private void CreateFlat(FlatInfoModel flatInfoModel)
+        private void CreateFlat(FlatInfoModel flat)
         {
-            var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flatInfoModel.PhoneNumber);
+            if (IsFlatWithDescriptionAndCostExist(flat)) return;
 
-            var flatInfoId = CreateFlatInfoAndGetHisId(flatInfoModel, phoneId);
+            var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flat.PhoneNumber);
 
-            CreateFlatImages(flatInfoModel.LinksOfImages, flatInfoId);
+            var flatInfoId = CreateFlatInfoAndGetHisId(flat, phoneId);
+
+            CreateFlatImages(flat.LinksOfImages, flatInfoId);
 
             _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
-            { FlatInfoId = flatInfoId, SitePublication = flatInfoModel.SitePublication.ToUniversalTime() });
+            { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication.ToUniversalTime() });
             _context.SaveChanges();
+        }
+
+        private bool IsFlatWithDescriptionAndCostExist(FlatInfoModel flat)
+        {
+            return _context.FlatInfosDto.FirstOrDefault(f =>
+                f.Description == flat.Description && f.Cost == flat.Cost) != null;
         }
 
         private long CreateFlatInfoAndGetHisId(FlatInfoModel flatInfoModel, long phoneId)

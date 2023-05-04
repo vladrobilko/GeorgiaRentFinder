@@ -122,13 +122,13 @@ public class UpdateHandler : IUpdateHandler
         static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            var carNotDistributedFlats = flatService.GetCountNotViewedFlats();
+            var countNotViewedFlats = flatService.GetCountNotViewedFlats();
 
-            if (carNotDistributedFlats != 0)
+            if (countNotViewedFlats != 0)
             {
                 return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: $"There are <ins><strong>{carNotDistributedFlats} NOT distributed flats.</strong></ins> \n" +
+                text: $"There are <ins><strong>{countNotViewedFlats} NOT distributed flats.</strong></ins> \n" +
                 $"You need to do this: /GetLastAvailableAdjaraFlat",
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
@@ -137,11 +137,11 @@ public class UpdateHandler : IUpdateHandler
 
             flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
 
-            carNotDistributedFlats = flatService.GetCountNotViewedFlats();
+            countNotViewedFlats = flatService.GetCountNotViewedFlats();
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: $"<ins><strong>{carNotDistributedFlats} flats founded </strong></ins> \n" +
+                text: $"<ins><strong>{countNotViewedFlats} flats founded </strong></ins> \n" +
                       $"You need to do this: /GetLastAvailableAdjaraFlat",
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
