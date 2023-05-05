@@ -22,14 +22,14 @@ namespace DataManagement.Repositories
             }
         }
 
-        public void UpdateFlatDateInfoToTelegramPublication(long flatId, DateTime timeOfPublic)
+        public void UpdateFlatDateInfoTelegramPublication(long flatId, DateTime timeOfPublic)
         {
             var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
             flatDateInfoDto.TelegramPublication = timeOfPublic;
             _context.SaveChanges();
         }
 
-        public void UpdateFlatDateInfoToRefusePublication(long flatId, DateTime timeOfRefuse)
+        public void UpdateFlatDateInfoRefusePublication(long flatId, DateTime timeOfRefuse)
         {
             var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
             flatDateInfoDto.RefusePublication = timeOfRefuse;
@@ -41,7 +41,7 @@ namespace DataManagement.Repositories
             return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);
         }
 
-        public FlatInfoClientModel ReadOldestNotViewedFlatInfoClientModel()
+        public FlatInfoClientModel ReadOldestNotViewedFlat()
         {
             var noViewedFlatDateInfoDto = _context.FlatDateInfosDto
                 .Where(d => d.RefusePublication == null && d.TelegramPublication == null)

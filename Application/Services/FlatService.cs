@@ -9,6 +9,7 @@ namespace Application.Services
     public class FlatService : IFlatService
     {
         private readonly IFlatRepository _flatRepository;
+
         private readonly IChannelInfoRepository _channelInfoRepository;
 
         private readonly FlatScraperSsDotGe _scraperSsDotGe;
@@ -54,12 +55,12 @@ namespace Application.Services
 
         public void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic)
         {
-            _flatRepository.UpdateFlatDateInfoToTelegramPublication(flatId, timeOfPublic);
+            _flatRepository.UpdateFlatDateInfoTelegramPublication(flatId, timeOfPublic);
         }
 
         public void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic)
         {
-            _flatRepository.UpdateFlatDateInfoToRefusePublication(flatId, timeOfPublic);
+            _flatRepository.UpdateFlatDateInfoRefusePublication(flatId, timeOfPublic);
         }
 
         public FlatInfoClientModel GetAvailableFlat(long channelId)
@@ -69,7 +70,7 @@ namespace Application.Services
                 throw new AccessViolationException();
             }
 
-            return _flatRepository.ReadOldestNotViewedFlatInfoClientModel();
+            return _flatRepository.ReadOldestNotViewedFlat();
         }
 
         public FlatInfoClientModel GetFlatById(long flatId)

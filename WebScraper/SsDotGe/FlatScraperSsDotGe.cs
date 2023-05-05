@@ -23,31 +23,31 @@ namespace WebScraper.SsDotGe
             {
                 if (j > FlatsOnPage * 2) break;
 
-                var flatCreationDate = GetFlatCreationDateFromFlatPage(mainPage, j);
+                var flatCreationDate = GetFlatCreationDateOrMinDate(mainPage, j);
 
                 if (flatCreationDate < lastCheckDate) continue;
 
-                var flatTitle = GetFlatTitleFromMainPage(mainPage, j);
+                var flatTitle = GetFlatTitle(mainPage, j);
 
-                var flatCost = GetFlatCostFromMainPage(mainPage, j);
+                var flatCost = GetFlatCost(mainPage, j);
 
                 if (IsFlatSuit(flatTitle, flatCost))
                 {
-                    var flatLink = GetFLatLinkFromMainPage(mainPage, url, j);
+                    var flatLink = GetFLatLink(mainPage, url, j);
 
-                    var flatDescription = GetValidDescriptionFromMainPage(mainPage, j, 200);
+                    var flatDescription = GetValidDescription(mainPage, j, 200);
 
-                    flats.Add(GetFlatPage(flatLink, flatTitle, flatCost, flatDescription, flatCreationDate));
+                    flats.Add(GetFlatInfoModel(flatLink, flatTitle, flatCost, flatDescription, flatCreationDate));
                     i++;
                 }
 
-                if (flatTitle != null && !IsFlatSuit(flatTitle, flatCost)) i++;
+                if (flatTitle != "No title" && !IsFlatSuit(flatTitle, flatCost)) i++;
             }
 
             return flats;
         }
 
-        private FlatInfoModel GetFlatPage(string flatLink, string flatTitle, int flatCost, string flatDescription, DateTime flatCreationDate)
+        private FlatInfoModel GetFlatInfoModel(string flatLink, string flatTitle, int flatCost, string flatDescription, DateTime flatCreationDate)
         {
             HtmlDocument flatPage = GetHtmlDocumentForPage(flatLink);
 
@@ -86,16 +86,16 @@ namespace WebScraper.SsDotGe
             return mainPage;
         }
 
-        private string GetFlatTitleFromMainPage(HtmlDocument mainPage, int number)
+        private string GetFlatTitle(HtmlDocument mainPage, int number)
         {
             return mainPage.DocumentNode
                 .SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a/div/span")
-                ?.InnerText;
+                ?.InnerText ?? "No title";
         }
 
         private bool IsFlatSuit(string flatTitle, int flatCost)
         {
-            return flatTitle != null && flatCost > FlatLowestPrice && flatCost < FlatHighestPrice;
+            return flatTitle != "No title" && flatCost > FlatLowestPrice && flatCost < FlatHighestPrice;
         }
 
         private string GetFlatOwnerPhoneNumberFromFlatPage(HtmlDocument flatPage)
@@ -105,7 +105,7 @@ namespace WebScraper.SsDotGe
                 ?.InnerText ?? "No number";
         }
 
-        private string GetFLatLinkFromMainPage(HtmlDocument mainPage, string url, int number)
+        private string GetFLatLink(HtmlDocument mainPage, string url, int number)
         {
             HtmlNode nextPage = mainPage.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[1]/div[2]/div[1]/a");
             var uri = new Uri(url);
@@ -131,7 +131,7 @@ namespace WebScraper.SsDotGe
             return imagesUrl;
         }
 
-        private string GetValidDescriptionFromMainPage(HtmlDocument flatPage, int number, int descriptionLength)
+        private string GetValidDescription(HtmlDocument flatPage, int number, int descriptionLength)
         {
             var input = flatPage.DocumentNode
                 .SelectSingleNode(
@@ -155,14 +155,14 @@ namespace WebScraper.SsDotGe
             return string.Concat(removeWhitespace.Substring(0, descriptionLength - 3) + "...");
         }
 
-        private int GetFlatCostFromMainPage(HtmlDocument mainPage, int number)
+        private int GetFlatCost(HtmlDocument mainPage, int number)
         {
             var inputCost = mainPage.DocumentNode.SelectSingleNode(
                 $"//*[@id=\"list\"]/div[{number}]/div[1]/div[1]/div[2]/div[2]/div[1]/text()")?.InnerText;
             return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
-        private DateTime GetFlatCreationDateFromFlatPage(HtmlDocument page, int number)
+        private DateTime GetFlatCreationDateOrMinDate(HtmlDocument page, int number)
         {
             var formatInputDate = "dd.MM.yyyy/HH:mm";
             var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
