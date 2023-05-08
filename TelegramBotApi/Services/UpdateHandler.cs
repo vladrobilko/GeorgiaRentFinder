@@ -45,7 +45,7 @@ public class UpdateHandler : IUpdateHandler
             await handler;
         }
         else
-            await botClient.SendTextMessageAsync(update.Message.Chat.Id, "Sorry, you are not admin to use this bot.",
+            await botClient.SendTextMessageAsync(long.Parse(_configuration.GetSection("BotConfiguration")["BotId"]), "Sorry, you are not an admin to use this bot.",
                 cancellationToken: cancellationToken);
     }
 
@@ -76,7 +76,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: "No free flats",
+                    text: $"No free flats\n\n{AppUsage}",
                     cancellationToken: cancellationToken);
             }
 
@@ -122,6 +122,7 @@ public class UpdateHandler : IUpdateHandler
         static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
+
             var countNotViewedFlats = flatService.GetCountNotViewedFlats();
 
             if (countNotViewedFlats != 0)
@@ -170,11 +171,10 @@ public class UpdateHandler : IUpdateHandler
             return update.CallbackQuery.From.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"];
         }
         return update.Message != null
-               && (update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
-                   || update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"]);
+               && update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
+                   && update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"];
     }
 
-    // Process Inline Keyboard callback data
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
