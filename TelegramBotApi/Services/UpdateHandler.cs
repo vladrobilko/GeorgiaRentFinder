@@ -7,6 +7,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using Application.Models;
 
 namespace TelegramBotApi.Services;
 
@@ -80,25 +81,9 @@ public class UpdateHandler : IUpdateHandler
                     cancellationToken: cancellationToken);
             }
 
-            var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
-
-            for (var i = 0; i < flat.LinksOfImages.Count; i++)
-            {
-                if (i == 0)
-                {
-                    photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
-                    {
-                        Caption = flat.ToTelegramCaption(),
-                        ParseMode = ParseMode.Html
-                    };
-                }
-
-                else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
-            }
-
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
-                photos,
+                GetAlbumInputMediaToPost(flat),
                 cancellationToken: cancellationToken);
 
             InlineKeyboardMarkup inlineKeyboard = new(
@@ -162,6 +147,27 @@ public class UpdateHandler : IUpdateHandler
         {
             throw new IndexOutOfRangeException();
         }
+    }
+
+    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat)
+    {
+        var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
+
+        for (var i = 0; i < flat.LinksOfImages.Count; i++)
+        {
+            if (i == 0)
+            {
+                photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
+                {
+                    Caption = flat.ToTelegramCaption(),
+                    ParseMode = ParseMode.Html
+                };
+            }
+
+            else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
+        }
+
+        return photos;
     }
 
     private bool IsAdmin(Update update)
