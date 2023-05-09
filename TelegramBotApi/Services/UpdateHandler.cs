@@ -17,9 +17,6 @@ public class UpdateHandler : IUpdateHandler
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _configuration;
     private readonly IFlatService _flatService;
-    private const string AppUsage = "AppUsage:\n"
-                         + "/FindSuitAdjaraFlats\n" +
-                         "/GetLastAvailableAdjaraFlat";
 
     public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatService flatService)
     {
@@ -77,7 +74,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: $"No free flats\n\n{AppUsage}",
+                    text: BotMessageManager.GetUsageWithWithNoFreeMessage(),
                     cancellationToken: cancellationToken);
             }
 
@@ -86,20 +83,10 @@ public class UpdateHandler : IUpdateHandler
                 GetAlbumInputMediaToPost(flat),
                 cancellationToken: cancellationToken);
 
-            InlineKeyboardMarkup inlineKeyboard = new(
-                new[]
-                {
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}"),
-                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}"),
-                    }
-                });
-
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Choose",
-                replyMarkup: inlineKeyboard,
+                replyMarkup: GetKeyboardToChoose(flat),
                 cancellationToken: cancellationToken);
 
         }
@@ -138,7 +125,7 @@ public class UpdateHandler : IUpdateHandler
         {
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: AppUsage,
+                text: BotMessageManager.Usage,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
@@ -147,6 +134,19 @@ public class UpdateHandler : IUpdateHandler
         {
             throw new IndexOutOfRangeException();
         }
+    }
+
+    private static InlineKeyboardMarkup GetKeyboardToChoose(FlatInfoClientModel flat)
+    {
+        return new(
+            new[]
+            {
+                    new []
+                    {
+                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}"),
+                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}"),
+                    }
+            });
     }
 
     private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat)
@@ -195,37 +195,21 @@ public class UpdateHandler : IUpdateHandler
 
         if (infoData == "post")
         {
-            var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
-
-            for (var i = 0; i < flat.LinksOfImages.Count; i++)
-            {
-                if (i == 0)
-                {
-                    photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
-                    {
-                        Caption = flat.ToTelegramCaption(),
-                        ParseMode = ParseMode.Html
-                    };
-                }
-
-                else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
-            }
-
             await _botClient.SendMediaGroupAsync(
                 chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"],
-                photos,
+                GetAlbumInputMediaToPost(flat),
                 cancellationToken: cancellationToken);
 
-            _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.UtcNow);
+            _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-            textResponseToBot = $"<ins><strong>The post has been sent!</strong></ins>\n{AppUsage}";
+            textResponseToBot = BotMessageManager.GetMessageAfterPost();
         }
 
         else if (infoData == "no post")
         {
-            textResponseToBot = $"<ins><strong>The post has NOT been sent!</strong></ins>\n{AppUsage}";
+            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost();
 
-            _flatService.AddDateOfRefusePublication(flat.Id, DateTime.UtcNow);
+            _flatService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
         }
 
         await _botClient.SendTextMessageAsync(

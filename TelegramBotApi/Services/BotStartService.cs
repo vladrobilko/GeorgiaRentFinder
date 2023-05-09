@@ -1,6 +1,5 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
-using WebScraper.Converters;
 
 namespace TelegramBotApi.Services
 {
@@ -16,15 +15,9 @@ namespace TelegramBotApi.Services
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var usage = "______________________________________\n" +
-                              $"The bot started at {DateTime.Now.ToCommonViewString()}\n" + 
-                              "Usage:\n"
-                              + "/FindSuitAdjaraFlats\n" +
-                              "/GetLastAvailableAdjaraFlat";
-
             return _botClient.SendTextMessageAsync(
                 chatId: _configuration.GetSection("BotConfiguration")["BotId"],
-                text: usage,
+                text: BotMessageManager.GetUsageWithTimeNow(),
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
@@ -33,6 +26,5 @@ namespace TelegramBotApi.Services
         {
             return Task.CompletedTask;
         }
-
     }
 }

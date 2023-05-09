@@ -122,7 +122,7 @@ namespace DataManagement.Repositories
             CreateFlatImages(flat.LinksOfImages, flatInfoId);
 
             _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
-            { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication.ToUniversalTime() });
+            { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication });
             _context.SaveChanges();
         }
 

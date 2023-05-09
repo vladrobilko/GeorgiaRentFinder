@@ -50,7 +50,7 @@ namespace Application.Services
 
             _flatRepository.CreateFlats(newAdjaraFlats);
             
-            _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.UtcNow);
+            _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.Now);
         }
 
         public void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic)

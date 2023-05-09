@@ -143,6 +143,18 @@ public partial class RentFinderDbContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
+
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                     .SelectMany(t => t.GetProperties())
+                     .Where
+                     (p
+                         => p.ClrType == typeof(DateTime)
+                            || p.ClrType == typeof(DateTime?)
+                     )
+                )
+        {
+            property.SetColumnType("timestamp without time zone");
+        }
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
