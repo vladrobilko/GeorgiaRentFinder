@@ -10,10 +10,12 @@ namespace Application.Interfaces
 
         void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic);
 
-        FlatInfoClientModel GetAvailableFlat(long channelId);
+        FlatInfoClientModel GetAvailableFlat();
 
         FlatInfoClientModel GetFlatById(long flatId);
 
         long GetCountNotViewedFlats();
+
+        long GetIdChannelWithLastCheckDate();
     }
 }

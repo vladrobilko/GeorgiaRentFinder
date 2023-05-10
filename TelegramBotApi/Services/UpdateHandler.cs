@@ -56,7 +56,7 @@ public class UpdateHandler : IUpdateHandler
         var action = messageText.Split(' ')[0] switch
         {
             "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/GetLastAvailableAdjaraFlat" => GetLastAvailableAdjaraFlat(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
@@ -64,11 +64,10 @@ public class UpdateHandler : IUpdateHandler
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
 
-        static async Task<Message> GetLastAvailableAdjaraFlat(ITelegramBotClient botClient, IFlatService flatService,
+        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            var flat = flatService.GetAvailableFlat(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
-            // maybe need without channel ID here? to make this method common__for it I need here get last founded flat date
+            var flat = flatService.GetAvailableFlat();
 
             if (flat == null)
             {
@@ -79,6 +78,8 @@ public class UpdateHandler : IUpdateHandler
                     cancellationToken: cancellationToken);
             }
 
+            var idChannelWithLastCheckDate = flatService.GetIdChannelWithLastCheckDate();
+
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
                 GetAlbumInputMediaToPost(flat),
@@ -87,7 +88,7 @@ public class UpdateHandler : IUpdateHandler
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Choose",
-                replyMarkup: GetKeyboardWithChoose(flat),
+                replyMarkup: GetKeyboardWithChoose(flat, idChannelWithLastCheckDate),
                 cancellationToken: cancellationToken);
 
         }
@@ -136,15 +137,15 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat)
+    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat,long idChannelToPost)
     {
         return new(
             new[]
             {
                     new []
                     {
-                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}"),
-                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}"),
+                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}_{idChannelToPost}"),
+                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}_noIdChannel"),
                     }
             });
     }
@@ -189,6 +190,8 @@ public class UpdateHandler : IUpdateHandler
 
         var infoData = callBackInfo[0];
         var flatId = callBackInfo[1];
+        var channelIdToPost = callBackInfo[2];
+
         string textResponseToBot = "Default";
 
         var flat = _flatService.GetFlatById(long.Parse(flatId));
@@ -196,7 +199,7 @@ public class UpdateHandler : IUpdateHandler
         if (infoData == "post")
         {
             await _botClient.SendMediaGroupAsync(
-                chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"], // give here id channel (last channel)
+                chatId: channelIdToPost,
                 GetAlbumInputMediaToPost(flat),
                 cancellationToken: cancellationToken);
 

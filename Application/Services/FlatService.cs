@@ -63,13 +63,8 @@ namespace Application.Services
             _flatRepository.UpdateFlatDateInfoRefusePublication(flatId, timeOfPublic);
         }
 
-        public FlatInfoClientModel GetAvailableFlat(long channelId)
+        public FlatInfoClientModel GetAvailableFlat()
         {
-            if (channelId != _channelInfoRepository.ReadIdChannelWithLastCheckDate())
-            {
-                throw new AccessViolationException();
-            }
-
             return _flatRepository.ReadOldestNotViewedFlat();
         }
 
@@ -81,6 +76,11 @@ namespace Application.Services
         public long GetCountNotViewedFlats()
         {
             return _flatRepository.ReadCountNotViewedFlats();
+        }
+
+        public long GetIdChannelWithLastCheckDate()
+        {
+            return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }
     }
 }

@@ -6,9 +6,9 @@ namespace TelegramBotApi
     {
         public const string Usage = "Usage:"
                               + "\n/FindSuitAdjaraFlats" +
-                              "\n/GetLastAvailableAdjaraFlat";
+                              "\n/GetLastAvailableFlat";
 
-        private const string GetLastAvailableFlatLink = "/GetLastAvailableAdjaraFlat";
+        private const string GetLastAvailableFlatLink = "/GetLastAvailableFlat";
         public static string GetUsageWithTimeNow()
         {
             return "______________________________________" +
