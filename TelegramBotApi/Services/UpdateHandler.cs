@@ -74,7 +74,8 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: BotMessageManager.GetUsageWithWithNoFreeMessage(),
+                    text: BotMessageManager.GetUsageWithNoFreeFlats(),
+                    parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
             }
 
@@ -86,7 +87,7 @@ public class UpdateHandler : IUpdateHandler
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Choose",
-                replyMarkup: GetKeyboardToChoose(flat),
+                replyMarkup: GetKeyboardWithChoose(flat),
                 cancellationToken: cancellationToken);
 
         }
@@ -94,15 +95,13 @@ public class UpdateHandler : IUpdateHandler
         static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-
             var countNotViewedFlats = flatService.GetCountNotViewedFlats();
 
             if (countNotViewedFlats != 0)
             {
                 return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: $"There are <ins><strong>{countNotViewedFlats} NOT distributed flats.</strong></ins> \n" +
-                $"You need to do this: /GetLastAvailableAdjaraFlat",
+                text: BotMessageManager.GetMessageWithCountNotDistributedFlats(countNotViewedFlats),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: cancellationToken);
@@ -110,12 +109,13 @@ public class UpdateHandler : IUpdateHandler
 
             flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
 
-            countNotViewedFlats = flatService.GetCountNotViewedFlats();
+            var textMessageToBot = flatService.GetCountNotViewedFlats() == 0 
+                ? BotMessageManager.GetUsageWithNoFreeFlats() 
+                : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: $"<ins><strong>{countNotViewedFlats} flats founded </strong></ins> \n" +
-                      $"You need to do this: /GetLastAvailableAdjaraFlat",
+                text: textMessageToBot,
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
@@ -136,7 +136,7 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    private static InlineKeyboardMarkup GetKeyboardToChoose(FlatInfoClientModel flat)
+    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat)
     {
         return new(
             new[]
@@ -196,7 +196,7 @@ public class UpdateHandler : IUpdateHandler
         if (infoData == "post")
         {
             await _botClient.SendMediaGroupAsync(
-                chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"],
+                chatId: _configuration.GetSection("AdjaraChannel")["ChannelName"], // give here id channel (last channel)
                 GetAlbumInputMediaToPost(flat),
                 cancellationToken: cancellationToken);
 
