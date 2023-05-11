@@ -146,7 +146,9 @@ namespace WebScraper.SsDotGe
                     .Replace("\r\n", "");
             }
 
-            if (string.IsNullOrWhiteSpace(input) || !(new Regex("^[\x20-\x7E]+$").IsMatch(input))) return "No description";
+            if (string.IsNullOrWhiteSpace(input)) return "No description";
+
+            if (!new Regex("^[\x20-\x7E]+$").IsMatch(input)) return input;
 
             var removeWhitespace = Regex.Replace(input, @"\s{2,}", " ");
 

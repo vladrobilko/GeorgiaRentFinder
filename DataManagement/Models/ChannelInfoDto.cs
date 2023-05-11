@@ -6,7 +6,7 @@ public partial class ChannelInfoDto
 
     public long? BotTelegramId { get; set; }
 
-    public string? ChannelName { get; set; }
+    public string ChannelName { get; set; }
 
     public DateTime LastCheckDate { get; set; }
 

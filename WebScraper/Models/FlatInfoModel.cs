@@ -47,7 +47,5 @@ namespace WebScraper.Models
             ViewsOnSite = viewsOnSite;
             FlatCoordinate = flatCoordinate;
         }
-
-        public FlatInfoModel() { }
     }
 }

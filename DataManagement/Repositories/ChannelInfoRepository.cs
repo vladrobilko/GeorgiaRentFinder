@@ -12,7 +12,7 @@ namespace DataManagement.Repositories
             _context = context;
         }
 
-        public DateTime ReadLastCheckDate(long channelId)
+        public DateTime ReadLastCheckDateById(long channelId)
         {
             return _context.ChannelInfosDto.Single(c => c.Id == channelId).LastCheckDate;
         }
@@ -26,21 +26,12 @@ namespace DataManagement.Repositories
             _context.SaveChanges();
         }
 
-        public DateTime ReadLatestCheckDateFromAllChannels()
+        public string ReadIdChannelWithLastCheckDate()
         {
             return _context.ChannelInfosDto
                 .OrderByDescending(c => c.LastCheckDate)
                 .Select(i => i)
-                .First()
-                .LastCheckDate;
-        }
-
-        public long ReadIdChannelWithLastCheckDate()
-        {
-            return _context.ChannelInfosDto
-                .OrderByDescending(c => c.LastCheckDate)
-                .Select(i => i)
-                .First().Id;
+                .First().ChannelName;
         }
     }
 }

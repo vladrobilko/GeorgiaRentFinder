@@ -12,7 +12,7 @@ namespace Application.Converters
         {
             var caption = IsCoordinateExist(flat.FlatCoordinateClientModel) ? GetCaptionWithCoordinate(flat) : GetCaptionWithOutCoordinate(flat);
 
-            if (flat.FlatPhoneClientModel.MentionOnSite > CountForRealtorDetection)
+            if (flat.FlatPhoneClientModel.MentionOnSite > CountForRealtorDetection && flat.FlatPhoneClientModel.PhoneNumber != "No number")
             {
                 caption += GetRealtorDescription(flat.FlatPhoneClientModel.MentionOnSite);
             }

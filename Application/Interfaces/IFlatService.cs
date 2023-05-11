@@ -6,6 +6,8 @@ namespace Application.Interfaces
     {
         void FindAndSaveSuitAdjaraFlats(long channelId);
 
+        void FindAndSaveSuitImeretiFlats(long channelId);
+
         void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic);
 
         void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic);
@@ -16,6 +18,6 @@ namespace Application.Interfaces
 
         long GetCountNotViewedFlats();
 
-        long GetIdChannelWithLastCheckDate();
+        string GetIdChannelWithLastCheckDate();
     }
 }

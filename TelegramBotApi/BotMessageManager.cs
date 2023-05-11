@@ -4,9 +4,13 @@ namespace TelegramBotApi
 {
     public static class BotMessageManager
     {
-        public const string Usage = "Usage:"
-                              + "\n/FindSuitAdjaraFlats" +
-                              "\n/GetLastAvailableFlat";
+        public const string Usage = "Usage:" + 
+                                    "\n  ____________________" +
+                                    "\n/GetLastAvailableFlat" +
+                                    "\n  ____________________" +
+                                    "\n/FindSuitAdjaraFlats" +
+                                    "\n  ____________________" +
+                                    "\n/FindSuitImeretiFlats";
 
         private const string GetLastAvailableFlatLink = "/GetLastAvailableFlat";
         public static string GetUsageWithTimeNow()
@@ -34,7 +38,7 @@ namespace TelegramBotApi
                    $"\n{Usage}";
         }
 
-        public static string GetMessageWithCountNotDistributedFlats(long countNotViewedFlats)
+        public static string GetMessageWithCountNotViewedFlats(long countNotViewedFlats)
         {
             return $"There are <ins><strong>{countNotViewedFlats} NOT distributed flats.</strong></ins>" +
                    $"\nYou need to do this: {GetLastAvailableFlatLink}";

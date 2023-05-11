@@ -43,7 +43,7 @@ public class UpdateHandler : IUpdateHandler
             await handler;
         }
         else
-            await botClient.SendTextMessageAsync(long.Parse(_configuration.GetSection("BotConfiguration")["BotId"]), "Sorry, you are not an admin to use this bot.",
+            await botClient.SendTextMessageAsync(long.Parse(_configuration.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException()), "Sorry, you are not an admin to use this bot.",
                 cancellationToken: cancellationToken);
     }
 
@@ -56,7 +56,8 @@ public class UpdateHandler : IUpdateHandler
         var action = messageText.Split(' ')[0] switch
         {
             "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/FindSuitImeretiFlats" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, _flatService, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
@@ -65,7 +66,7 @@ public class UpdateHandler : IUpdateHandler
         _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
 
         static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService,
-            IConfiguration configuration, Message message, CancellationToken cancellationToken)
+            Message message, CancellationToken cancellationToken)
         {
             var flat = flatService.GetAvailableFlat();
 
@@ -78,7 +79,7 @@ public class UpdateHandler : IUpdateHandler
                     cancellationToken: cancellationToken);
             }
 
-            var idChannelWithLastCheckDate = flatService.GetIdChannelWithLastCheckDate();
+            var channelName = flatService.GetIdChannelWithLastCheckDate();
 
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
@@ -88,7 +89,7 @@ public class UpdateHandler : IUpdateHandler
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: "Choose",
-                replyMarkup: GetKeyboardWithChoose(flat, idChannelWithLastCheckDate),
+                replyMarkup: GetKeyboardWithChoose(flat, channelName),
                 cancellationToken: cancellationToken);
 
         }
@@ -102,16 +103,45 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: BotMessageManager.GetMessageWithCountNotDistributedFlats(countNotViewedFlats),
+                text: BotMessageManager.GetMessageWithCountNotViewedFlats(countNotViewedFlats),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: cancellationToken);
             }
 
-            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
+            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ?? throw new InvalidOperationException()));
 
             var textMessageToBot = flatService.GetCountNotViewedFlats() == 0 
                 ? BotMessageManager.GetUsageWithNoFreeFlats() 
+                : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
+
+            return await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: textMessageToBot,
+                parseMode: ParseMode.Html,
+                replyMarkup: new ReplyKeyboardRemove(),
+                cancellationToken: cancellationToken);
+        }
+
+        static async Task<Message> FindSuitImeretiFlats(ITelegramBotClient botClient, IFlatService flatService,
+            IConfiguration configuration, Message message, CancellationToken cancellationToken)
+        {
+            var countNotViewedFlats = flatService.GetCountNotViewedFlats();
+
+            if (countNotViewedFlats != 0)
+            {
+                return await botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: BotMessageManager.GetMessageWithCountNotViewedFlats(countNotViewedFlats),
+                    parseMode: ParseMode.Html,
+                    replyMarkup: new ReplyKeyboardRemove(),
+                    cancellationToken: cancellationToken);
+            }
+
+            flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ?? throw new InvalidOperationException()));
+
+            var textMessageToBot = flatService.GetCountNotViewedFlats() == 0
+                ? BotMessageManager.GetUsageWithNoFreeFlats()
                 : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
 
             return await botClient.SendTextMessageAsync(
@@ -137,15 +167,15 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat,long idChannelToPost)
+    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat,string channelName)
     {
         return new(
             new[]
             {
                     new []
                     {
-                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}_{idChannelToPost}"),
-                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}_noIdChannel"),
+                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}_{channelName}"),
+                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}_noChannel"),
                     }
             });
     }
@@ -190,7 +220,7 @@ public class UpdateHandler : IUpdateHandler
 
         var infoData = callBackInfo[0];
         var flatId = callBackInfo[1];
-        var channelIdToPost = callBackInfo[2];
+        var channelName = callBackInfo[2];
 
         string textResponseToBot = "Default";
 
@@ -199,7 +229,7 @@ public class UpdateHandler : IUpdateHandler
         if (infoData == "post")
         {
             await _botClient.SendMediaGroupAsync(
-                chatId: channelIdToPost,
+                chatId: channelName,
                 GetAlbumInputMediaToPost(flat),
                 cancellationToken: cancellationToken);
 

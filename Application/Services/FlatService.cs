@@ -23,14 +23,7 @@ namespace Application.Services
 
         public void FindAndSaveSuitAdjaraFlats(long channelId)
         {
-            var lastCheckDate = _channelInfoRepository.ReadLastCheckDate(channelId);
-
-            var last = _channelInfoRepository.ReadLatestCheckDateFromAllChannels();
-
-            if (lastCheckDate != last)
-            {
-                throw new AggregateException();
-            }
+            var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
 
             var newAdjaraFlats = new List<FlatInfoModel>();
 
@@ -51,6 +44,26 @@ namespace Application.Services
             _flatRepository.CreateFlats(newAdjaraFlats);
             
             _channelInfoRepository.UpdateLastCheckDate(channelId,DateTime.Now);
+        }
+
+        public void FindAndSaveSuitImeretiFlats(long channelId)
+        {
+            //_____________________________________________
+            var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
+
+            var newImeretiFlats = new List<FlatInfoModel>();
+
+            var countPagesForScrap = 10;
+
+            for (var i = 1; i < countPagesForScrap; i++)
+            {
+                var imeretiFlats = _scraperSsDotGe.ScrapPageWithAllFlats(ImeretiMunicipallyLinksSsDotGe.GetKutaisiLink(i), lastCheckDate);
+                newImeretiFlats.AddRange(imeretiFlats);
+            }
+
+            _flatRepository.CreateFlats(newImeretiFlats);
+
+            _channelInfoRepository.UpdateLastCheckDate(channelId, DateTime.Now);
         }
 
         public void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic)
@@ -78,7 +91,7 @@ namespace Application.Services
             return _flatRepository.ReadCountNotViewedFlats();
         }
 
-        public long GetIdChannelWithLastCheckDate()
+        public string GetIdChannelWithLastCheckDate()
         {
             return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }

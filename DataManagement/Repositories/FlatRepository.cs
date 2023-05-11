@@ -113,8 +113,6 @@ namespace DataManagement.Repositories
 
         private void CreateFlat(FlatInfoModel flat)
         {
-            if (IsFlatWithDescriptionAndCostExist(flat)) return;
-
             var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flat.PhoneNumber);
 
             var flatInfoId = CreateFlatInfoAndGetHisId(flat, phoneId);
@@ -124,12 +122,6 @@ namespace DataManagement.Repositories
             _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
             { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication });
             _context.SaveChanges();
-        }
-
-        private bool IsFlatWithDescriptionAndCostExist(FlatInfoModel flat)
-        {
-            return _context.FlatInfosDto.FirstOrDefault(f =>
-                f.Description == flat.Description && f.Cost == flat.Cost) != null;
         }
 
         private long CreateFlatInfoAndGetHisId(FlatInfoModel flatInfoModel, long phoneId)
