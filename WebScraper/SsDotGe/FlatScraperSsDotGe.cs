@@ -118,6 +118,7 @@ namespace WebScraper.SsDotGe
                 .Where(e => e.Attributes["class"]?.Value == "img-responsive")
                 .Select(e => e.GetAttributeValue("src", null))
                 .Where(s => !String.IsNullOrEmpty(s) && !s.Contains("Thumb") && s.Contains("static.ss.ge"))
+                .Select(s => Regex.Replace(s, @"(?<!/)/(?!/)", "//"))
                 .Take(10)
                 .ToList();
 

@@ -16,7 +16,7 @@ public class UpdateHandler : IUpdateHandler
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _configuration;
-    private readonly IFlatService _flatService;
+    private static  IFlatService _flatService;
 
     public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatService flatService)
     {
@@ -167,51 +167,6 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat,string channelName)
-    {
-        return new(
-            new[]
-            {
-                    new []
-                    {
-                        InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}_{channelName}"),
-                        InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}_noChannel"),
-                    }
-            });
-    }
-
-    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat)
-    {
-        var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
-
-        for (var i = 0; i < flat.LinksOfImages.Count; i++)
-        {
-            if (i == 0)
-            {
-                photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
-                {
-                    Caption = flat.ToTelegramCaption(),
-                    ParseMode = ParseMode.Html
-                };
-            }
-
-            else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
-        }
-
-        return photos;
-    }
-
-    private bool IsAdmin(Update update)
-    {
-        if (update.CallbackQuery != null)
-        {
-            return update.CallbackQuery.From.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"];
-        }
-        return update.Message != null
-               && update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
-                   && update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"];
-    }
-
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
@@ -305,5 +260,50 @@ public class UpdateHandler : IUpdateHandler
         // Cooldown in case of network connection error
         if (exception is RequestException)
             await Task.Delay(TimeSpan.FromSeconds(20), cancellationToken);
+    }
+
+    private static InlineKeyboardMarkup GetKeyboardWithChoose(FlatInfoClientModel flat, string channelName)
+    {
+        return new(
+            new[]
+            {
+                new []
+                {
+                    InlineKeyboardButton.WithCallbackData("✅✅Post✅✅",$"post_{flat.Id}_{channelName}"),
+                    InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}_noChannel"),
+                }
+            });
+    }
+
+    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat)
+    {
+        var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
+
+        for (var i = 0; i < flat.LinksOfImages.Count; i++)
+        {
+            if (i == 0)
+            {
+                photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
+                {
+                    Caption = flat.ToTelegramCaption(),
+                    ParseMode = ParseMode.Html
+                };
+            }
+
+            else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
+        }
+
+        return photos;
+    }
+
+    private bool IsAdmin(Update update)
+    {
+        if (update.CallbackQuery != null)
+        {
+            return update.CallbackQuery.From.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"];
+        }
+        return update.Message != null
+               && update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
+               && update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"];
     }
 }
