@@ -10,14 +10,43 @@ namespace Application.Converters
 
         public static string ToTelegramCaption(this FlatInfoClientModel flat)
         {
-            var caption = IsCoordinateExist(flat.FlatCoordinateClientModel) ? GetCaptionWithCoordinate(flat) : GetCaptionWithOutCoordinate(flat);
+            var caption = GetCaptionWithOutCoordinateAndRealtor(flat);
 
-            if (flat.FlatPhoneClientModel.MentionOnSite > CountForRealtorDetection && flat.FlatPhoneClientModel.PhoneNumber != "No number")
-            {
-                caption += GetRealtorDescription(flat.FlatPhoneClientModel.MentionOnSite);
-            }
+            if (IsCoordinateExist(flat.FlatCoordinateClientModel)) caption += GetCoordinateOrEmptyDescription(flat);
+
+            if (IsItRealtor(flat)) caption += GetRealtorDescription(flat.FlatPhoneClientModel.MentionOnSite);
 
             return caption;
+        }
+
+        private static string GetCaptionWithOutCoordinateAndRealtor(FlatInfoClientModel flat)
+        {
+            return $"{flat.Title}\n\n" +
+
+                 $"<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescription(flat.Cost)}\n\n" +
+
+                 $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
+                 $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
+                 $"<strong>Description:</strong> {flat.Description}\n\n" +
+
+                 $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
+                 $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n";
+        }
+
+        private static string GetCostInGelOrEmptyDescription(long cost)
+        {
+            var usdToGel = UsdToGelCourseScraper.GetGelInOneDollarFromGeorgiaNationalBank();
+
+            if (usdToGel == double.MaxValue) return "";
+
+            return $"({Convert.ToInt32(usdToGel * cost)} ლ)";
+        }
+
+        private static string GetCoordinateOrEmptyDescription(FlatInfoClientModel flat)
+        {
+            return
+                $"<strong>Location:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>\n";
+
         }
 
         private static bool IsCoordinateExist(FlatCoordinateClientModel flatCoordinate)
@@ -30,42 +59,10 @@ namespace Application.Converters
             return $"https://www.google.com/maps/search/?api=1&query={latitude},{longitude}";
         }
 
-        private static string GetCaptionWithCoordinate(FlatInfoClientModel flat)
+        private static bool IsItRealtor(FlatInfoClientModel flat)
         {
-            return $"{flat.Title}\n\n" +
-
-                 $"<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescription(flat.Cost)}\n\n" +
-
-                 $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
-                 $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
-                 $"<strong>Description:</strong> {flat.Description}\n\n" +
-
-                 $"<strong>Location:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>\n" +
-                 $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
-                 $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n";
-        }
-
-        private static string GetCaptionWithOutCoordinate(FlatInfoClientModel flat)
-        {
-            return $"{flat.Title}\n\n" +
-
-                   $"<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescription(flat.Cost)}\n\n" +
-
-                   $"<strong>Views on site:</strong> {flat.ViewsOnSite}\n" +
-                   $"<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}\n" +
-                   $"<strong>Description:</strong> {flat.Description}\n\n" +
-
-                   $"<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>\n" +
-                   $"<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}\n\n";
-        }
-
-        private static string GetCostInGelOrEmptyDescription(long cost)
-        {
-            var usdToGel = UsdToGelCourseScraper.GetGelInOneDollarFromGeorgiaNationalBank();
-
-            if (usdToGel == double.MaxValue) return "";
-
-            return $"({Convert.ToInt32(usdToGel * cost)} ლ)";
+            return flat.FlatPhoneClientModel.MentionOnSite > CountForRealtorDetection &&
+                   flat.FlatPhoneClientModel.PhoneNumber != "No number";
         }
 
         private static string GetRealtorDescription(long mentionOnSite)

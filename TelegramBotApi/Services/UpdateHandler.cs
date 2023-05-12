@@ -55,9 +55,9 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/FindSuitAdjaraFlats" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/FindSuitImeretiFlats" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/GetLastAvailableFlat" => GetLastAvailableFlat(_botClient, _flatService, message, cancellationToken),
+            "/AdjaraSearch" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/ImeretiSearch" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/LookFlat" => GetLastAvailableFlat(_botClient, _flatService, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };

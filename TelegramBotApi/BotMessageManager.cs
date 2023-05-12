@@ -5,14 +5,15 @@ namespace TelegramBotApi
     public static class BotMessageManager
     {
         public const string Usage = "Usage:" + 
-                                    "\n  ____________________" +
-                                    "\n/GetLastAvailableFlat" +
-                                    "\n  ____________________" +
-                                    "\n/FindSuitAdjaraFlats" +
-                                    "\n  ____________________" +
-                                    "\n/FindSuitImeretiFlats";
+                                    "\n  _____________" +
+                                    "\n/LookFlat" +
+                                    "\n  _____________" +
+                                    "\n/ImeretiSearch" +
+                                    "\n  _____________" +
+                                    "\n/AdjaraSearch";
 
-        private const string GetLastAvailableFlatLink = "/GetLastAvailableFlat";
+        private const string GetLastAvailableFlatLink = "/LookFlat";
+
         public static string GetUsageWithTimeNow()
         {
             return "______________________________________" +
