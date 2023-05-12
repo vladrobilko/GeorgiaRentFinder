@@ -4,7 +4,7 @@ namespace TelegramBotApi
 {
     public static class BotMessageManager
     {
-        public const string Usage = "Usage:" + 
+        public const string Usage = "Usage:" +
                                     "\n  _____________" +
                                     "\n/LookFlat" +
                                     "\n  _____________" +
@@ -18,7 +18,7 @@ namespace TelegramBotApi
         {
             return "______________________________________" +
                    $"\nThe bot started at {DateTime.Now.ToCommonViewString()}" +
-                   $"\n{Usage}" ;
+                   $"\n{Usage}";
         }
 
         public static string GetUsageWithNoFreeFlats()
@@ -27,15 +27,29 @@ namespace TelegramBotApi
                    $"\n\n{Usage}";
         }
 
-        public static string GetMessageAfterPost()
+        public static string GetMessageAfterPost(long flatsKeep)
         {
+            if (flatsKeep > 0)
+            {
+                return $"<ins><strong>The post has been sent!</strong></ins>" +
+                       $"\nThere are <ins><strong>{flatsKeep} NOT distributed flats.</strong></ins>" +
+                       $"\nYou need to do this: {GetLastAvailableFlatLink}";
+            }
             return $"<ins><strong>The post has been sent!</strong></ins>" +
+                   $"\n<ins><strong>There are no free flats</strong></ins>" +
                    $"\n{Usage}";
         }
 
-        public static string GetMessageAfterRefusePost()
+        public static string GetMessageAfterRefusePost(long flatsKeep)
         {
+            if (flatsKeep > 0)
+            {
+                return $"<ins><strong>The post has NOT been sent!</strong></ins>" +
+                       $"\nThere are <ins><strong>{flatsKeep} NOT distributed flats.</strong></ins>" +
+                       $"\nYou need to do this: {GetLastAvailableFlatLink}";
+            }
             return $"<ins><strong>The post has NOT been sent!</strong></ins>" +
+                   $"\n<ins><strong>There are no free flats</strong></ins>" +
                    $"\n{Usage}";
         }
 

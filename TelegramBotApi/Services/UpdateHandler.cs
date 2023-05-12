@@ -9,6 +9,7 @@ using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using Application.Models;
 using Microsoft.Extensions.Configuration;
+using Application.Services;
 
 namespace TelegramBotApi.Services;
 
@@ -191,12 +192,12 @@ public class UpdateHandler : IUpdateHandler
 
             _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-            textResponseToBot = BotMessageManager.GetMessageAfterPost();
+            textResponseToBot = BotMessageManager.GetMessageAfterPost(_flatService.GetCountNotViewedFlats()); // add here count of free apartments and if != 0 => return only GetFlat if == 0 =>get only choice 
         }
 
         else if (infoData == "no post")
         {
-            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost();
+            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(_flatService.GetCountNotViewedFlats()); // and here
 
             _flatService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
         }
