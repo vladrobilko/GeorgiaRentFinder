@@ -8,6 +8,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using Application.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace TelegramBotApi.Services;
 
@@ -57,7 +58,7 @@ public class UpdateHandler : IUpdateHandler
         {
             "/AdjaraSearch" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/ImeretiSearch" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/LookFlat" => GetLastAvailableFlat(_botClient, _flatService, message, cancellationToken),
+            "/LookFlat" => GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => Usage(_botClient, message, cancellationToken),
         };
@@ -65,8 +66,8 @@ public class UpdateHandler : IUpdateHandler
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
 
-        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService,
-            Message message, CancellationToken cancellationToken)
+        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService, 
+            IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
             var flat = flatService.GetAvailableFlat();
 
@@ -80,10 +81,10 @@ public class UpdateHandler : IUpdateHandler
             }
 
             var channelName = flatService.GetIdChannelWithLastCheckDate();
-
+            
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
-                GetAlbumInputMediaToPost(flat),
+                GetAlbumInputMediaToPost(flat, configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
                 cancellationToken: cancellationToken);
 
             return await botClient.SendTextMessageAsync(
@@ -184,8 +185,8 @@ public class UpdateHandler : IUpdateHandler
         if (infoData == "post")
         {
             await _botClient.SendMediaGroupAsync(
-                chatId: channelName,
-                GetAlbumInputMediaToPost(flat),
+            chatId: channelName,
+                GetAlbumInputMediaToPost(flat, _configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
                 cancellationToken: cancellationToken);
 
             _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
@@ -275,7 +276,7 @@ public class UpdateHandler : IUpdateHandler
             });
     }
 
-    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat)
+    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat, string apiTranslatorToken)
     {
         var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
 
@@ -285,7 +286,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
                 {
-                    Caption = flat.ToTelegramCaption(),
+                    Caption = flat.ToTelegramCaptionWithRussianLanguage("ru", apiTranslatorToken),
                     ParseMode = ParseMode.Html
                 };
             }
