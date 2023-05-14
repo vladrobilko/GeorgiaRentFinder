@@ -113,6 +113,8 @@ namespace DataManagement.Repositories
 
         private void CreateFlat(FlatInfoModel flat)
         {
+            if (IsSameFlatExist(flat)) return;
+
             var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flat.PhoneNumber);
 
             var flatInfoId = CreateFlatInfoAndGetHisId(flat, phoneId);
@@ -122,6 +124,15 @@ namespace DataManagement.Repositories
             _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
             { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication });
             _context.SaveChanges();
+        }
+
+        private bool IsSameFlatExist(FlatInfoModel flat)
+        {
+            var flatWithTitle = _context.FlatInfosDto.FirstOrDefault(f => f.Title == flat.Title);
+            var flatWithDescription = _context.FlatInfosDto.FirstOrDefault(f => f.Description == flat.Description);
+            var flatWithLink = _context.FlatInfosDto.FirstOrDefault(f => f.PageLink == flat.PageLink);
+
+            return flatWithTitle != null && flatWithDescription != null && flatWithLink != null;
         }
 
         private long CreateFlatInfoAndGetHisId(FlatInfoModel flatInfoModel, long phoneId)
