@@ -76,7 +76,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: BotMessageManager.GetUsageWithNoFreeFlats(),
+                    text: BotMessageManager.GetMessageIfNoFreeFlats(),
                     parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
             }
@@ -114,7 +114,7 @@ public class UpdateHandler : IUpdateHandler
             flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ?? throw new InvalidOperationException()));
 
             var textMessageToBot = flatService.GetCountNotViewedFlats() == 0 
-                ? BotMessageManager.GetUsageWithNoFreeFlats() 
+                ? BotMessageManager.GetMessageIfNoFreeFlats() 
                 : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
 
             return await botClient.SendTextMessageAsync(
@@ -143,7 +143,7 @@ public class UpdateHandler : IUpdateHandler
             flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ?? throw new InvalidOperationException()));
 
             var textMessageToBot = flatService.GetCountNotViewedFlats() == 0
-                ? BotMessageManager.GetUsageWithNoFreeFlats()
+                ? BotMessageManager.GetMessageIfNoFreeFlats()
                 : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
 
             return await botClient.SendTextMessageAsync(
@@ -192,14 +192,14 @@ public class UpdateHandler : IUpdateHandler
 
             _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-            textResponseToBot = BotMessageManager.GetMessageAfterPost(_flatService.GetCountNotViewedFlats()); // add here count of free apartments and if != 0 => return only GetFlat if == 0 =>get only choice 
+            textResponseToBot = BotMessageManager.GetMessageAfterPost(_flatService.GetCountNotViewedFlats());
         }
 
         else if (infoData == "no post")
         {
-            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(_flatService.GetCountNotViewedFlats()); // and here
-
             _flatService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
+
+            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(_flatService.GetCountNotViewedFlats());
         }
 
         await _botClient.SendTextMessageAsync(

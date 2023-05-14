@@ -21,10 +21,13 @@ namespace TelegramBotApi
                    $"\n{Usage}";
         }
 
-        public static string GetUsageWithNoFreeFlats()
+        public static string GetMessageIfNoFreeFlats()
         {
-            return $"<ins><strong>No free flats</strong></ins>" +
-                   $"\n\n{Usage}";
+            return "<ins><strong>No free flats</strong></ins>" +
+                    "\n  _____________" +
+                    "\n/ImeretiSearch" +
+                    "\n  _____________" +
+                    "\n/AdjaraSearch";
         }
 
         public static string GetMessageAfterPost(long flatsKeep)
