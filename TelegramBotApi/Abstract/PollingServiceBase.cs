@@ -36,10 +36,8 @@ public abstract class PollingServiceBase<TReceiverService> : BackgroundService
     {
         await _botClient.SendTextMessageAsync(
             chatId: _configuration.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
-            text: BotMessageManager.GetUsageWithTimeNow(),
-            replyMarkup: new ReplyKeyboardRemove(),
+            text: BotMessageManager.GetStartMessage(),
             cancellationToken: cancellationToken);
-
     }
 
     private async Task DoWork(CancellationToken stoppingToken)

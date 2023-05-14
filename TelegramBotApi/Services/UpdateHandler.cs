@@ -57,15 +57,27 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
+
+            "/start" => BotStart(_botClient, _flatService, _configuration, message, cancellationToken),
             "/AdjaraSearch" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/ImeretiSearch" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/LookFlat" => GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
-            _ => Usage(_botClient, message, cancellationToken),
+            _ => OnTextResponse(_botClient, message, cancellationToken),
         };
 
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
+
+        static async Task<Message> BotStart(ITelegramBotClient botClient, IFlatService flatService,
+            IConfiguration configuration, Message message, CancellationToken cancellationToken)
+        {
+            return await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: BotMessageManager.GetMessageFlatCountInfo(flatService.GetCountNotViewedFlats()),
+                parseMode: ParseMode.Html,
+                cancellationToken: cancellationToken);
+        }
 
         static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService, 
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
@@ -76,7 +88,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: BotMessageManager.GetMessageIfNoFreeFlats(),
+                    text: BotMessageManager.GetMessageFlatCountInfo(0),
                     parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
             }
@@ -105,7 +117,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: BotMessageManager.GetMessageWithCountNotViewedFlats(countNotViewedFlats),
+                text: BotMessageManager.GetMessageFlatCountInfo(countNotViewedFlats),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: cancellationToken);
@@ -113,13 +125,9 @@ public class UpdateHandler : IUpdateHandler
 
             flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ?? throw new InvalidOperationException()));
 
-            var textMessageToBot = flatService.GetCountNotViewedFlats() == 0 
-                ? BotMessageManager.GetMessageIfNoFreeFlats() 
-                : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
-
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: textMessageToBot,
+                text: BotMessageManager.GetMessageFlatCountInfo(flatService.GetCountNotViewedFlats()),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
@@ -134,7 +142,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 return await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: BotMessageManager.GetMessageWithCountNotViewedFlats(countNotViewedFlats),
+                    text: BotMessageManager.GetMessageFlatCountInfo(countNotViewedFlats),
                     parseMode: ParseMode.Html,
                     replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: cancellationToken);
@@ -142,23 +150,19 @@ public class UpdateHandler : IUpdateHandler
 
             flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ?? throw new InvalidOperationException()));
 
-            var textMessageToBot = flatService.GetCountNotViewedFlats() == 0
-                ? BotMessageManager.GetMessageIfNoFreeFlats()
-                : BotMessageManager.GetMessageWithCountFoundedFlats(flatService.GetCountNotViewedFlats());
-
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: textMessageToBot,
+                text: BotMessageManager.GetMessageFlatCountInfo(flatService.GetCountNotViewedFlats()),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
 
-        static async Task<Message> Usage(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        static async Task<Message> OnTextResponse(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: BotMessageManager.Usage,
+                text: BotMessageManager.GetMessageAfterOnlyTextSending(),
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
