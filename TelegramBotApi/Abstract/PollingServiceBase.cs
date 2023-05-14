@@ -1,3 +1,6 @@
+using Telegram.Bot;
+using Telegram.Bot.Types.ReplyMarkups;
+
 namespace TelegramBotApi.Abstract;
 
 public abstract class PollingServiceBase<TReceiverService> : BackgroundService
@@ -5,20 +8,38 @@ public abstract class PollingServiceBase<TReceiverService> : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger _logger;
+    private readonly ITelegramBotClient _botClient;
+    private readonly IConfiguration _configuration;
 
     internal PollingServiceBase(
         IServiceProvider serviceProvider,
-        ILogger<PollingServiceBase<TReceiverService>> logger)
+        ILogger<PollingServiceBase<TReceiverService>> logger,
+        ITelegramBotClient botClient,
+        IConfiguration configuration)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
+        _botClient = botClient;
+        _configuration = configuration;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Starting polling service");
 
+        await Start(stoppingToken);
+
         await DoWork(stoppingToken);
+    }
+
+    private async Task Start(CancellationToken cancellationToken)
+    {
+        await _botClient.SendTextMessageAsync(
+            chatId: _configuration.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
+            text: BotMessageManager.GetUsageWithTimeNow(),
+            replyMarkup: new ReplyKeyboardRemove(),
+            cancellationToken: cancellationToken);
+
     }
 
     private async Task DoWork(CancellationToken stoppingToken)
