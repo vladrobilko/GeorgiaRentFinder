@@ -22,7 +22,7 @@ namespace Application.Services
         {
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
 
-            var scraperSsDotGe = new FlatScraperSsDotGe(20, 60, 510);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 510);
 
             var newAdjaraFlats = new List<FlatInfoModel>();
 
@@ -49,7 +49,7 @@ namespace Application.Services
         {
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
 
-            var scraperSsDotGe = new FlatScraperSsDotGe(20, 60, 360);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 360);
 
             var newImeretiFlats = new List<FlatInfoModel>();
 

@@ -115,7 +115,7 @@ namespace DataManagement.Repositories
         {
             if (IsSameFlatExist(flat)) return;
 
-            var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flat.PhoneNumber);
+            var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flat.PhoneNumber, flat.PageLink);
 
             var flatInfoId = CreateFlatInfoAndGetHisId(flat, phoneId);
 
@@ -162,7 +162,7 @@ namespace DataManagement.Repositories
             });
         }
 
-        private long CreateOrUpgradePhoneNumberAndGetHisId(string number)
+        private long CreateOrUpgradePhoneNumberAndGetHisId(string number, string flatLink)
         {
             var phoneModel = _context.FlatPhonesDto.SingleOrDefault(p => p.Number == number);
 
@@ -174,9 +174,12 @@ namespace DataManagement.Repositories
                 return flatPhone.Id;
             }
 
-            phoneModel.NumberMentionsOnSite += 1;
-            _context.FlatPhonesDto.Update(phoneModel);
-            _context.SaveChanges();
+            if (_context.FlatInfosDto.FirstOrDefault(f => flatLink == f.PageLink) == null)
+            {
+                phoneModel.NumberMentionsOnSite += 1;
+                _context.FlatPhonesDto.Update(phoneModel);
+                _context.SaveChanges();
+            }
 
             return phoneModel.Id;
         }
