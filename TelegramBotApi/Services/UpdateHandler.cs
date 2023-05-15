@@ -97,7 +97,7 @@ public class UpdateHandler : IUpdateHandler
             
             await botClient.SendMediaGroupAsync(
                 chatId: message.Chat.Id,
-                GetAlbumInputMediaToPost(flat, configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
+                GetAlbumInputMediaToPost(flat,true, configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
                 cancellationToken: cancellationToken);
 
             return await botClient.SendTextMessageAsync(
@@ -191,7 +191,7 @@ public class UpdateHandler : IUpdateHandler
         {
             await _botClient.SendMediaGroupAsync(
             chatId: channelName,
-                GetAlbumInputMediaToPost(flat, _configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
+                GetAlbumInputMediaToPost(flat,false, _configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
                 cancellationToken: cancellationToken);
 
             _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
@@ -281,7 +281,7 @@ public class UpdateHandler : IUpdateHandler
             });
     }
 
-    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat, string apiTranslatorToken)
+    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat,bool isForAdmin, string apiTranslatorToken)
     {
         var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
 
@@ -291,7 +291,7 @@ public class UpdateHandler : IUpdateHandler
             {
                 photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
                 {
-                    Caption = flat.ToTelegramCaptionWithRussianLanguage("ru", apiTranslatorToken),
+                    Caption = flat.ToTelegramCaptionWithRussianLanguage(isForAdmin,"ru", apiTranslatorToken),
                     ParseMode = ParseMode.Html
                 };
             }

@@ -20,13 +20,15 @@ namespace Application.Converters
             return caption;
         }
 
-        public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, string language = null, string apiToken = null)
+        public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat,bool isForAdmin, string language = null, string apiToken = null)
         {
             var caption = GetCaptionWithOutCoordinateAndRealtor(flat, language, apiToken);
 
             if (IsCoordinateExist(flat.FlatCoordinateClientModel)) caption += GetCoordinateOrEmptyDescription(flat,"ru");
 
             if (IsItRealtor(flat)) caption += GetRealtorDescription(flat.FlatPhoneClientModel.MentionOnSite,"ru");
+
+            if (isForAdmin) caption += $"\nID in database - {flat.Id}";
 
             return caption;
         }
