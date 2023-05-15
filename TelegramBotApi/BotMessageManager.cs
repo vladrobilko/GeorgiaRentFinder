@@ -42,21 +42,6 @@ namespace TelegramBotApi
                    $"\nYou need to do this: {GetLastAvailableFlatLink}";
         }
 
-        /*public static string GetMessageIfNoFreeFlats()
-        {
-            return "<ins><strong>No free flats</strong></ins>" +
-                    "\n  _____________" +
-                    "\n/ImeretiSearch" +
-                    "\n  _____________" +
-                    "\n/AdjaraSearch";
-        }
-
-        public static string GetMessageWithCountNotViewedFlats(long countNotViewedFlats)
-        {
-            return $"There are <ins><strong>{countNotViewedFlats} NOT distributed flats.</strong></ins>" +
-                   $"\nYou need to do this: {GetLastAvailableFlatLink}";
-        }*/
-
         public static string GetMessageAfterPost(long flatsKeep)
         {
             if (flatsKeep > 0)
@@ -81,12 +66,6 @@ namespace TelegramBotApi
             return $"<ins><strong>The post has NOT been sent!</strong></ins>" +
                    $"\n<ins><strong>There are no free flats</strong></ins>" +
                    $"\n{Usage}";
-        }
-        
-        public static string GetMessageWithCountFoundedFlats(long countFoundedFlats)
-        {
-            return $"There are <ins><strong>{countFoundedFlats} NOT distributed flats.</strong></ins>" +
-                   $"\nYou need to do this: {GetLastAvailableFlatLink}";
         }
     }
 }

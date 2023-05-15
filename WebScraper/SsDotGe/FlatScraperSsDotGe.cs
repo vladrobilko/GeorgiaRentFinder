@@ -7,11 +7,18 @@ namespace WebScraper.SsDotGe
 {
     public class FlatScraperSsDotGe
     {
-        private const int FlatsOnPage = 20;
+        private readonly int _flatsOnPage;
 
-        private const int FlatLowestPrice = 70;
+        private readonly int _flatLowestPrice;
 
-        private const int FlatHighestPrice = 360;
+        private readonly int _flatHighestPrice;
+
+        public FlatScraperSsDotGe(int flatOnPage, int flatLowestPrice, int flatHighestPrice)
+        {
+            _flatsOnPage = flatOnPage;
+            _flatLowestPrice = flatLowestPrice;
+            _flatHighestPrice = flatHighestPrice;
+        }
 
         public List<FlatInfoModel> ScrapPageWithAllFlats(string url, DateTime lastCheckDate)
         {
@@ -19,9 +26,9 @@ namespace WebScraper.SsDotGe
 
             HtmlDocument mainPage = GetHtmlDocumentForPage(url);
 
-            for (int i = 0, j = 0; i < FlatsOnPage; j++)
+            for (int i = 0, j = 0; i < _flatsOnPage; j++)
             {
-                if (j > FlatsOnPage * 2) break;
+                if (j > _flatsOnPage * 2) break;
 
                 var flatCreationDate = GetFlatCreationDateOrMinDate(mainPage, j);
 
@@ -95,7 +102,7 @@ namespace WebScraper.SsDotGe
 
         private bool IsFlatSuit(string flatTitle, int flatCost)
         {
-            return flatTitle != "No title" && flatCost > FlatLowestPrice && flatCost < FlatHighestPrice;
+            return flatTitle != "No title" && flatCost > _flatLowestPrice && flatCost < _flatHighestPrice;
         }
 
         private string GetFlatOwnerPhoneNumberFromFlatPage(HtmlDocument flatPage)

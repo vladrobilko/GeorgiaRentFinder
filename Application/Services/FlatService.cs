@@ -12,11 +12,8 @@ namespace Application.Services
 
         private readonly IChannelInfoRepository _channelInfoRepository;
 
-        private readonly FlatScraperSsDotGe _scraperSsDotGe;
-
         public FlatService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
         {
-            _scraperSsDotGe = new FlatScraperSsDotGe();
             _flatRepository = flatRepository;
             _channelInfoRepository = channelInfoRepository;
         }
@@ -25,19 +22,21 @@ namespace Application.Services
         {
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
 
+            var scraperSsDotGe = new FlatScraperSsDotGe(20, 60, 510);
+
             var newAdjaraFlats = new List<FlatInfoModel>();
 
             var countPagesForScrap = 10;
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
-                var batumiFlats = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetBatumiLink(i), lastCheckDate);
+                var batumiFlats = scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetBatumiLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(batumiFlats);
 
-                var kobuletiFlats = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(i), lastCheckDate);
+                var kobuletiFlats = scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(kobuletiFlats);
 
-                var khelvachauriFlats = _scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKhelvachauriLink(i), lastCheckDate);
+                var khelvachauriFlats = scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKhelvachauriLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(khelvachauriFlats);
             }
 
@@ -48,8 +47,9 @@ namespace Application.Services
 
         public void FindAndSaveSuitImeretiFlats(long channelId)
         {
-            //_____________________________________________
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
+
+            var scraperSsDotGe = new FlatScraperSsDotGe(20, 60, 360);
 
             var newImeretiFlats = new List<FlatInfoModel>();
 
@@ -57,7 +57,7 @@ namespace Application.Services
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
-                var imeretiFlats = _scraperSsDotGe.ScrapPageWithAllFlats(ImeretiMunicipallyLinksSsDotGe.GetKutaisiLink(i), lastCheckDate);
+                var imeretiFlats = scraperSsDotGe.ScrapPageWithAllFlats(ImeretiMunicipallyLinksSsDotGe.GetKutaisiLink(i), lastCheckDate);
                 newImeretiFlats.AddRange(imeretiFlats);
             }
 
