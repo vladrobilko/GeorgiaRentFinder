@@ -11,6 +11,8 @@ namespace Application.Interfaces.Repository
 
         void UpdateFlatDateInfoRefusePublication(long flatId, DateTime timeOfRefuse);
 
+        void UpdateFlatDateInfoTelegramException(long flatId, DateTime time);
+
         long ReadCountNotViewedFlats();
 
         FlatInfoClientModel ReadOldestNotViewedFlat();

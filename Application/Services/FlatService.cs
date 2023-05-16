@@ -105,5 +105,10 @@ namespace Application.Services
         {
             return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }
+
+        public void AddDatesForTelegramException(long flatId, DateTime time)
+        {
+            _flatRepository.UpdateFlatDateInfoTelegramException(flatId, time);
+        }
     }
 }

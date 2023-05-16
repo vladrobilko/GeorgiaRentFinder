@@ -37,6 +37,14 @@ namespace DataManagement.Repositories
             _context.SaveChanges();
         }
 
+        public void UpdateFlatDateInfoTelegramException(long flatId, DateTime time)
+        {
+            var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
+            flatDateInfoDto.RefusePublication = time;
+            flatDateInfoDto.TelegramPublication = time;
+            _context.SaveChanges();
+        }
+
         public long ReadCountNotViewedFlats()
         {
             return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);

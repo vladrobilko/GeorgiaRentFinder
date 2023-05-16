@@ -18,7 +18,7 @@ public class UpdateHandler : IUpdateHandler
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _configuration;
-    private static  IFlatService _flatService;
+    private static IFlatService _flatService;
 
     public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatService flatService)
     {
@@ -79,7 +79,7 @@ public class UpdateHandler : IUpdateHandler
                 cancellationToken: cancellationToken);
         }
 
-        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService, 
+        static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
             var flat = flatService.GetAvailableFlat();
@@ -94,11 +94,8 @@ public class UpdateHandler : IUpdateHandler
             }
 
             var channelName = flatService.GetIdChannelWithLastCheckDate();
-            
-            await botClient.SendMediaGroupAsync(
-                chatId: message.Chat.Id,
-                GetAlbumInputMediaToPost(flat,true, configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
-                cancellationToken: cancellationToken);
+
+            await SendContentToBotWithTranslateText(botClient, message.Chat.Id, flat, configuration, cancellationToken, true);
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -173,6 +170,45 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
+    private static async Task SendContentToBotWithTranslateText(ITelegramBotClient botClient, ChatId chatId,
+        FlatInfoClientModel flat, IConfiguration configuration, CancellationToken cancellationToken, bool isForAdmin)
+    {
+
+        var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
+
+        var apiTranslatorToken = configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ??
+                                 throw new InvalidOperationException();
+
+        for (var i = 0; i < flat.LinksOfImages.Count; i++)
+        {
+            if (i == 0)
+            {
+                photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
+                {
+                    Caption = flat.ToTelegramCaptionWithRussianLanguage(isForAdmin, "ru", apiTranslatorToken),
+                    ParseMode = ParseMode.Html
+                };
+            }
+
+            else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
+        }
+
+        try
+        {
+            await botClient.SendMediaGroupAsync(chatId, photos, cancellationToken: cancellationToken);
+        }
+        catch
+        {
+            _flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
+            await botClient.SendTextMessageAsync(
+                chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
+                text: BotMessageManager.GetMessageAfterOnlyTextSending(),
+                replyMarkup: new ReplyKeyboardRemove(),
+                cancellationToken: cancellationToken);
+            throw;
+        }
+    }
+
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
@@ -189,10 +225,7 @@ public class UpdateHandler : IUpdateHandler
 
         if (infoData == "post")
         {
-            await _botClient.SendMediaGroupAsync(
-            chatId: channelName,
-                GetAlbumInputMediaToPost(flat,false, _configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ?? throw new InvalidOperationException()),
-                cancellationToken: cancellationToken);
+            await SendContentToBotWithTranslateText(_botClient, channelName, flat, _configuration, cancellationToken, false);
 
             _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
@@ -279,27 +312,6 @@ public class UpdateHandler : IUpdateHandler
                     InlineKeyboardButton.WithCallbackData("❌DON'T post❌",$"no post_{flat.Id}_noChannel"),
                 }
             });
-    }
-
-    private static IAlbumInputMedia[] GetAlbumInputMediaToPost(FlatInfoClientModel flat,bool isForAdmin, string apiTranslatorToken)
-    {
-        var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
-
-        for (var i = 0; i < flat.LinksOfImages.Count; i++)
-        {
-            if (i == 0)
-            {
-                photos[i] = new InputMediaPhoto(flat.LinksOfImages[i])
-                {
-                    Caption = flat.ToTelegramCaptionWithRussianLanguage(isForAdmin,"ru", apiTranslatorToken),
-                    ParseMode = ParseMode.Html
-                };
-            }
-
-            else photos[i] = new InputMediaPhoto(flat.LinksOfImages[i]);
-        }
-
-        return photos;
     }
 
     private bool IsAdmin(Update update)

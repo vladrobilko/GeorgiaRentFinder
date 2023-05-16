@@ -19,5 +19,7 @@ namespace Application.Interfaces
         long GetCountNotViewedFlats();
 
         string GetIdChannelWithLastCheckDate();
+
+        void AddDatesForTelegramException(long flatId, DateTime time);
     }
 }
