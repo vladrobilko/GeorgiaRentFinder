@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Repository;
+﻿using System.Text.RegularExpressions;
+using Application.Interfaces.Repository;
 using Application.Models;
 using DataManagement.Models;
 using WebScraper.Models;
@@ -113,7 +114,26 @@ namespace DataManagement.Repositories
 
         private void CreateFlat(FlatInfoModel flat)
         {
-            if (IsSameFlatExist(flat)) return;
+            if (IsSameFlatExist(flat))
+            {
+                var flatModel = _context.FlatInfosDto.First(f => f.PageLink == flat.PageLink);
+
+                if (flatModel.Cost > flat.Cost)
+                {
+                    var flatDateDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatModel.Id);
+                    flatDateDto.RefusePublication = null;
+                    flatDateDto.TelegramPublication = null;
+                    _context.FlatDateInfosDto.Update(flatDateDto);
+                    _context.SaveChanges();
+
+                    if (!flatModel.Description.Contains("(The price has decreased)")) flatModel.Description = "(The price has decreased)" + flatModel.Description;
+                    flatModel.Cost = flat.Cost;
+                    _context.FlatInfosDto.Update(flatModel);
+                    _context.SaveChanges();
+                }
+
+                return;
+            }
 
             var phoneId = CreateOrUpgradePhoneNumberAndGetHisId(flat.PhoneNumber, flat.PageLink);
 
@@ -128,11 +148,9 @@ namespace DataManagement.Repositories
 
         private bool IsSameFlatExist(FlatInfoModel flat)
         {
-            var flatWithTitle = _context.FlatInfosDto.FirstOrDefault(f => f.Title == flat.Title);
-            var flatWithDescription = _context.FlatInfosDto.FirstOrDefault(f => f.Description == flat.Description);
             var flatWithLink = _context.FlatInfosDto.FirstOrDefault(f => f.PageLink == flat.PageLink);
 
-            return flatWithTitle != null && flatWithDescription != null && flatWithLink != null;
+            return flatWithLink != null;
         }
 
         private long CreateFlatInfoAndGetHisId(FlatInfoModel flatInfoModel, long phoneId)

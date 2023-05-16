@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Repository;
 using Application.Models;
+using WebScraper;
 using WebScraper.Models;
 using WebScraper.SsDotGe;
 
@@ -30,13 +31,13 @@ namespace Application.Services
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
-                var batumiFlats = scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetBatumiLink(i), lastCheckDate);
+                var batumiFlats = scraperSsDotGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetBatumiLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(batumiFlats);
 
-                var kobuletiFlats = scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(i), lastCheckDate);
+                var kobuletiFlats = scraperSsDotGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKobuletiLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(kobuletiFlats);
 
-                var khelvachauriFlats = scraperSsDotGe.ScrapPageWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKhelvachauriLink(i), lastCheckDate);
+                var khelvachauriFlats = scraperSsDotGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksSsDotGe.GetKhelvachauriLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(khelvachauriFlats);
             }
 
@@ -49,19 +50,28 @@ namespace Application.Services
         {
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 360);
-
-            var newImeretiFlats = new List<FlatInfoModel>();
+            var imeretiFlats = new List<FlatInfoModel>();
 
             var countPagesForScrap = 10;
 
+            /*var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 360);
+
             for (var i = 1; i < countPagesForScrap; i++)
             {
-                var imeretiFlats = scraperSsDotGe.ScrapPageWithAllFlats(ImeretiMunicipallyLinksSsDotGe.GetKutaisiLink(i), lastCheckDate);
-                newImeretiFlats.AddRange(imeretiFlats);
+                var imeretiMyHomeDotGeFlats = scraperMyHomeDotGe.ScrapAllPagesWithAllFlats(ImeretiMunicipallyLinksMyHomeDotGe.GetKutaisiLink(i), lastCheckDate);
+                imeretiFlats.AddRange(imeretiMyHomeDotGeFlats);
+            }*/
+
+
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 360);
+
+            for (var i = 1; i < countPagesForScrap; i++)
+            {
+                var imeretiSsDotGeFlats = scraperSsDotGe.ScrapAllPagesWithAllFlats(ImeretiMunicipallyLinksSsDotGe.GetKutaisiLink(i), lastCheckDate);
+                imeretiFlats.AddRange(imeretiSsDotGeFlats);
             }
 
-            _flatRepository.CreateFlats(newImeretiFlats);
+            _flatRepository.CreateFlats(imeretiFlats);
 
             _channelInfoRepository.UpdateLastCheckDate(channelId, DateTime.Now);
         }

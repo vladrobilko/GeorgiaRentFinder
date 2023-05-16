@@ -18,13 +18,20 @@ namespace WebScraper.SsDotGe
             _flatScraper = flatScraper;
         }
 
-        public List<FlatInfoModel> ScrapPageWithAllFlats(string url, DateTime lastCheckDate)
+        public List<FlatInfoModel> ScrapAllPagesWithAllFlats(string url, DateTime lastCheckDate)
         {
             var flats = new List<FlatInfoModel>();
 
             HtmlDocument mainPage = GetHtmlDocumentForPage(url);
 
-            for (int i = 0, j = 0; i < _flatsOnPage; j++)
+            ScrapPage(url, lastCheckDate, mainPage, flats);
+
+            return flats;
+        }
+
+        private void ScrapPage(string url, DateTime lastCheckDate, HtmlDocument mainPage, List<FlatInfoModel> flats)
+        {
+            for (int i = 0, j = 1; i < _flatsOnPage; j++)
             {
                 if (j > _flatsOnPage * 2) break;
 
@@ -48,8 +55,6 @@ namespace WebScraper.SsDotGe
 
                 if (flatTitle != "No title" && !IsFlatSuit(flatTitle, flatCost)) i++;
             }
-
-            return flats;
         }
 
         private FlatInfoModel GetFlatInfoModel(string flatLink, string flatTitle, int flatCost, string flatDescription, DateTime flatCreationDate)
