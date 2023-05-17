@@ -31,7 +31,7 @@ namespace WebScraper.SsDotGe
 
         private void ScrapPage(string url, DateTime lastCheckDate, HtmlDocument mainPage, List<FlatInfoModel> flats)
         {
-            for (int i = 0, j = 1; i < _flatsOnPage; j++)
+            for (int i = 0, j = 0; i < _flatsOnPage; j++)
             {
                 if (j > _flatsOnPage * 2) break;
 
@@ -47,9 +47,7 @@ namespace WebScraper.SsDotGe
                 {
                     var flatLink = _flatScraper.GetFLatLink(mainPage, url, j);
 
-                    var flatDescription = _flatScraper.GetFlatDescription(mainPage, j, 200);
-
-                    flats.Add(GetFlatInfoModel(flatLink, flatTitle, flatCost, flatDescription, flatCreationDate));
+                    flats.Add(GetFlatInfoModel(flatLink, flatTitle, flatCost, flatCreationDate));
                     i++;
                 }
 
@@ -57,9 +55,11 @@ namespace WebScraper.SsDotGe
             }
         }
 
-        private FlatInfoModel GetFlatInfoModel(string flatLink, string flatTitle, int flatCost, string flatDescription, DateTime flatCreationDate)
+        private FlatInfoModel GetFlatInfoModel(string flatLink, string flatTitle, int flatCost, DateTime flatCreationDate)
         {
             HtmlDocument flatPage = GetHtmlDocumentForPage(flatLink);
+
+            var flatDescription = _flatScraper.GetFlatDescription(flatPage, 200);
 
             var flatOwnerPhoneNumber = _flatScraper.GetFlatOwnerPhoneNumber(flatPage);
 

@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using WebScraper.Models;
 
 namespace WebScraper
@@ -8,37 +9,63 @@ namespace WebScraper
     {
         public DateTime GetFlatCreationOrMinDate(HtmlDocument mainPage, int htmlDivNumber)
         {
-            var formatInputDate = "dd.MM.yyyy/HH:mm";
+            var formatInputDate = "dd MMM HH:mm yyyy";
             var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
-            var inputDate = mainPage.DocumentNode.SelectSingleNode(
-                    $"//*[@id=\"main_block\"]/div[3]/div[1]/div[4]/div/div[{htmlDivNumber}]/a/div/div/div/div[4]/text");
-            ///html/body/div[5]/div[1]/div[3]/div[1]/div[4]/div/div[1]/a/div[1]/div/div/div[4]
-            return new DateTime();
+            var inputDate = mainPage.DocumentNode.SelectNodes(
+                    "//div[contains(@class,'statement-date')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
+
+            if (inputDate != minDateInFormat)
+            {
+                var currentYear = DateTime.Now.Year.ToString();
+                inputDate += " " + currentYear;
+            }
+
+            return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
         }
 
         public string GetFlatTitle(HtmlDocument mainPage, int htmlDivNumber)
         {
-            throw new NotImplementedException();
+            return mainPage.DocumentNode.SelectNodes(
+                "//h5[contains(@class,'card-title')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "No title";
         }
 
         public int GetFlatCost(HtmlDocument mainPage, int htmlDivNumber)
         {
-            throw new NotImplementedException();
+            var inputCost =  mainPage.DocumentNode.SelectNodes(
+                "//b[contains(@class,'item-price-usd  mr-2')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText;
+
+            return int.TryParse(inputCost, out var result) ? result : int.MaxValue;
         }
 
         public string GetFLatLink(HtmlDocument mainPage, string url, int htmlDivNumber)
         {
-            throw new NotImplementedException();
+            return  mainPage.DocumentNode.SelectNodes(
+                "//a[contains(@class,'card-container')]").ToList().ElementAtOrDefault(htmlDivNumber)?.GetAttributeValue<string>("href", null);
         }
 
-        public string GetFlatDescription(HtmlDocument flatPage, int htmlDivNumber, int descriptionLength)
+        public string GetFlatDescription(HtmlDocument flatPage, int descriptionLength)
         {
-            throw new NotImplementedException();
+
+            var input = flatPage.DocumentNode
+                .SelectSingleNode(
+                    "//*[@id=\"main_block\"]/div[5]/div[5]/div[2]/div/p[1]/text()")?.InnerText
+                .Replace("\r\n", "");
+
+            if (string.IsNullOrWhiteSpace(input)) return "No description";
+
+            if (!new Regex("^[\x20-\x7E]+$").IsMatch(input)) return input;
+
+            var removeWhitespace = Regex.Replace(input, @"\s{2,}", " ");
+
+            if (removeWhitespace.Length <= descriptionLength) return removeWhitespace;
+
+            return string.Concat(removeWhitespace.Substring(0, descriptionLength - 3) + "..."); // check it
         }
 
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
         {
-            throw new NotImplementedException();
+            return flatPage.DocumentNode.SelectNodes(
+                "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]")?.ToList().FirstOrDefault()?.InnerText ?? "No number";
         }
 
         public List<string> GetFirstTenImages(HtmlDocument flatPage)

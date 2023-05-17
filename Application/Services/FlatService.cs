@@ -53,15 +53,15 @@ namespace Application.Services
             var imeretiFlats = new List<FlatInfoModel>();
 
             var countPagesForScrap = 10;
-
-            /*var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 360);
+            /*//comment it
+            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 360);
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
                 var imeretiMyHomeDotGeFlats = scraperMyHomeDotGe.ScrapAllPagesWithAllFlats(ImeretiMunicipallyLinksMyHomeDotGe.GetKutaisiLink(i), lastCheckDate);
                 imeretiFlats.AddRange(imeretiMyHomeDotGeFlats);
-            }*/
-
+            }
+            // comment it*/
 
             var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 360);
 

@@ -13,7 +13,7 @@ namespace WebScraper
 
         string GetFLatLink(HtmlDocument mainPage, string url, int htmlDivNumber);
 
-        string GetFlatDescription(HtmlDocument flatPage, int htmlDivNumber, int descriptionLength);
+        string GetFlatDescription(HtmlDocument flatPage, int descriptionLength);
 
         string GetFlatOwnerPhoneNumber(HtmlDocument flatPage);
 

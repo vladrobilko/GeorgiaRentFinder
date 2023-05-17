@@ -126,7 +126,7 @@ namespace DataManagement.Repositories
             {
                 var flatModel = _context.FlatInfosDto.First(f => f.PageLink == flat.PageLink);
 
-                if (flatModel.Cost > flat.Cost)
+                if (flatModel.Cost > flat.Cost + 30)
                 {
                     var flatDateDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatModel.Id);
                     flatDateDto.RefusePublication = null;
@@ -134,7 +134,7 @@ namespace DataManagement.Repositories
                     _context.FlatDateInfosDto.Update(flatDateDto);
                     _context.SaveChanges();
 
-                    if (!flatModel.Description.Contains("(The price has decreased)")) flatModel.Description = "(The price has decreased)" + flatModel.Description;
+                    if (!flatModel.Description.Contains("The price has decreased")) flatModel.Description = $"(The price has decreased by {flatModel.Cost - flat.Cost})" + flatModel.Description;
                     flatModel.Cost = flat.Cost;
                     _context.FlatInfosDto.Update(flatModel);
                     _context.SaveChanges();

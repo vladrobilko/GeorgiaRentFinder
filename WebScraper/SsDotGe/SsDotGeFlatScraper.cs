@@ -47,20 +47,12 @@ namespace WebScraper.SsDotGe
             return uri.Scheme + "://" + uri.Authority + nextPage.GetAttributeValue<string>("href", null);
         }
 
-        public string GetFlatDescription(HtmlDocument flatPage, int htmlDivNumber, int descriptionLength)
+        public string GetFlatDescription(HtmlDocument flatPage, int descriptionLength)
         {
             var input = flatPage.DocumentNode
                 .SelectSingleNode(
-                    $"//*[@id=\"list\"]/div[{htmlDivNumber}]/div[1]/div[1]/div[1]/div[2]/div[2]/div/div[1]/text()")?.InnerText
+                    "//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[18]/div[2]/div/span[1]/text()")?.InnerText
                 .Replace("\r\n", "");
-
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                input = flatPage.DocumentNode
-                    .SelectSingleNode(
-                        $"//*[@id=\"list\"]/div[{htmlDivNumber}]/div[1]/div[1]/div[1]/div[2]/div[1]/div[5]/text()")?.InnerText
-                    .Replace("\r\n", "");
-            }
 
             if (string.IsNullOrWhiteSpace(input)) return "No description";
 
