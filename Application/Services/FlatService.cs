@@ -53,6 +53,7 @@ namespace Application.Services
             var imeretiFlats = new List<FlatInfoModel>();
 
             var countPagesForScrap = 10;
+
             /*//comment it
             var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 360);
 

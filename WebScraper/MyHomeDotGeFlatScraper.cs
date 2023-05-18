@@ -12,7 +12,7 @@ namespace WebScraper
             var formatInputDate = "dd MMM HH:mm yyyy";
             var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
             var inputDate = mainPage.DocumentNode.SelectNodes(
-                    "//div[contains(@class,'statement-date')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
+                "//div[contains(@class,'statement-date')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
 
             if (inputDate != minDateInFormat)
             {
@@ -20,7 +20,14 @@ namespace WebScraper
                 inputDate += " " + currentYear;
             }
 
-            return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
+            try
+            {
+                return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
         }
 
         public string GetFlatTitle(HtmlDocument mainPage, int htmlDivNumber)
@@ -50,6 +57,12 @@ namespace WebScraper
                     "//*[@id=\"main_block\"]/div[5]/div[5]/div[2]/div/p[1]/text()")?.InnerText
                 .Replace("\r\n", "");
 
+            if (input == null)
+            {
+                input = flatPage.DocumentNode.SelectNodes(
+                    "//p[contains(@class,'pr-comment translated')]")?.ToList().FirstOrDefault()?.InnerText;
+            }
+
             if (string.IsNullOrWhiteSpace(input)) return "No description";
 
             if (!new Regex("^[\x20-\x7E]+$").IsMatch(input)) return input;
@@ -63,23 +76,49 @@ namespace WebScraper
 
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
         {
-            return flatPage.DocumentNode.SelectNodes(
-                "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]")?.ToList().FirstOrDefault()?.InnerText ?? "No number";
+            return  flatPage.DocumentNode.SelectNodes(
+                    "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]//div")
+                ?.Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
+                .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))
+                .ToList()
+                .FirstOrDefault() ?? "No number";
         }
 
         public List<string> GetFirstTenImages(HtmlDocument flatPage)
         {
-            throw new NotImplementedException();
+            var imagesUrl = flatPage.DocumentNode.SelectNodes(
+                "//div[contains(@class,'new-popup-gallery-thumbs')]//p")?
+                .Select(e => e.GetAttributeValue("data-image", null)).ToList() ?? new List<string>();
+
+            if (imagesUrl == null || imagesUrl.Count == 0)
+            {
+                var linkBlurredImageIfFlatNotHaveImages =
+                    "https://media.istockphoto.com/id/955951212/photo/blurred-background-modern-kitchen-and-dinning-room-in-house-with-bokeh-light-lifestyle-backdrop.jpg?s=612x612&w=0&k=20&c=THHBhrRhOCnD0DdfLj42JNsDuzZpC0oqp7K0EIO4B8U=";
+                imagesUrl.Add(linkBlurredImageIfFlatNotHaveImages);
+            }
+
+            return imagesUrl;
         }
 
         public int GetPageViews(HtmlDocument flatPage)
         {
-            throw new NotImplementedException();
+            var viewsFromPage = flatPage.DocumentNode.SelectNodes(
+                "//div[contains(@class,'d-flex align-items-center views')]")?.FirstOrDefault()?.InnerText;
+
+            return int.TryParse(viewsFromPage?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
         public FlatCoordinate GetFlatCoordinate(HtmlDocument flatPage)
         {
-            throw new NotImplementedException();
+            var viewsFromPage = flatPage.DocumentNode.SelectSingleNode(
+                "//div[contains(@id,'map')]");
+
+            var latitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lat", null));
+            var longitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lng", null));
+
+            if (latitude == 0 || longitude == 0) return new FlatCoordinate().GetDefaultFlatCoordinate();
+
+            return new FlatCoordinate(latitude, longitude);
         }
     }
 }
