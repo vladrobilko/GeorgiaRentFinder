@@ -49,10 +49,11 @@ namespace WebScraper.SsDotGe
 
         public string GetFlatDescription(HtmlDocument flatPage, int descriptionLength)
         {
-            var input = flatPage.DocumentNode
-                .SelectSingleNode(
-                    "//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[18]/div[2]/div/span[1]/text()")?.InnerText
-                .Replace("\r\n", "");
+            var input = flatPage.DocumentNode.SelectNodes(
+                    "//span[contains(@class,'details_text')]")?
+                .ToList()
+                .FirstOrDefault()?
+                .InnerText.Replace("\r\n", "");
 
             if (string.IsNullOrWhiteSpace(input)) return "No description";
 

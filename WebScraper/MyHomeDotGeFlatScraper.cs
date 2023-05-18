@@ -45,7 +45,6 @@ namespace WebScraper
 
         public string GetFlatDescription(HtmlDocument flatPage, int descriptionLength)
         {
-
             var input = flatPage.DocumentNode
                 .SelectSingleNode(
                     "//*[@id=\"main_block\"]/div[5]/div[5]/div[2]/div/p[1]/text()")?.InnerText
