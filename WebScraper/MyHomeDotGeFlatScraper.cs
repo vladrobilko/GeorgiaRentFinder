@@ -11,8 +11,11 @@ namespace WebScraper
         {
             var formatInputDate = "d MMM HH:mm yyyy";
             var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
-            var inputDate = mainPage.DocumentNode.SelectNodes(
-                "//div[contains(@class,'statement-date')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
+            var inputDate = mainPage.DocumentNode
+                .SelectNodes(
+                "//div[contains(@class,'statement-date')]")
+                .ToList()
+                .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
 
             if (inputDate != minDateInFormat)
             {
@@ -25,22 +28,32 @@ namespace WebScraper
 
         public string GetFlatTitle(HtmlDocument mainPage, int htmlDivNumber)
         {
-            return mainPage.DocumentNode.SelectNodes(
-                "//h5[contains(@class,'card-title')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "No title";
+            return mainPage.DocumentNode
+                .SelectNodes(
+                "//h5[contains(@class,'card-title')]")
+                .ToList()
+                .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "No title";
         }
 
         public int GetFlatCost(HtmlDocument mainPage, int htmlDivNumber)
         {
-            var inputCost = mainPage.DocumentNode.SelectNodes(
-                "//b[contains(@class,'item-price-usd  mr-2')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText;
+            var inputCost = mainPage.DocumentNode
+                .SelectNodes(
+                "//b[contains(@class,'item-price-usd  mr-2')]")
+                .ToList()
+                .ElementAtOrDefault(htmlDivNumber)?.InnerText;
 
             return int.TryParse(inputCost, out var result) ? result : int.MaxValue;
         }
 
         public string GetFLatLink(HtmlDocument mainPage, string url, int htmlDivNumber)
         {
-            return mainPage.DocumentNode.SelectNodes(
-                "//a[contains(@class,'card-container')]").ToList().ElementAtOrDefault(htmlDivNumber)?.GetAttributeValue<string>("href", null);
+            return mainPage.DocumentNode
+                .SelectNodes(
+                "//a[contains(@class,'card-container')]")
+                .ToList()
+                .ElementAtOrDefault(htmlDivNumber)?
+                .GetAttributeValue<string>("href", null);
         }
 
         public string GetFlatDescription(HtmlDocument flatPage, int descriptionLength)
@@ -52,8 +65,11 @@ namespace WebScraper
 
             if (input == null)
             {
-                input = flatPage.DocumentNode.SelectNodes(
-                    "//p[contains(@class,'pr-comment translated')]")?.ToList().FirstOrDefault()?.InnerText;
+                input = flatPage.DocumentNode
+                    .SelectNodes(
+                    "//p[contains(@class,'pr-comment translated')]")?
+                    .ToList()
+                    .FirstOrDefault()?.InnerText;
             }
 
             if (string.IsNullOrWhiteSpace(input)) return "No description";
@@ -77,11 +93,13 @@ namespace WebScraper
                 .FirstOrDefault() ?? "No number";
         }
 
-        public List<string> GetFirstTenImages(HtmlDocument flatPage)
+        public List<string> GetFirstSixImages(HtmlDocument flatPage)
         {
             var imagesUrl = flatPage.DocumentNode.SelectNodes(
                 "//div[contains(@class,'new-popup-gallery-thumbs')]//p")?
-                .Select(e => e.GetAttributeValue("data-image", null)).ToList() ?? new List<string>();
+                .Select(e => e.GetAttributeValue("data-image", null))
+                .Take(6)
+                .ToList() ?? new List<string>();
 
             if (imagesUrl == null || imagesUrl.Count == 0)
             {
@@ -95,15 +113,18 @@ namespace WebScraper
 
         public int GetPageViews(HtmlDocument flatPage)
         {
-            var viewsFromPage = flatPage.DocumentNode.SelectNodes(
-                "//div[contains(@class,'d-flex align-items-center views')]")?.FirstOrDefault()?.InnerText;
+            var viewsFromPage = flatPage.DocumentNode
+                .SelectNodes(
+                "//div[contains(@class,'d-flex align-items-center views')]")?
+                .FirstOrDefault()?.InnerText;
 
             return int.TryParse(viewsFromPage?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
         public FlatCoordinate GetFlatCoordinate(HtmlDocument flatPage)
         {
-            var viewsFromPage = flatPage.DocumentNode.SelectSingleNode(
+            var viewsFromPage = flatPage.DocumentNode
+                .SelectSingleNode(
                 "//div[contains(@id,'map')]");
 
             var latitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lat", null));

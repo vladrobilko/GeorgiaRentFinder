@@ -17,7 +17,7 @@ namespace WebScraper
 
         string GetFlatOwnerPhoneNumber(HtmlDocument flatPage);
 
-        List<string> GetFirstTenImages(HtmlDocument flatPage);
+        List<string> GetFirstSixImages(HtmlDocument flatPage);
 
         int GetPageViews(HtmlDocument flatPage);
 

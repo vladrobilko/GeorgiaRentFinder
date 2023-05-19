@@ -5,7 +5,7 @@ using WebScraper.Models;
 
 namespace WebScraper.SsDotGe
 {
-    public class SsDotGeFlatScraper : IFlatScraper 
+    public class SsDotGeFlatScraper : IFlatScraper
     {
         public DateTime GetFlatCreationOrMinDate(HtmlDocument mainPage, int htmlDivNumber)
         {
@@ -73,14 +73,14 @@ namespace WebScraper.SsDotGe
                 ?.InnerText ?? "No number";
         }
 
-        public List<string> GetFirstTenImages(HtmlDocument flatPage)
+        public List<string> GetFirstSixImages(HtmlDocument flatPage)
         {
             var imagesUrl = flatPage.DocumentNode.Descendants("img")
                 .Where(e => e.Attributes["class"]?.Value == "img-responsive")
                 .Select(e => e.GetAttributeValue("src", null))
                 .Where(s => !String.IsNullOrEmpty(s) && !s.Contains("Thumb") && s.Contains("static.ss.ge"))
                 .Select(s => Regex.Replace(s, @"(?<!/)/(?!/)", "//"))
-                .Take(10)
+                .Take(6)
                 .ToList();
 
             if (imagesUrl.Count == 0)

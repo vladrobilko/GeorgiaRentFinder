@@ -63,7 +63,7 @@ namespace WebScraper.SsDotGe
 
             var flatOwnerPhoneNumber = _flatScraper.GetFlatOwnerPhoneNumber(flatPage);
 
-            var firstTenImagesFromFlatPage = _flatScraper.GetFirstTenImages(flatPage);
+            var firstTenImagesFromFlatPage = _flatScraper.GetFirstSixImages(flatPage);
 
             var pageViews = _flatScraper.GetPageViews(flatPage);
 
