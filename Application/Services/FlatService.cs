@@ -54,7 +54,7 @@ namespace Application.Services
 
             var countPagesForScrap = 10;
 
-            /*//comment it
+            //comment it
             var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 360);
 
             for (var i = 1; i < countPagesForScrap; i++)
@@ -62,7 +62,7 @@ namespace Application.Services
                 var imeretiMyHomeDotGeFlats = scraperMyHomeDotGe.ScrapAllPagesWithAllFlats(ImeretiMunicipallyLinksMyHomeDotGe.GetKutaisiLink(i), lastCheckDate);
                 imeretiFlats.AddRange(imeretiMyHomeDotGeFlats);
             }
-            // comment it*/
+            // comment it
 
             var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 360);
 

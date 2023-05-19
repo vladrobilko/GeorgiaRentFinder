@@ -9,7 +9,7 @@ namespace WebScraper
     {
         public DateTime GetFlatCreationOrMinDate(HtmlDocument mainPage, int htmlDivNumber)
         {
-            var formatInputDate = "dd MMM HH:mm yyyy";
+            var formatInputDate = "d MMM HH:mm yyyy";
             var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
             var inputDate = mainPage.DocumentNode.SelectNodes(
                 "//div[contains(@class,'statement-date')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
@@ -20,14 +20,7 @@ namespace WebScraper
                 inputDate += " " + currentYear;
             }
 
-            try
-            {
-                return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                return DateTime.MinValue;
-            }
+            return DateTime.ParseExact(inputDate, formatInputDate, CultureInfo.InvariantCulture);
         }
 
         public string GetFlatTitle(HtmlDocument mainPage, int htmlDivNumber)
@@ -38,7 +31,7 @@ namespace WebScraper
 
         public int GetFlatCost(HtmlDocument mainPage, int htmlDivNumber)
         {
-            var inputCost =  mainPage.DocumentNode.SelectNodes(
+            var inputCost = mainPage.DocumentNode.SelectNodes(
                 "//b[contains(@class,'item-price-usd  mr-2')]").ToList().ElementAtOrDefault(htmlDivNumber)?.InnerText;
 
             return int.TryParse(inputCost, out var result) ? result : int.MaxValue;
@@ -46,7 +39,7 @@ namespace WebScraper
 
         public string GetFLatLink(HtmlDocument mainPage, string url, int htmlDivNumber)
         {
-            return  mainPage.DocumentNode.SelectNodes(
+            return mainPage.DocumentNode.SelectNodes(
                 "//a[contains(@class,'card-container')]").ToList().ElementAtOrDefault(htmlDivNumber)?.GetAttributeValue<string>("href", null);
         }
 
@@ -76,7 +69,7 @@ namespace WebScraper
 
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
         {
-            return  flatPage.DocumentNode.SelectNodes(
+            return flatPage.DocumentNode.SelectNodes(
                     "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]//div")
                 ?.Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
                 .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))

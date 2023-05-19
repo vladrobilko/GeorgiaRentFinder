@@ -149,8 +149,18 @@ namespace DataManagement.Repositories
 
             CreateFlatImages(flat.LinksOfImages, flatInfoId);
 
+            if (flat.FlatCoordinate.Latitude != 0 && flat.FlatCoordinate.Longitude != 0) CreateFlatCoordinate(flat,flatInfoId);
+
             _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
             { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication });
+            _context.SaveChanges();
+        }
+
+        private void CreateFlatCoordinate(FlatInfoModel flat,long flatId)
+        {
+            var flatCoordinateDto = new FlatCoordinateDto() { FlatInfoId = flatId, Latitude = flat.FlatCoordinate.Latitude, Longitude = flat.FlatCoordinate.Longitude};
+
+            _context.FlatCoordinatesDto.Add(flatCoordinateDto);
             _context.SaveChanges();
         }
 
