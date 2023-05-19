@@ -93,12 +93,11 @@ namespace WebScraper
                 .FirstOrDefault() ?? "No number";
         }
 
-        public List<string> GetFirstSixImages(HtmlDocument flatPage)
+        public List<string> GetFlatImages(HtmlDocument flatPage)
         {
             var imagesUrl = flatPage.DocumentNode.SelectNodes(
                 "//div[contains(@class,'new-popup-gallery-thumbs')]//p")?
                 .Select(e => e.GetAttributeValue("data-image", null))
-                .Take(6)
                 .ToList() ?? new List<string>();
 
             if (imagesUrl == null || imagesUrl.Count == 0)

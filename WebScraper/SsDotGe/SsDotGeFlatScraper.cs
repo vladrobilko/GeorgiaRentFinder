@@ -73,17 +73,16 @@ namespace WebScraper.SsDotGe
                 ?.InnerText ?? "No number";
         }
 
-        public List<string> GetFirstSixImages(HtmlDocument flatPage)
+        public List<string> GetFlatImages(HtmlDocument flatPage)
         {
             var imagesUrl = flatPage.DocumentNode.Descendants("img")
                 .Where(e => e.Attributes["class"]?.Value == "img-responsive")
                 .Select(e => e.GetAttributeValue("src", null))
                 .Where(s => !String.IsNullOrEmpty(s) && !s.Contains("Thumb") && s.Contains("static.ss.ge"))
                 .Select(s => Regex.Replace(s, @"(?<!/)/(?!/)", "//"))
-                .Take(6)
                 .ToList();
 
-            if (imagesUrl.Count == 0)
+            if (imagesUrl == null || imagesUrl.Count == 0)
             {
                 var linkBlurredImageIfFlatNotHaveImages =
                     "https://media.istockphoto.com/id/955951212/photo/blurred-background-modern-kitchen-and-dinning-room-in-house-with-bokeh-light-lifestyle-backdrop.jpg?s=612x612&w=0&k=20&c=THHBhrRhOCnD0DdfLj42JNsDuzZpC0oqp7K0EIO4B8U=";
