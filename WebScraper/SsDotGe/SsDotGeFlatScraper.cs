@@ -68,9 +68,19 @@ namespace WebScraper.SsDotGe
 
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
         {
-            return flatPage.DocumentNode.SelectSingleNode(
+            var number = flatPage.DocumentNode.SelectSingleNode(
                     "//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[7]/div/div/div/div[5]/div/div/div[3]/div/div[1]/div[3]/a/span")
-                ?.InnerText ?? "No number";
+                ?.InnerText;
+
+            if (number == null)
+            {
+                number = flatPage.DocumentNode
+                    .SelectNodes(
+                        "//div[contains(@class,'UserMObileNumbersBlock')]//a")?
+                    .FirstOrDefault()?.InnerText.Replace("\r\n", "") ?? "No number";
+            }
+
+            return Regex.Replace(number, @"\s{2,}", " ");
         }
 
         public List<string> GetFlatImages(HtmlDocument flatPage)

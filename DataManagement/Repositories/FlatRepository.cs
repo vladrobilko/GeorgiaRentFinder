@@ -71,7 +71,7 @@ namespace DataManagement.Repositories
                 SitePublication = noViewedFlatDateInfoDto.SitePublication,
                 Description = flatModelDto.Description,
                 FlatPhoneClientModel = new FlatPhoneClientModel() { PhoneNumber = flatPhoneModelDto.Number, MentionOnSite = flatPhoneModelDto.NumberMentionsOnSite },
-                LinksOfImages = ReadFirstSixFlatImagesById(flatModelDto.Id),
+                LinksOfImages = ReadFirstEightFlatImagesById(flatModelDto.Id),
                 PageLink = flatModelDto.PageLink,
                 ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
                 FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id)
@@ -96,7 +96,7 @@ namespace DataManagement.Repositories
                 SitePublication = flatDateInfoDto.SitePublication,
                 Description = flatModelDto.Description,
                 FlatPhoneClientModel = new FlatPhoneClientModel() { PhoneNumber = flatPhoneModelDto.Number, MentionOnSite = flatPhoneModelDto.NumberMentionsOnSite },
-                LinksOfImages = ReadFirstSixFlatImagesById(flatModelDto.Id),
+                LinksOfImages = ReadFirstEightFlatImagesById(flatModelDto.Id),
                 PageLink = flatModelDto.PageLink,
                 ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
                 FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id)
@@ -115,9 +115,9 @@ namespace DataManagement.Repositories
             return new FlatCoordinateClientModel() { Latitude = flatCoordinateDto.Latitude.GetValueOrDefault(), Longitude = flatCoordinateDto.Longitude.GetValueOrDefault() };
         }
 
-        private List<string> ReadFirstSixFlatImagesById(long flatId)
+        private List<string> ReadFirstEightFlatImagesById(long flatId)
         {
-            return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).Take(6).ToList();
+            return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).Take(8).ToList();
         }
 
         private void CreateFlat(FlatInfoModel flat)
