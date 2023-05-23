@@ -9,18 +9,18 @@ namespace Application.Converters
     {
         private const long CountForRealtorDetection = 10;
 
-        public static string ToTelegramCaptionWithDefaultLanguage(this FlatInfoClientModel flat, bool isForAdmin)
+        public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language = null, string apiToken = null)
         {
-            var caption = GetCaptionWithOutCoordinateAndRealtor(flat);
+            var caption = GetCaptionWithOutCoordinateAndRealtor(flat, language, apiToken);
 
             if (isForAdmin) caption += $"\nID in database - {flat.Id}";
 
             return caption;
         }
 
-        public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language = null, string apiToken = null)
+        public static string ToTelegramCaptionWithDefaultLanguage(this FlatInfoClientModel flat, bool isForAdmin)
         {
-            var caption = GetCaptionWithOutCoordinateAndRealtor(flat, language, apiToken);
+            var caption = GetCaptionWithOutCoordinateAndRealtor(flat);
 
             if (isForAdmin) caption += $"\nID in database - {flat.Id}";
 
@@ -38,7 +38,7 @@ namespace Application.Converters
                        $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
                        $"\n\n<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> link</a>" +
                        $"{GetCoordinateOrEmptyDescribe(flat, "ru")}" +
-                       $"\n<strong>Телефон:</strong> {flat.FlatPhoneClientModel.PhoneNumber.Translate(language, apiToken)}" +
+                       $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
                        $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite, "ru")}";
             }
 
@@ -49,8 +49,15 @@ namespace Application.Converters
                    $"{GetDescriptionOrEmptyString(flat.Description)}" +
                    $"\n\n<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>" +
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
-                   $"\n<strong>Mobile phone:</strong> {flat.FlatPhoneClientModel.PhoneNumber}" +
+                   $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
                    $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite, "ru")}";
+        }
+
+        private static string GetNumberDescribe(string number)
+        {
+            if (number == "No number") return "";
+
+            return $"\n<strong>Mobile phone:</strong> {number}";
         }
 
         private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite, string language = null)
