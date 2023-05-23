@@ -8,8 +8,6 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using Application.Models;
-using Microsoft.Extensions.Configuration;
-using Application.Services;
 
 namespace TelegramBotApi.Services;
 
@@ -45,8 +43,9 @@ public class UpdateHandler : IUpdateHandler
             await handler;
         }
         else
-            await botClient.SendTextMessageAsync(long.Parse(_configuration.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException()), "Sorry, you are not an admin to use this bot.",
-                cancellationToken: cancellationToken);
+            await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id,
+                    "Sorry, you are not an admin to use this bot.",
+                    cancellationToken: cancellationToken);
     }
 
     private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
@@ -57,7 +56,6 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-
             "/start" => BotStart(_botClient, _flatService, _configuration, message, cancellationToken),
             "/AdjaraSearch" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/ImeretiSearch" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
@@ -102,7 +100,6 @@ public class UpdateHandler : IUpdateHandler
                 text: "Choose",
                 replyMarkup: GetKeyboardWithChoose(flat, channelName),
                 cancellationToken: cancellationToken);
-
         }
 
         static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
@@ -200,6 +197,7 @@ public class UpdateHandler : IUpdateHandler
         catch
         {
             _flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
+
             await botClient.SendTextMessageAsync(
                 chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
                 text: BotMessageManager.GetMessageAfterOnlyTextSending(),
