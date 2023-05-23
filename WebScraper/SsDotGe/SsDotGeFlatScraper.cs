@@ -38,7 +38,10 @@ namespace WebScraper.SsDotGe
         {
             var inputCost = mainPage.DocumentNode.SelectSingleNode(
                 $"//*[@id=\"list\"]/div[{htmlDivNumber}]/div[1]/div[1]/div[2]/div[2]/div[1]/text()")?.InnerText;
-            return int.TryParse(inputCost?.Replace(" ", ""), out var result) ? result : int.MaxValue;
+
+            if (inputCost != null) inputCost = Regex.Replace(inputCost, @"[^\d\s]+", string.Empty);
+
+            return int.TryParse(inputCost, out var result) ? result : int.MaxValue;
         }
 
         public string GetFLatLink(HtmlDocument mainPage, string url, int htmlDivNumber)
@@ -109,7 +112,9 @@ namespace WebScraper.SsDotGe
                 .SelectSingleNode("//*[@id=\"main-body\"]/div[2]/div[2]/div[1]/div[1]/div[6]/div/div[1]/div[2]/div[1]/span")
                 ?.InnerText;
 
-            return int.TryParse(viewsFromPage?.Replace(" ", ""), out var result) ? result : int.MaxValue;
+            if (viewsFromPage != null) Regex.Replace(viewsFromPage, @"[^\d\s]+", string.Empty);
+
+            return int.TryParse(viewsFromPage, out var result) ? result : int.MaxValue;
         }
 
         public FlatCoordinate GetFlatCoordinate(HtmlDocument flatPage)

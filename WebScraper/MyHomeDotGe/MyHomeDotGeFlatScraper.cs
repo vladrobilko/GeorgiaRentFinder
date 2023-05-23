@@ -12,9 +12,10 @@ namespace WebScraper.MyHomeDotGe
         {
             var formatInputDate = "d MMM HH:mm yyyy";
             var minDateInFormat = DateTime.MinValue.ToString(formatInputDate);
+
             var inputDate = mainPage.DocumentNode
                 .SelectNodes(
-                "//div[contains(@class,'statement-date')]")
+                "//div[contains(@class,'statement-date')]")?
                 .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
 
@@ -31,7 +32,7 @@ namespace WebScraper.MyHomeDotGe
         {
             return mainPage.DocumentNode
                 .SelectNodes(
-                "//h5[contains(@class,'card-title')]")
+                "//h5[contains(@class,'card-title')]")?
                 .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "No title";
         }
@@ -40,9 +41,11 @@ namespace WebScraper.MyHomeDotGe
         {
             var inputCost = mainPage.DocumentNode
                 .SelectNodes(
-                "//b[contains(@class,'item-price-usd  mr-2')]")
+                "//b[contains(@class,'item-price-usd  mr-2')]")?
                 .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText;
+
+            if (inputCost != null) Regex.Replace(inputCost, @"[^\d\s]+", string.Empty);
 
             return int.TryParse(inputCost, out var result) ? result : int.MaxValue;
         }
@@ -51,7 +54,7 @@ namespace WebScraper.MyHomeDotGe
         {
             return mainPage.DocumentNode
                 .SelectNodes(
-                "//a[contains(@class,'card-container')]")
+                "//a[contains(@class,'card-container')]")?
                 .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?
                 .GetAttributeValue<string>("href", null);
@@ -87,8 +90,8 @@ namespace WebScraper.MyHomeDotGe
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
         {
             return flatPage.DocumentNode.SelectNodes(
-                    "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]//div")
-                ?.Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
+                    "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]//div")?
+                .Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
                 .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))
                 .ToList()
                 .FirstOrDefault() ?? "No number";
@@ -117,6 +120,8 @@ namespace WebScraper.MyHomeDotGe
                 .SelectNodes(
                 "//div[contains(@class,'d-flex align-items-center views')]")?
                 .FirstOrDefault()?.InnerText;
+
+            if (viewsFromPage != null) Regex.Replace(viewsFromPage, @"[^\d\s]+", string.Empty);
 
             return int.TryParse(viewsFromPage?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }

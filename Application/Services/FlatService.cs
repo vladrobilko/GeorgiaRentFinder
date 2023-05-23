@@ -26,11 +26,26 @@ namespace Application.Services
         {
             var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 510);
-
             var newAdjaraFlats = new List<FlatInfoModel>();
 
-            var countPagesForScrap = 10;
+            var countPagesForScrap = 5;
+
+            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 510);
+
+            for (var i = 1; i < countPagesForScrap; i++)
+            {
+                var batumiFlats = scraperMyHomeGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksMyHomeDotGe.GetBatumiLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(batumiFlats);
+
+                var kobuletiFlats = scraperMyHomeGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksMyHomeDotGe.GetKobuletiLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(kobuletiFlats);
+
+                var khelvachauriFlats = scraperMyHomeGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksMyHomeDotGe.GetKhelvachauriLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(khelvachauriFlats);
+            }
+            //
+
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), 20, 60, 510);
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
@@ -55,9 +70,8 @@ namespace Application.Services
 
             var imeretiFlats = new List<FlatInfoModel>();
 
-            var countPagesForScrap = 10;
+            var countPagesForScrap = 5;
 
-            //comment it
             var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 60, 360);
 
             for (var i = 1; i < countPagesForScrap; i++)
@@ -65,7 +79,6 @@ namespace Application.Services
                 var imeretiMyHomeDotGeFlats = scraperMyHomeDotGe.ScrapAllPagesWithAllFlats(ImeretiMunicipallyLinksMyHomeDotGe.GetKutaisiLink(i), lastCheckDate);
                 imeretiFlats.AddRange(imeretiMyHomeDotGeFlats);
             }
-            // comment it
 
             var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 60, 360);
 
