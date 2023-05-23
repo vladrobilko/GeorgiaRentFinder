@@ -1,7 +1,7 @@
 ﻿using HtmlAgilityPack;
 using WebScraper.Models;
 
-namespace WebScraper
+namespace WebScraper.Interfaces
 {
     public interface IFlatScraper
     {

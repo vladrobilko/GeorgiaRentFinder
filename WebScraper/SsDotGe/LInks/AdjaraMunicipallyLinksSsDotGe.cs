@@ -1,4 +1,4 @@
-﻿namespace WebScraper.SsDotGe
+﻿namespace WebScraper.SsDotGe.LInks
 {
     public static class AdjaraMunicipallyLinksSsDotGe
     {

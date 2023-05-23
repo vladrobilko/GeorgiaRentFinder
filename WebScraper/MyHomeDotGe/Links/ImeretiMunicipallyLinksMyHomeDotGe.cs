@@ -1,4 +1,4 @@
-﻿namespace WebScraper
+﻿namespace WebScraper.MyHomeDotGe.Links
 {
     public class ImeretiMunicipallyLinksMyHomeDotGe
     {

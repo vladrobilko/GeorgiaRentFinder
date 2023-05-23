@@ -3,7 +3,10 @@ using Application.Interfaces.Repository;
 using Application.Models;
 using WebScraper;
 using WebScraper.Models;
+using WebScraper.MyHomeDotGe;
+using WebScraper.MyHomeDotGe.Links;
 using WebScraper.SsDotGe;
+using WebScraper.SsDotGe.LInks;
 
 namespace Application.Services
 {

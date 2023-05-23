@@ -1,4 +1,4 @@
-﻿using WebScraper.Converters;
+﻿using Application.Converters;
 
 namespace TelegramBotApi
 {

@@ -1,9 +1,10 @@
 ﻿using HtmlAgilityPack;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using WebScraper.Interfaces;
 using WebScraper.Models;
 
-namespace WebScraper
+namespace WebScraper.MyHomeDotGe
 {
     public class MyHomeDotGeFlatScraper : IFlatScraper
     {

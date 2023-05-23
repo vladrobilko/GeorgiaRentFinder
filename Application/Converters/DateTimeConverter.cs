@@ -1,4 +1,4 @@
-﻿namespace WebScraper.Converters
+﻿namespace Application.Converters
 {
     public static class DateTimeConverter
     {

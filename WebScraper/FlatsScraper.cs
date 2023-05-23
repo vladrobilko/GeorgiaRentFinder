@@ -1,7 +1,8 @@
 ﻿using HtmlAgilityPack;
+using WebScraper.Interfaces;
 using WebScraper.Models;
 
-namespace WebScraper.SsDotGe
+namespace WebScraper
 {
     public class FlatsScraper
     {

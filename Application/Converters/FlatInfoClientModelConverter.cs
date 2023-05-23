@@ -1,7 +1,6 @@
 ﻿using Application.Models;
 using System.Text.RegularExpressions;
 using WebScraper;
-using WebScraper.Converters;
 
 namespace Application.Converters
 {
