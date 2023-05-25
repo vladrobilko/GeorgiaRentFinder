@@ -19,6 +19,11 @@ namespace TelegramBotApi
             return "Sorry, only commands";
         }
 
+        public static string GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(long flatId)
+        {
+            return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>";
+        }
+
         public static string GetStartMessage()
         {
             return "Hello, I'm an admin bot of these channels:" +

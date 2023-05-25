@@ -134,7 +134,7 @@ namespace DataManagement.Repositories
                     _context.FlatDateInfosDto.Update(flatDateDto);
                     _context.SaveChanges();
 
-                    if (!flatModel.Description.Contains("The price has decreased")) flatModel.Description = $"(The price has decreased by {flatModel.Cost - flat.Cost})" + flatModel.Description;
+                    if (!flatModel.Description.Contains("The price has decreased")) flatModel.Description = $"(The price has decreased by {flatModel.Cost - flat.Cost} $)" + flatModel.Description;
                     flatModel.Cost = flat.Cost;
                     _context.FlatInfosDto.Update(flatModel);
                     _context.SaveChanges();
