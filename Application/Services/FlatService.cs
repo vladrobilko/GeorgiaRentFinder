@@ -43,7 +43,7 @@ namespace Application.Services
                 var khelvachauriFlats = scraperMyHomeGe.ScrapAllPagesWithAllFlats(AdjaraMunicipallyLinksMyHomeDotGe.GetKhelvachauriLink(i), lastCheckDate);
                 newAdjaraFlats.AddRange(khelvachauriFlats);
             }
-            //
+            
 
             var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), 20, 60, 510);
 

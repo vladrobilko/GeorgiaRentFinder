@@ -30,11 +30,27 @@ namespace WebScraper.MyHomeDotGe
 
         public string GetFlatTitle(HtmlDocument mainPage, int htmlDivNumber)
         {
-            return mainPage.DocumentNode
+            var title = mainPage.DocumentNode
                 .SelectNodes(
-                "//h5[contains(@class,'card-title')]")?
+                    "//h5[contains(@class,'card-title')]")?
                 .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "No title";
+
+            if (title == "No title") return title;
+
+            var location = mainPage.DocumentNode
+                .SelectNodes(
+                    "//div[contains(@class,'address')]")?
+                .ToList()
+                .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "";
+
+            if (location == "") return title;
+
+            var locationWords = location.Split(new string[] { ", " }, StringSplitOptions.None);
+
+            if (locationWords.Length < 2) return title;
+
+            return $"{title}. {locationWords[^2]}";
         }
 
         public int GetFlatCost(HtmlDocument mainPage, int htmlDivNumber)
