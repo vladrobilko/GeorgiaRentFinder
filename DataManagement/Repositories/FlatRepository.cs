@@ -15,9 +15,9 @@ namespace DataManagement.Repositories
             _context = context;
         }
 
-        public void CreateFlats(List<FlatInfoModel> flatInfoModels)
+        public void CreateFlats(List<FlatInfoModel> flats)
         {
-            foreach (var flat in flatInfoModels)
+            foreach (var flat in flats)
             {
                 CreateFlat(flat);
             }
@@ -71,7 +71,7 @@ namespace DataManagement.Repositories
                 SitePublication = noViewedFlatDateInfoDto.SitePublication,
                 Description = flatModelDto.Description,
                 FlatPhoneClientModel = new FlatPhoneClientModel() { PhoneNumber = flatPhoneModelDto.Number, MentionOnSite = flatPhoneModelDto.NumberMentionsOnSite },
-                LinksOfImages = ReadFirstEightFlatImagesById(flatModelDto.Id),
+                LinksOfImages = ReadFirstTenFlatImagesById(flatModelDto.Id),
                 PageLink = flatModelDto.PageLink,
                 ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
                 FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id)
@@ -96,7 +96,7 @@ namespace DataManagement.Repositories
                 SitePublication = flatDateInfoDto.SitePublication,
                 Description = flatModelDto.Description,
                 FlatPhoneClientModel = new FlatPhoneClientModel() { PhoneNumber = flatPhoneModelDto.Number, MentionOnSite = flatPhoneModelDto.NumberMentionsOnSite },
-                LinksOfImages = ReadFirstEightFlatImagesById(flatModelDto.Id),
+                LinksOfImages = ReadFirstTenFlatImagesById(flatModelDto.Id),
                 PageLink = flatModelDto.PageLink,
                 ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
                 FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id)
@@ -115,9 +115,9 @@ namespace DataManagement.Repositories
             return new FlatCoordinateClientModel() { Latitude = flatCoordinateDto.Latitude.GetValueOrDefault(), Longitude = flatCoordinateDto.Longitude.GetValueOrDefault() };
         }
 
-        private List<string> ReadFirstEightFlatImagesById(long flatId)
+        private List<string> ReadFirstTenFlatImagesById(long flatId)
         {
-            return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).Take(8).ToList();
+            return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).Take(10).ToList();
         }
 
         private void CreateFlat(FlatInfoModel flat)
@@ -134,7 +134,11 @@ namespace DataManagement.Repositories
                     _context.FlatDateInfosDto.Update(flatDateDto);
                     _context.SaveChanges();
 
-                    if (!flatModel.Description.Contains("The price has decreased")) flatModel.Description = $"(The price has decreased by {flatModel.Cost - flat.Cost} $)" + flatModel.Description;
+                    if (!flatModel.Description.Contains("The price has decreased"))
+                    {
+                        flatModel.Description = $"(The price has decreased by {flatModel.Cost - flat.Cost} $)"
+                                                + flatModel.Description;
+                    }
                     flatModel.Cost = flat.Cost;
                     _context.FlatInfosDto.Update(flatModel);
                     _context.SaveChanges();

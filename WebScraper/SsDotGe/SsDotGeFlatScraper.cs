@@ -55,19 +55,18 @@ namespace WebScraper.SsDotGe
         {
             var input = flatPage.DocumentNode.SelectNodes(
                     "//span[contains(@class,'details_text')]")?
-                .ToList()
                 .FirstOrDefault()?
                 .InnerText.Replace("\r\n", "");
 
             if (string.IsNullOrWhiteSpace(input)) return "No description";
 
-            if (!new Regex("^[\x20-\x7E]+$").IsMatch(input)) return input;
-
             var removeWhitespace = Regex.Replace(input, @"\s{2,}", " ");
-
+            
             if (removeWhitespace.Length <= descriptionLength) return removeWhitespace;
 
-            return string.Concat(removeWhitespace.Substring(0, descriptionLength - 3) + "...");
+            var description = removeWhitespace.Substring(0, descriptionLength - 3) + "...";
+
+            return description;
         }
 
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
@@ -94,9 +93,9 @@ namespace WebScraper.SsDotGe
                 .Select(e => e.GetAttributeValue("src", null))
                 .Where(s => !String.IsNullOrEmpty(s) && !s.Contains("Thumb") && s.Contains("static.ss.ge"))
                 .Select(s => Regex.Replace(s, @"(?<!/)/(?!/)", "//"))
-                .ToList();
+                .ToList() ?? new List<string>();
 
-            if (imagesUrl == null || imagesUrl.Count == 0)
+            if (imagesUrl.Count == 0)
             {
                 var linkBlurredImageIfFlatNotHaveImages =
                     "https://media.istockphoto.com/id/955951212/photo/blurred-background-modern-kitchen-and-dinning-room-in-house-with-bokeh-light-lifestyle-backdrop.jpg?s=612x612&w=0&k=20&c=THHBhrRhOCnD0DdfLj42JNsDuzZpC0oqp7K0EIO4B8U=";

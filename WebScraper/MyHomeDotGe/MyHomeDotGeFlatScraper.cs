@@ -16,7 +16,6 @@ namespace WebScraper.MyHomeDotGe
             var inputDate = mainPage.DocumentNode
                 .SelectNodes(
                 "//div[contains(@class,'statement-date')]")?
-                .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? minDateInFormat;
 
             if (inputDate != minDateInFormat)
@@ -33,7 +32,6 @@ namespace WebScraper.MyHomeDotGe
             var title = mainPage.DocumentNode
                 .SelectNodes(
                     "//h5[contains(@class,'card-title')]")?
-                .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "No title";
 
             if (title == "No title") return title;
@@ -41,7 +39,6 @@ namespace WebScraper.MyHomeDotGe
             var location = mainPage.DocumentNode
                 .SelectNodes(
                     "//div[contains(@class,'address')]")?
-                .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText ?? "";
 
             if (location == "") return title;
@@ -58,7 +55,6 @@ namespace WebScraper.MyHomeDotGe
             var inputCost = mainPage.DocumentNode
                 .SelectNodes(
                 "//b[contains(@class,'item-price-usd  mr-2')]")?
-                .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?.InnerText;
 
             if (inputCost != null) Regex.Replace(inputCost, @"[^\d\s]+", string.Empty);
@@ -71,7 +67,6 @@ namespace WebScraper.MyHomeDotGe
             return mainPage.DocumentNode
                 .SelectNodes(
                 "//a[contains(@class,'card-container')]")?
-                .ToList()
                 .ElementAtOrDefault(htmlDivNumber)?
                 .GetAttributeValue<string>("href", null);
         }
@@ -88,19 +83,18 @@ namespace WebScraper.MyHomeDotGe
                 input = flatPage.DocumentNode
                     .SelectNodes(
                     "//p[contains(@class,'pr-comment translated')]")?
-                    .ToList()
                     .FirstOrDefault()?.InnerText;
             }
 
             if (string.IsNullOrWhiteSpace(input)) return "No description";
 
-            if (!new Regex("^[\x20-\x7E]+$").IsMatch(input)) return input;
-
             var removeWhitespace = Regex.Replace(input, @"\s{2,}", " ");
 
             if (removeWhitespace.Length <= descriptionLength) return removeWhitespace;
 
-            return string.Concat(removeWhitespace.Substring(0, descriptionLength - 3) + "..."); // check it
+            var description = removeWhitespace.Substring(0, descriptionLength - 3) + "...";
+
+            return description;
         }
 
         public string GetFlatOwnerPhoneNumber(HtmlDocument flatPage)
@@ -108,8 +102,7 @@ namespace WebScraper.MyHomeDotGe
             return flatPage.DocumentNode.SelectNodes(
                     "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]//div")?
                 .Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
-                .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))
-                .ToList()
+                .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))?
                 .FirstOrDefault() ?? "No number";
         }
 
@@ -121,7 +114,7 @@ namespace WebScraper.MyHomeDotGe
                 .Select(s => Regex.Replace(s, @"(?<!/)/(?!/)", "//"))
                 .ToList() ?? new List<string>();
 
-            if (imagesUrl == null || imagesUrl.Count == 0)
+            if (imagesUrl.Count == 0)
             {
                 var linkBlurredImageIfFlatNotHaveImages =
                     "https://media.istockphoto.com/id/955951212/photo/blurred-background-modern-kitchen-and-dinning-room-in-house-with-bokeh-light-lifestyle-backdrop.jpg?s=612x612&w=0&k=20&c=THHBhrRhOCnD0DdfLj42JNsDuzZpC0oqp7K0EIO4B8U=";
