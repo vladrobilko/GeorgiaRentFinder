@@ -116,12 +116,12 @@ namespace WebScraper.SsDotGe
             return int.TryParse(viewsFromPage, out var result) ? result : int.MaxValue;
         }
 
-        public FlatCoordinate GetFlatCoordinate(HtmlDocument flatPage)
+        public FlatCoordinateModel GetFlatCoordinate(HtmlDocument flatPage)
         {
-            return new FlatCoordinate().GetDefaultFlatCoordinate();
+            return new FlatCoordinateModel().GetDefaultFlatCoordinate();
         }
 
-        public ComfortStuff GetComfortStuff(HtmlDocument flatPage)
+        public ComfortStuffModel GetComfortStuff(HtmlDocument flatPage)
         {
             var paramsBotBlk = flatPage.DocumentNode
                 .SelectNodes("//div[contains(@class,'ParamsBotBlk')]")
@@ -158,7 +158,7 @@ namespace WebScraper.SsDotGe
 
             var isThereConditioner = spans.ElementAtOrDefault(indexConditioner)?.GetAttributeValue("class", "UnCheckedParam") == "CheckedParam";
 
-            return new ComfortStuff(bedrooms, floor, totalArea, isThereGas, isThereHotWater, isThereConditioner);
+            return new ComfortStuffModel(bedrooms, floor, totalArea, isThereGas, isThereHotWater, isThereConditioner);
         }
     }
 }

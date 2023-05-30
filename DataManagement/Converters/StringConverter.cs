@@ -1,13 +1,30 @@
-﻿using Newtonsoft.Json;
+﻿using Application.Models;
+using Newtonsoft.Json;
 using WebScraper.Models;
 
 namespace DataManagement.Converters
 {
     public static class StringConverter
     {
-        public static ComfortStuff ToComfortStuff(this string comfortStuffJson)
+        public static ComfortStuffClientModel ToComfortStuffClientModel(this string comfortStuffJson)
         {
-            return JsonConvert.DeserializeObject<ComfortStuff>(comfortStuffJson) ?? new ComfortStuff();
+            var comfortStuffDto = JsonConvert.DeserializeObject<ComfortStuffClientModel>(comfortStuffJson);
+
+            if (comfortStuffDto == null)
+            {
+                var defaultComfortStuff = new ComfortStuffModel();
+
+                return new ComfortStuffClientModel()
+                {
+                    BedRooms = defaultComfortStuff.BedRooms,
+                    Floor = defaultComfortStuff.Floor,
+                    TotalArea = defaultComfortStuff.TotalArea,
+                    IsThereGas = defaultComfortStuff.IsThereGas,
+                    IsThereHotWater = defaultComfortStuff.IsThereHotWater,
+                    IsThereConditioner = defaultComfortStuff.IsThereConditioner
+                };
+            }
+            return comfortStuffDto;
         }
     }
 }

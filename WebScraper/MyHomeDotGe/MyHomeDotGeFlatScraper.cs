@@ -137,7 +137,7 @@ namespace WebScraper.MyHomeDotGe
             return int.TryParse(viewsFromPage?.Replace(" ", ""), out var result) ? result : int.MaxValue;
         }
 
-        public FlatCoordinate GetFlatCoordinate(HtmlDocument flatPage)
+        public FlatCoordinateModel GetFlatCoordinate(HtmlDocument flatPage)
         {
             var viewsFromPage = flatPage.DocumentNode
                 .SelectSingleNode(
@@ -146,12 +146,12 @@ namespace WebScraper.MyHomeDotGe
             var latitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lat", null));
             var longitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lng", null));
 
-            if (latitude == 0 || longitude == 0) return new FlatCoordinate().GetDefaultFlatCoordinate();
+            if (latitude == 0 || longitude == 0) return new FlatCoordinateModel().GetDefaultFlatCoordinate();
 
-            return new FlatCoordinate(latitude, longitude);
+            return new FlatCoordinateModel(latitude, longitude);
         }
 
-        public ComfortStuff GetComfortStuff(HtmlDocument flatPage)
+        public ComfortStuffModel GetComfortStuff(HtmlDocument flatPage)
         {
             var myHome = flatPage.DocumentNode
                 .SelectNodes(
@@ -173,7 +173,7 @@ namespace WebScraper.MyHomeDotGe
 
             var isConditioner = myHomeAdditionalInfoAbsent?.FirstOrDefault(e => e.InnerText.Contains("Air conditioner")) == null;
 
-            return new ComfortStuff(bedrooms, floor, totalArea, isGas, isHotWater, isConditioner);
+            return new ComfortStuffModel(bedrooms, floor, totalArea, isGas, isHotWater, isConditioner);
         }
     }
 }

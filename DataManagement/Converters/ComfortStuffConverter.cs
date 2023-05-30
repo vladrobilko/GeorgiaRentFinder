@@ -5,9 +5,9 @@ namespace DataManagement.Converters
 {
     public static class ComfortStuffConverter
     {
-        public static string ToJson(this ComfortStuff comfortStuff)
+        public static string ToJson(this ComfortStuffModel comfortStuffModel)
         {
-            return JsonConvert.SerializeObject(comfortStuff);
+            return JsonConvert.SerializeObject(comfortStuffModel);
         }
     }
 }

@@ -21,5 +21,7 @@
         public long ViewsOnSite { get; set; }
 
         public FlatCoordinateClientModel FlatCoordinateClientModel { get; set; }
+
+        public ComfortStuffClientModel ComfortStuffClientModel { get; set; }
     }
 }

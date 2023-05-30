@@ -24,9 +24,9 @@ namespace WebScraper.Models
 
         public long ViewsOnSite { get; set; }
 
-        public FlatCoordinate FlatCoordinate { get; set; }
+        public FlatCoordinateModel FlatCoordinateModel { get; set; }
 
-        public ComfortStuff ComfortStuff { get; set; }
+        public ComfortStuffModel ComfortStuffModel { get; set; }
 
         public FlatInfoModel(
             string title,
@@ -37,8 +37,8 @@ namespace WebScraper.Models
             List<string> linksOfImage,
             string adLink,
             long viewsOnSite,
-            FlatCoordinate flatCoordinate,
-            ComfortStuff comfortStuff)
+            FlatCoordinateModel flatCoordinateModel,
+            ComfortStuffModel comfortStuffModel)
         {
             Title = title;
             Cost = cost;
@@ -48,8 +48,8 @@ namespace WebScraper.Models
             LinksOfImages = linksOfImage;
             PageLink = adLink;
             ViewsOnSite = viewsOnSite;
-            FlatCoordinate = flatCoordinate;
-            ComfortStuff = comfortStuff;
+            FlatCoordinateModel = flatCoordinateModel;
+            ComfortStuffModel = comfortStuffModel;
         }
     }
 }

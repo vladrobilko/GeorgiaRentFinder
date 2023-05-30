@@ -1,22 +1,22 @@
 ﻿namespace WebScraper.Models;
 
-public class FlatCoordinate
+public class FlatCoordinateModel
 {
     public double Latitude { get; set; }
 
     public double Longitude { get; set; }
 
-    public FlatCoordinate(double latitude, double longitude)
+    public FlatCoordinateModel(double latitude, double longitude)
     {
         Latitude = latitude;
         Longitude = longitude;
     }
 
-    public FlatCoordinate() { }
+    public FlatCoordinateModel() { }
 
-    public FlatCoordinate GetDefaultFlatCoordinate()
+    public FlatCoordinateModel GetDefaultFlatCoordinate()
     {
-        return new FlatCoordinate(0, 0);
+        return new FlatCoordinateModel(0, 0);
     }
 
     public string ToStringForView()

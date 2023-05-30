@@ -26,13 +26,14 @@ namespace Application.Converters
             return caption;
         }
 
-        private static string GetCaptionWithOutCoordinateAndRealtor(FlatInfoClientModel flat, string language = null, string apiToken = null)
+        private static string GetCaptionWithOutCoordinateAndRealtor(FlatInfoClientModel flat, string? language = null, string? apiToken = null)
         {
             if (language == "ru")
             {
                 return $"{flat.Title.Translate(language, apiToken)}" +
                        $"\n\n<strong>Цена:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescribe(flat.Cost)}" +
-                       $"\n<strong>Опубликовано:</strong> {flat.SitePublication.ToCommonViewString()}" +
+                       $"{GetComfortStuffDescribe(flat.ComfortStuffClientModel)}" + 
+                       $"\n\n<strong>Опубликовано:</strong> {flat.SitePublication.ToCommonViewString()}" +
                        $"\n<strong>Просмотры на сайте:</strong> {flat.ViewsOnSite}" +
                        $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
                        $"\n\n<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> link</a>" +
@@ -43,13 +44,34 @@ namespace Application.Converters
 
             return $"{flat.Title}" +
                    $"\n\n<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescribe(flat.Cost)}" +
-                   $"\n<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}" +
+                   $"\n\n<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}" +
                    $"\n<strong>Views on site:</strong> {flat.ViewsOnSite}" +
                    $"{GetDescriptionOrEmptyString(flat.Description)}" +
                    $"\n\n<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>" +
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
                    $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}";
+        }
+
+        private static string GetComfortStuffDescribe(ComfortStuffClientModel comfortStuff)// language
+        {
+            var describe = "";
+
+            if (comfortStuff == null) return describe;//<strong></strong>
+
+            if (comfortStuff.BedRooms != "No bedrooms") describe += $"\n<strong>Спален:</strong> {comfortStuff.BedRooms}";
+
+            if (comfortStuff.Floor != "No floors") describe += $"\n<strong>Этаж:</strong> {comfortStuff.Floor}";
+
+            if (comfortStuff.TotalArea != "No total area") describe += $"\n<strong>Площадь:</strong> {comfortStuff.TotalArea}";
+
+            if (comfortStuff.IsThereGas != null) describe += comfortStuff.IsThereGas == true ? $"\n✅Газ✅" : $"\n❌Газ❌";
+
+            if (comfortStuff.IsThereHotWater != null) describe += comfortStuff.IsThereHotWater == true ? $"\n✅Горячая вода✅" : $"\n❌Горячая вода❌";
+
+            if (comfortStuff.IsThereConditioner != null) describe += comfortStuff.IsThereConditioner == true ? $"\n✅Кондиционер✅" : $"\n❌Кондиционер❌";
+
+            return describe;
         }
 
         private static string GetNumberDescribe(string number, string? language = null)
@@ -67,6 +89,8 @@ namespace Application.Converters
         private static string ConvertMobilePhoneToViewFormat(string number)
         {
             string numberWithAddWhiteSpaces = "";
+
+            if (number.Length > 9) return number;
 
             for (int i = 0; i < number.Length; i++)
             {

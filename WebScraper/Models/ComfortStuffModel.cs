@@ -1,6 +1,6 @@
 ﻿namespace WebScraper.Models
 {
-    public class ComfortStuff
+    public class ComfortStuffModel
     {
         public string BedRooms { get; set; } = "No bedrooms";
 
@@ -14,7 +14,7 @@
 
         public bool? IsThereConditioner { get; set; } = null;
 
-        public ComfortStuff(string bedRooms,string floor, string totalArea, bool? isThereGas, bool? isThereHotWater, bool? isThereConditioner)
+        public ComfortStuffModel(string bedRooms,string floor, string totalArea, bool? isThereGas, bool? isThereHotWater, bool? isThereConditioner)
         {
             BedRooms = bedRooms;
             Floor = floor;
@@ -24,6 +24,6 @@
             IsThereConditioner = isThereConditioner;
         }
 
-        public ComfortStuff() { }
+        public ComfortStuffModel() { }
     }
 }
