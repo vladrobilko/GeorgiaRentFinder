@@ -83,7 +83,7 @@ namespace WebScraper.SsDotGe
                     .FirstOrDefault()?.InnerText.Replace("\r\n", "") ?? "No number";
             }
 
-            return Regex.Replace(number, @"\s{2,}", " ");
+            return number.Replace(" ","");
         }
 
         public List<string> GetFlatImages(HtmlDocument flatPage)

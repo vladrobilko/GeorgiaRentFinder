@@ -37,7 +37,7 @@ namespace Application.Converters
                        $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
                        $"\n\n<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> link</a>" +
                        $"{GetCoordinateOrEmptyDescribe(flat, "ru")}" +
-                       $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
+                       $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber, "ru")}" +
                        $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite, "ru")}";
             }
 
@@ -49,17 +49,36 @@ namespace Application.Converters
                    $"\n\n<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>" +
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
-                   $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite, "ru")}";
+                   $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}";
         }
 
-        private static string GetNumberDescribe(string number)
+        private static string GetNumberDescribe(string number, string? language = null)
         {
             if (number == "No number") return "";
 
-            return $"\n<strong>Mobile phone:</strong> {number}";
+            if (language == "ru")
+            {
+                return $"\n<strong>Телефон:</strong> {ConvertMobilePhoneToViewFormat(number)}";
+            }
+
+            return $"\n<strong>Phone:</strong> {ConvertMobilePhoneToViewFormat(number)}";
         }
 
-        private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite, string language = null)
+        private static string ConvertMobilePhoneToViewFormat(string number)
+        {
+            string numberWithAddWhiteSpaces = "";
+
+            for (int i = 0; i < number.Length; i++)
+            {
+                numberWithAddWhiteSpaces += number[i];
+
+                if ((i + 1) % 3 == 0 && i != number.Length - 1) numberWithAddWhiteSpaces += " ";
+            }
+
+            return $"+995 {numberWithAddWhiteSpaces}";
+        }
+
+        private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite, string? language = null)
         {
             if (!IsItRealtor(flat)) return "";
 

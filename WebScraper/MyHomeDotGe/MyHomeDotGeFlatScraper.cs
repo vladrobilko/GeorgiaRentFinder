@@ -103,7 +103,8 @@ namespace WebScraper.MyHomeDotGe
                     "//div[contains(@class,'container full-height d-flex align-items-center justify-content-between')]//div")?
                 .Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
                 .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))?
-                .FirstOrDefault() ?? "No number";
+                .FirstOrDefault()?
+                .Replace(" ","") ?? "No number";
         }
 
         public List<string> GetFlatImages(HtmlDocument flatPage)
