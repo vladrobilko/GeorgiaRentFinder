@@ -22,5 +22,7 @@ namespace WebScraper.Interfaces
         int GetPageViews(HtmlDocument flatPage);
 
         FlatCoordinate GetFlatCoordinate(HtmlDocument flatPage);
+
+        ComfortStuff GetComfortStuff(HtmlDocument flatPage);
     }
 }

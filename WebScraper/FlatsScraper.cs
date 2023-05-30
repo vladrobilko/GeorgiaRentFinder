@@ -77,7 +77,8 @@ namespace WebScraper
                 firstTenImagesFromFlatPage,
                 flatLink,
                 pageViews,
-                _flatScraper.GetFlatCoordinate(flatPage)
+                _flatScraper.GetFlatCoordinate(flatPage),
+                _flatScraper.GetComfortStuff(flatPage)
             );
         }
 

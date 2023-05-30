@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Application.Interfaces.Repository;
 using Application.Models;
+using DataManagement.Converters;
 using DataManagement.Models;
 using WebScraper.Models;
 
@@ -184,7 +185,8 @@ namespace DataManagement.Repositories
                 Description = flatInfoModel.Description,
                 ViewsOnSite = flatInfoModel.ViewsOnSite,
                 PageLink = flatInfoModel.PageLink,
-                FlatPhoneId = phoneId
+                FlatPhoneId = phoneId,
+                AdditionalInformation = flatInfoModel.ComfortStuff.ToJson() 
             };
 
             _context.FlatInfosDto.Add(flatDto);

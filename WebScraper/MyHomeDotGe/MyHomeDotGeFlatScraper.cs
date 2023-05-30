@@ -150,5 +150,30 @@ namespace WebScraper.MyHomeDotGe
 
             return new FlatCoordinate(latitude, longitude);
         }
+
+        public ComfortStuff GetComfortStuff(HtmlDocument flatPage)
+        {
+            var myHome = flatPage.DocumentNode
+                .SelectNodes(
+                    "//div[contains(@class,'col-6 col-lg-4 mb-0 mb-md-4 mb-lg-0 d-flex align-items-center mb-lg-0 mb-4 pr-2 pr-lg-0')]//span");
+
+            var bedrooms = myHome?.ElementAtOrDefault(2)?.InnerText ?? "No bedrooms";
+
+            var floor = myHome?.ElementAtOrDefault(4)?.InnerText.Replace(" ", "").Replace("\n", "").Replace("\t", "").Replace("\r", "") ?? "No floors";
+
+            var totalArea = myHome?.ElementAtOrDefault(0)?.InnerText ?? "No total area";
+
+            var myHomeAdditionalInfoAbsent = flatPage.DocumentNode
+                .SelectNodes(
+                    "//span[contains(@class,'d-block no')]");
+
+            var isGas = myHomeAdditionalInfoAbsent?.FirstOrDefault(e => e.InnerText.Contains("Gas")) == null;
+
+            var isHotWater = myHomeAdditionalInfoAbsent?.FirstOrDefault(e => e.InnerText.Contains("Hot water")) == null;
+
+            var isConditioner = myHomeAdditionalInfoAbsent?.FirstOrDefault(e => e.InnerText.Contains("Air conditioner")) == null;
+
+            return new ComfortStuff(bedrooms, floor, totalArea, isGas, isHotWater, isConditioner);
+        }
     }
 }

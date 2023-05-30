@@ -120,5 +120,45 @@ namespace WebScraper.SsDotGe
         {
             return new FlatCoordinate().GetDefaultFlatCoordinate();
         }
+
+        public ComfortStuff GetComfortStuff(HtmlDocument flatPage)
+        {
+            var paramsBotBlk = flatPage.DocumentNode
+                .SelectNodes("//div[contains(@class,'ParamsBotBlk')]")
+                .ToList();
+
+            var paramsHdBlk = flatPage.DocumentNode
+                .SelectNodes("//div[contains(@class,'ParamsHdBlk')]//text")
+                .ToList();
+
+            var indexBedrooms = paramsBotBlk.FindIndex(e => e.InnerText == "Bedrooms");
+            var bedrooms = paramsHdBlk.ElementAtOrDefault(indexBedrooms)?.InnerText ?? "No bedrooms";
+
+            var indexFloors = paramsBotBlk.FindIndex(e => e.InnerText == "Floor");
+            var floor = paramsHdBlk.ElementAtOrDefault(indexFloors)?.InnerText.Replace(" ", "").Replace("\r\n", "") ?? "No floors";
+
+            var indexTotalArea = paramsBotBlk.FindIndex(e => e.InnerText == "Total Area");
+            var totalArea = paramsHdBlk.ElementAtOrDefault(indexTotalArea)?.InnerText ?? "No total area";
+
+            var additionalInfo = flatPage.DocumentNode
+                .SelectNodes("//div[contains(@class,'col-md-6 col-xs-6 parameteres_item_each')]")
+                .ToList();
+
+            var indexGas = additionalInfo.FindIndex(e => e.InnerText.Contains("Natural gas"));
+            var indexHotWater = additionalInfo.FindIndex(e => e.InnerText.Contains("Hot water"));
+            var indexConditioner = additionalInfo.FindIndex(e => e.InnerText.Contains("Air conditioning"));
+
+
+            var spans = flatPage.DocumentNode
+                .SelectNodes("//div[contains(@class,'col-md-6 col-xs-6 parameteres_item_each')]//span")
+                .ToList();
+            var isThereGas = spans.ElementAtOrDefault(indexGas)?.GetAttributeValue("class", "UnCheckedParam") == "CheckedParam";
+
+            var isThereHotWater = spans.ElementAtOrDefault(indexHotWater)?.GetAttributeValue("class", "UnCheckedParam") == "CheckedParam";
+
+            var isThereConditioner = spans.ElementAtOrDefault(indexConditioner)?.GetAttributeValue("class", "UnCheckedParam") == "CheckedParam";
+
+            return new ComfortStuff(bedrooms, floor, totalArea, isThereGas, isThereHotWater, isThereConditioner);
+        }
     }
 }
