@@ -201,6 +201,7 @@ public class UpdateHandler : IUpdateHandler
             await botClient.SendTextMessageAsync(
                 chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
                 text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
+                parseMode:  ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
             throw;
