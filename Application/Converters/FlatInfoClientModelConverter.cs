@@ -8,7 +8,7 @@ namespace Application.Converters
     {
         private const long CountForRealtorDetection = 10;
 
-        public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language = null, string apiToken = null)
+        public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language, string apiToken)
         {
             var caption = GetCaptionWithOutCoordinateAndRealtor(flat, language, apiToken);
 
@@ -17,73 +17,90 @@ namespace Application.Converters
             return caption;
         }
 
-        public static string ToTelegramCaptionWithDefaultLanguage(this FlatInfoClientModel flat, bool isForAdmin)
+        private static string GetCaptionWithOutCoordinateAndRealtor(FlatInfoClientModel flat, string language, string apiToken)
         {
-            var caption = GetCaptionWithOutCoordinateAndRealtor(flat);
-
-            if (isForAdmin) caption += $"\nID in database - {flat.Id}";
-
-            return caption;
-        }
-
-        private static string GetCaptionWithOutCoordinateAndRealtor(FlatInfoClientModel flat, string? language = null, string? apiToken = null)
-        {
-            if (language == "ru")
-            {
-                return $"{flat.Title.Translate(language, apiToken)}" +
-                       $"\n\n<strong>Цена:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescribe(flat.Cost)}" +
-                       $"{GetComfortStuffDescribe(flat.ComfortStuffClientModel)}" + 
-                       $"\n\n<strong>Опубликовано:</strong> {flat.SitePublication.ToCommonViewString()}" +
-                       $"\n<strong>Просмотры на сайте:</strong> {flat.ViewsOnSite}" +
-                       $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
-                       $"\n\n<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> link</a>" +
-                       $"{GetCoordinateOrEmptyDescribe(flat, "ru")}" +
-                       $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber, "ru")}" +
-                       $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite, "ru")}";
-            }
-
-            return $"{flat.Title}" +
-                   $"\n\n<strong>Cost:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescribe(flat.Cost)}" +
-                   $"\n\n<strong>Published:</strong> {flat.SitePublication.ToCommonViewString()}" +
-                   $"\n<strong>Views on site:</strong> {flat.ViewsOnSite}" +
-                   $"{GetDescriptionOrEmptyString(flat.Description)}" +
-                   $"\n\n<strong>Web page:</strong><a href=\"{flat.PageLink}\"> link</a>" +
+            return $"{GetTitleDescribe(flat, language, apiToken)}" +
+                   $"{GetCostDescribe(flat)}" +
+                   $"{GetComfortStuffDescribe(flat.ComfortStuffClientModel)}" +
+                   $"{GetTimeDescribe(flat)}" +
+                   $"{GetViewsOnSiteDescribe(flat)}" +
+                   $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
+                   $"{GetPageLinkDescribe(flat)}" +
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
                    $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}";
         }
 
-        private static string GetComfortStuffDescribe(ComfortStuffClientModel comfortStuff)// language
+        private static string GetTitleDescribe(FlatInfoClientModel flat, string language, string apiToken)
+        {
+            return $"🏠{flat.Title.Translate(language, apiToken)}";
+        }
+
+        private static string GetCostDescribe(FlatInfoClientModel flat)
+        {
+            return $"\n\n💵<strong>Цена:</strong> {flat.Cost} $ {GetCostInGelOrEmptyDescribe(flat.Cost)}";
+        }
+
+        private static string GetComfortStuffDescribe(ComfortStuffClientModel comfortStuff)
         {
             var describe = "";
 
-            if (comfortStuff == null) return describe;//<strong></strong>
+            if (comfortStuff == null) return describe;
 
-            if (comfortStuff.BedRooms != "No bedrooms") describe += $"\n<strong>Спален:</strong> {comfortStuff.BedRooms}";
+            if (comfortStuff.BedRooms != "No bedrooms") describe += $"\n🛏<strong>Спален:</strong> {comfortStuff.BedRooms}";
 
-            if (comfortStuff.Floor != "No floors") describe += $"\n<strong>Этаж:</strong> {comfortStuff.Floor}";
+            if (comfortStuff.Floor != "No floors") describe += $"\n🏢<strong>Этаж:</strong> {comfortStuff.Floor}";
 
-            if (comfortStuff.TotalArea != "No total area") describe += $"\n<strong>Площадь:</strong> {comfortStuff.TotalArea}";
+            if (comfortStuff.TotalArea != "No total area") describe += $"\n📌<strong>Площадь:</strong> {comfortStuff.TotalArea}";
 
-            if (comfortStuff.IsThereGas != null) describe += comfortStuff.IsThereGas == true ? $"\n✅Газ✅" : $"\n❌Газ❌";
+            if (comfortStuff.IsThereGas != null) describe += comfortStuff.IsThereGas == true ? $"\n✅Газ" : $"\n❌Газ";
 
-            if (comfortStuff.IsThereHotWater != null) describe += comfortStuff.IsThereHotWater == true ? $"\n✅Горячая вода✅" : $"\n❌Горячая вода❌";
+            if (comfortStuff.IsThereHotWater != null) describe += comfortStuff.IsThereHotWater == true ? $"\n✅Горячая вода" : $"\n❌Горячая вода";
 
-            if (comfortStuff.IsThereConditioner != null) describe += comfortStuff.IsThereConditioner == true ? $"\n✅Кондиционер✅" : $"\n❌Кондиционер❌";
+            if (comfortStuff.IsThereConditioner != null) describe += comfortStuff.IsThereConditioner == true ? $"\n✅Кондиционер" : $"\n❌Кондиционер";
 
             return describe;
         }
 
-        private static string GetNumberDescribe(string number, string? language = null)
+        private static string GetTimeDescribe(FlatInfoClientModel flat)
+        {
+            return $"\n\n🕑<strong>Опубликовано:</strong> {flat.SitePublication.ToCommonViewString()}";
+        }
+
+        private static string GetViewsOnSiteDescribe(FlatInfoClientModel flat)
+        {
+            return $"\n👀<strong>Просмотры на сайте:</strong> {flat.ViewsOnSite}";
+        }
+
+        private static string GetDescriptionOrEmptyString(string description, string language, string apiToken)
+        {
+            if (description == "No description") return "";
+            return $"\n📝<strong>Описание:</strong> {Regex.Replace(description.Translate(language, apiToken), @"\s{2,}", " ")}";
+        }
+
+        private static string GetPageLinkDescribe(FlatInfoClientModel flat)
+        {
+            return $"\n\n🔗<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> link</a>";
+        }
+
+        private static string GetCoordinateOrEmptyDescribe(FlatInfoClientModel flat)
+        {
+            if (!IsCoordinateExist(flat.FlatCoordinateClientModel)) return "";
+
+            return $"\n📍<strong>Локация:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>";
+        }
+
+        private static string GetNumberDescribe(string number)
         {
             if (number == "No number") return "";
+            return $"\n☎️<strong>Телефон:</strong> {ConvertMobilePhoneToViewFormat(number)}";
+        }
 
-            if (language == "ru")
-            {
-                return $"\n<strong>Телефон:</strong> {ConvertMobilePhoneToViewFormat(number)}";
-            }
+        private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite)
+        {
+            if (!IsItRealtor(flat)) return "";
 
-            return $"\n<strong>Phone:</strong> {ConvertMobilePhoneToViewFormat(number)}";
+            return $"\n‼️<strong>Возможно это риелтор:</strong> <ins>Номер упоминался {mentionOnSite / 2} раз</ins>";
         }
 
         private static string ConvertMobilePhoneToViewFormat(string number)
@@ -100,41 +117,6 @@ namespace Application.Converters
             }
 
             return $"+995 {numberWithAddWhiteSpaces}";
-        }
-
-        private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite, string? language = null)
-        {
-            if (!IsItRealtor(flat)) return "";
-
-            if (language == "ru")
-            {
-                return $"\n<strong>Возможно это риелтор:</strong> <ins>Номер упоминался {mentionOnSite} раз</ins>";
-            }
-
-            return $"\n<strong>Maybe it's a realtor:</strong> <ins>The number was mentioned {mentionOnSite} times</ins>";
-        }
-
-        private static string GetCoordinateOrEmptyDescribe(FlatInfoClientModel flat, string language = null)
-        {
-            if (!IsCoordinateExist(flat.FlatCoordinateClientModel)) return "";
-
-            if (language == "ru")
-            {
-                return
-                    $"\n<strong>Локация:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>";
-            }
-            return
-                $"\n<strong>Location:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>";
-        }
-
-        private static string GetDescriptionOrEmptyString(string description, string language = null, string apiToken = null)
-        {
-            if (description == "No description") return "";
-
-            if (language == null) return $"\n<strong>Description:</strong> {description}";
-
-            return
-                $"\n<strong>Описание:</strong> {Regex.Replace(description.Translate(language, apiToken), @"\s{2,}", " ")}";
         }
 
         private static string GetCostInGelOrEmptyDescribe(long cost)
