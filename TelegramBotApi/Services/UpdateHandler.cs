@@ -93,7 +93,7 @@ public class UpdateHandler : IUpdateHandler
 
             var channelName = flatService.GetIdChannelWithLastCheckDate();
 
-            await SendContentToBotWithTranslateText(botClient, message.Chat.Id, flat, configuration, cancellationToken, true);
+            await SendContentToTelegramWithTranslateText(botClient, message.Chat.Id, flat, configuration, cancellationToken, true);
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -167,10 +167,9 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    private static async Task SendContentToBotWithTranslateText(ITelegramBotClient botClient, ChatId chatId,
+    private static async Task SendContentToTelegramWithTranslateText(ITelegramBotClient botClient, ChatId chatId,
         FlatInfoClientModel flat, IConfiguration configuration, CancellationToken cancellationToken, bool isForAdmin)
     {
-
         var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
 
         var apiTranslatorToken = configuration.GetSection("GoogleTranslatorConfiguration")["Token"] ??
@@ -196,16 +195,31 @@ public class UpdateHandler : IUpdateHandler
         }
         catch
         {
-            _flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
+            if (flat.LinksOfImages.Count == 0)
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
+                    text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
+                    parseMode: ParseMode.Html,
+                    replyMarkup: new ReplyKeyboardRemove(),
+                    cancellationToken: cancellationToken);
+
+                _flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
+                throw;
+            }
 
             await botClient.SendTextMessageAsync(
                 chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
-                text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
-                parseMode:  ParseMode.Html,
+                text: $"Problem with photo in flat with ID - {flat.Id}.\nThere will another one try without this image.",
+                parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
-            throw;
+
+            flat.LinksOfImages.RemoveAt(0);
+
+            await SendContentToTelegramWithTranslateText(botClient, chatId, flat, configuration, cancellationToken, isForAdmin);
         }
+
     }
 
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
@@ -224,7 +238,7 @@ public class UpdateHandler : IUpdateHandler
 
         if (infoData == "post")
         {
-            await SendContentToBotWithTranslateText(_botClient, channelName, flat, _configuration, cancellationToken, false);
+            await SendContentToTelegramWithTranslateText(_botClient, channelName, flat, _configuration, cancellationToken, false);
 
             _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 

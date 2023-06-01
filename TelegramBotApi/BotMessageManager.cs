@@ -21,7 +21,8 @@ namespace TelegramBotApi
 
         public static string GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(long flatId)
         {
-            return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>";
+            return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>" +
+                   $"\n{GetLastAvailableFlatLink}";
         }
 
         public static string GetStartMessage()
