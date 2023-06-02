@@ -141,12 +141,12 @@ namespace WebScraper.SsDotGe
             var totalArea = paramsHdBlk?.ElementAtOrDefault(indexTotalArea)?.InnerText ?? "No total area";
 
             var additionalInfo = flatPage.DocumentNode
-                .SelectNodes("//div[contains(@class,'col-md-6 col-xs-6 parameteres_item_each')]")
+                .SelectNodes("//div[contains(@class,'col-md-6 col-xs-6 parameteres_item_each')]")?
                 .ToList();
 
-            var indexGas = additionalInfo.FindIndex(e => e.InnerText.Contains("Natural gas"));
-            var indexHotWater = additionalInfo.FindIndex(e => e.InnerText.Contains("Hot water"));
-            var indexConditioner = additionalInfo.FindIndex(e => e.InnerText.Contains("Air conditioning"));
+            var indexGas = additionalInfo?.FindIndex(e => e.InnerText.Contains("Natural gas")) ?? 0;
+            var indexHotWater = additionalInfo?.FindIndex(e => e.InnerText.Contains("Hot water")) ?? 0;
+            var indexConditioner = additionalInfo?.FindIndex(e => e.InnerText.Contains("Air conditioning")) ?? 0;
 
 
             var spans = flatPage.DocumentNode
