@@ -6,7 +6,7 @@ namespace Application.Converters
 {
     public static class FlatInfoClientModelConverter
     {
-        private const long CountForRealtorDetection = 10;
+        private const long CountForRealtorDetection = 20;
 
         public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language, string apiToken)
         {
@@ -140,7 +140,7 @@ namespace Application.Converters
 
         private static bool IsItRealtor(FlatInfoClientModel flat)
         {
-            return flat.FlatPhoneClientModel.MentionOnSite > CountForRealtorDetection &&
+            return flat.FlatPhoneClientModel.MentionOnSite / 2 > CountForRealtorDetection &&
                    flat.FlatPhoneClientModel.PhoneNumber != "No number";
         }
     }
