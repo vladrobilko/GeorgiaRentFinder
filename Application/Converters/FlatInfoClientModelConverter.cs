@@ -80,14 +80,14 @@ namespace Application.Converters
 
         private static string GetPageLinkDescribe(FlatInfoClientModel flat)
         {
-            return $"\n\n🔗<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> link</a>";
+            return $"\n\n🔗<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> www.home.com</a>";
         }
 
         private static string GetCoordinateOrEmptyDescribe(FlatInfoClientModel flat)
         {
             if (!IsCoordinateExist(flat.FlatCoordinateClientModel)) return "";
 
-            return $"\n📍<strong>Локация:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> link</a>";
+            return $"\n📍<strong>Расположение:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> google.map</a>";
         }
 
         private static string GetNumberDescribe(string number)
