@@ -193,7 +193,7 @@ public class UpdateHandler : IUpdateHandler
         {
             await botClient.SendMediaGroupAsync(chatId, photos, cancellationToken: cancellationToken);
         }
-        catch
+        catch(Exception e)
         {
             if (flat.LinksOfImages.Count == 0)
             {
@@ -210,7 +210,7 @@ public class UpdateHandler : IUpdateHandler
 
             await botClient.SendTextMessageAsync(
                 chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
-                text: $"Problem with photo in flat with ID - {flat.Id}.\nThere will another one try without this image.",
+                text: $"Problem with photo in flat with ID - {flat.Id}.\n{e.Message}",
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);

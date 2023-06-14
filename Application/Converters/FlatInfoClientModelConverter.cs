@@ -91,7 +91,7 @@ namespace Application.Converters
         {
             if (!IsCoordinateExist(flat.FlatCoordinateClientModel)) return "";
 
-            return $"\n📍<strong>Расположение:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> google.com/maps</a>";
+            return $"\n📍<strong>На карте:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> google.com/maps</a>";
         }
 
         private static string GetNumberDescribe(string number)
