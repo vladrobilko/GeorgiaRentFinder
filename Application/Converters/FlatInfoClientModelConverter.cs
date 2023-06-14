@@ -26,8 +26,8 @@ namespace Application.Converters
                    $"{GetViewsOnSiteDescribe(flat)}" +
                    $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
                    $"{GetPageLinkDescribe(flat)}" +
-                   $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
+                   $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}";
         }
 
@@ -80,14 +80,18 @@ namespace Application.Converters
 
         private static string GetPageLinkDescribe(FlatInfoClientModel flat)
         {
-            return $"\n\n🔗<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> www.home.com</a>";
+            if (flat.PageLink.Contains("myhome"))
+            {
+                return $"\n\n🔗<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> myhome.ge</a>";
+            }
+            return $"\n\n🔗<strong>Сайт:</strong><a href=\"{flat.PageLink}\"> ss.ge</a>";
         }
 
         private static string GetCoordinateOrEmptyDescribe(FlatInfoClientModel flat)
         {
             if (!IsCoordinateExist(flat.FlatCoordinateClientModel)) return "";
 
-            return $"\n📍<strong>Расположение:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> google.map</a>";
+            return $"\n📍<strong>Расположение:</strong><a href=\"{GetGoogleMapLocation(flat.FlatCoordinateClientModel.Latitude, flat.FlatCoordinateClientModel.Longitude)}\"> google.com/maps</a>";
         }
 
         private static string GetNumberDescribe(string number)
