@@ -91,7 +91,7 @@ namespace WebScraper
 
         private bool IsFlatSuit(string flatTitle, int flatCost)
         {
-            return flatTitle != "No title" && flatCost > _flatLowestPrice && flatCost < _flatHighestPrice;
+            return flatTitle != "No title" && flatCost >= _flatLowestPrice && flatCost <= _flatHighestPrice;
         }
     }
 }
