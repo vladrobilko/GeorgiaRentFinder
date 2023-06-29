@@ -18,33 +18,30 @@ namespace DataManagement.Repositories
 
         public void CreateFlats(List<FlatInfoModel> flats)
         {
-            foreach (var flat in flats)
-            {
-                CreateFlat(flat);
-            }
+            flats.ForEach(CreateFlat);
         }
 
         private void CreateFlat(FlatInfoModel flat)
         {
-            if (IsSameFlatExist(flat))
-            {
-                var flatModel = _context.FlatInfosDto.First(f => f.PageLink == flat.PageLink);
+            var flatModelDto = _context.FlatInfosDto.FirstOrDefault(f => f.PageLink == flat.PageLink);
 
-                if (flatModel.Cost > flat.Cost + 30)
+            if (flatModelDto != null)
+            {
+                if (flatModelDto.Cost > flat.Cost + 30)
                 {
-                    var flatDateDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatModel.Id);
+                    var flatDateDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatModelDto.Id);
                     flatDateDto.RefusePublication = null;
                     flatDateDto.TelegramPublication = null;
                     _context.FlatDateInfosDto.Update(flatDateDto);
                     _context.SaveChanges();
 
-                    if (!flatModel.Description.Contains("The price has decreased"))
+                    if (flatModelDto.Description != null && !flatModelDto.Description.Contains("The price has decreased"))
                     {
-                        flatModel.Description = $"(The price has decreased by {flatModel.Cost - flat.Cost} $)"
-                                                + flatModel.Description;
+                        flatModelDto.Description = $"(The price has decreased by {flatModelDto.Cost - flat.Cost} $)"
+                                                + flatModelDto.Description;
                     }
-                    flatModel.Cost = flat.Cost;
-                    _context.FlatInfosDto.Update(flatModel);
+                    flatModelDto.Cost = flat.Cost;
+                    _context.FlatInfosDto.Update(flatModelDto);
                     _context.SaveChanges();
                 }
 
@@ -177,7 +174,9 @@ namespace DataManagement.Repositories
 
         private List<string> ReadFirstTenFlatImagesById(long flatId)
         {
-            return _context.FlatLinksImage.Where(l => l.FlatInfoId == flatId).Select(i => i.Link).Take(10).ToList();
+            return _context.FlatLinksImage
+                .Where(l => l.FlatInfoId == flatId)
+                .Select(i => i.Link).Take(10).ToList();
         }
 
         public void UpdateFlatDateInfoTelegramPublication(long flatId, DateTime timeOfPublic)
@@ -200,13 +199,6 @@ namespace DataManagement.Repositories
             flatDateInfoDto.RefusePublication = time;
             flatDateInfoDto.TelegramPublication = time;
             _context.SaveChanges();
-        }
-
-        private bool IsSameFlatExist(FlatInfoModel flat)
-        {
-            var flatWithLink = _context.FlatInfosDto.FirstOrDefault(f => f.PageLink == flat.PageLink);
-
-            return flatWithLink != null;
         }
     }
 }
