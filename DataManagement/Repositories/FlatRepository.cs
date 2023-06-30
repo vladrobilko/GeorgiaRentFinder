@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Application.Interfaces.Repository;
+﻿using Application.Interfaces.Repository;
 using Application.Models;
 using DataManagement.Converters;
 using DataManagement.Models;
@@ -156,7 +155,7 @@ namespace DataManagement.Repositories
                 PageLink = flatModelDto.PageLink,
                 ViewsOnSite = flatModelDto.ViewsOnSite.GetValueOrDefault(),
                 FlatCoordinateClientModel = ReadFlatCoordinateOrGetDefaultById(flatModelDto.Id),
-                ComfortStuffClientModel = flatModelDto?.AdditionalInformation?.ToComfortStuffClientModel()
+                ComfortStuffClientModel = flatModelDto.AdditionalInformation?.ToComfortStuffClientModel()
             };
         }
 

@@ -1,4 +1,5 @@
-﻿using Application.Models;
+﻿using System.Text;
+using Application.Models;
 using System.Text.RegularExpressions;
 using WebScraper;
 
@@ -10,15 +11,6 @@ namespace Application.Converters
 
         public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language, string apiToken)
         {
-            var caption = GetCaptionWithOutCoordinateAndRealtor(flat, language, apiToken);
-
-            if (isForAdmin) caption += $"\nID in database - {flat.Id}";
-
-            return caption;
-        }
-
-        private static string GetCaptionWithOutCoordinateAndRealtor(FlatInfoClientModel flat, string language, string apiToken)
-        {
             return $"{GetTitleDescribe(flat, language, apiToken)}" +
                    $"{GetCostDescribe(flat)}" +
                    $"{GetComfortStuffDescribe(flat.ComfortStuffClientModel)}" +
@@ -28,7 +20,8 @@ namespace Application.Converters
                    $"{GetPageLinkDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
-                   $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}";
+                   $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}" +
+                   $"{GetIdDescriptionOrEmptyString(isForAdmin,flat.Id)}";
         }
 
         private static string GetTitleDescribe(FlatInfoClientModel flat, string language, string apiToken)
@@ -44,8 +37,6 @@ namespace Application.Converters
         private static string GetComfortStuffDescribe(ComfortStuffClientModel comfortStuff)
         {
             var describe = "";
-
-            if (comfortStuff == null) return describe;
 
             if (comfortStuff.BedRooms != "No bedrooms") describe += $"\n🛏<strong>Спален:</strong> {comfortStuff.BedRooms}";
 
@@ -97,7 +88,7 @@ namespace Application.Converters
         private static string GetNumberDescribe(string number)
         {
             if (number == "No number") return "";
-            return $"\n☎️<strong>Телефон:</strong> {ConvertMobilePhoneToViewFormat(number)}";
+            return $"\n☎️<strong>Телефон:</strong> {ConvertMobilePhoneToViewGeorgiaFormat(number)}";
         }
 
         private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite)
@@ -107,20 +98,22 @@ namespace Application.Converters
             return $"\n‼️<strong>Возможно это риелтор:</strong> <ins>Номер упоминался {mentionOnSite / 2} раз</ins>";
         }
 
-        private static string ConvertMobilePhoneToViewFormat(string number)
+        private static string ConvertMobilePhoneToViewGeorgiaFormat(string number)
         {
-            string numberWithAddWhiteSpaces = "";
+            var numberWithAddWhiteSpaces = new StringBuilder();
+
+            var codeOfGeorgia = "+995";
 
             if (number.Length > 9) return number;
 
             for (int i = 0; i < number.Length; i++)
             {
-                numberWithAddWhiteSpaces += number[i];
+                numberWithAddWhiteSpaces.Append(number[i]);
 
-                if ((i + 1) % 3 == 0 && i != number.Length - 1) numberWithAddWhiteSpaces += " ";
+                if ((i + 1) % 3 == 0 && i != number.Length - 1) numberWithAddWhiteSpaces.Append(" ");
             }
 
-            return $"+995 {numberWithAddWhiteSpaces}";
+            return $"{codeOfGeorgia} {numberWithAddWhiteSpaces}";
         }
 
         private static string GetCostInGelOrEmptyDescribe(long cost)
@@ -146,6 +139,16 @@ namespace Application.Converters
         {
             return flat.FlatPhoneClientModel.MentionOnSite / 2 > CountForRealtorDetection &&
                    flat.FlatPhoneClientModel.PhoneNumber != "No number";
+        }
+
+        private static string GetIdDescriptionOrEmptyString(bool isForAdmin, long id)
+        {
+            if (isForAdmin)
+            {
+                return $"\nID in database - {id}";
+            }
+
+            return "";
         }
     }
 }

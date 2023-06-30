@@ -2,7 +2,7 @@
 
 namespace WebScraper
 {
-    public class UsdToGelCourseScraper
+    public static class UsdToGelCourseScraper
     {
         public static double GetGelInOneDollarFromGeorgiaNationalBank()
         {
