@@ -10,9 +10,21 @@ namespace TelegramBotApi
                                     "\n  _____________" +
                                     "\n/ImeretiSearch" +
                                     "\n  _____________" +
-                                    "\n/AdjaraSearch";
+                                    "\n/AdjaraSearch" +
+                                    "\n  _____________" +
+                                    "\n/AutoFlatSendingEveryHour";
 
         private const string GetLastAvailableFlatLink = "/LookFlat";
+
+        public static string GetMessageCountOfProcessedFlats(long count)
+        {
+            return $"{count} flats were processed";
+        }
+
+        public static string GetMessageForStartAutoFlatSendingEveryHour()
+        {
+            return "Program is working in auto mode";
+        }
 
         public static string GetMessageAfterOnlyTextSending()
         {
@@ -42,7 +54,9 @@ namespace TelegramBotApi
                        "\n  _____________" +
                        "\n/ImeretiSearch" +
                        "\n  _____________" +
-                       "\n/AdjaraSearch";
+                       "\n/AdjaraSearch" +
+                       "\n  _____________" + 
+                       "\n/AutoFlatSendingEveryHour"; 
             }
             return $"There are <ins><strong>{countFlats} NOT distributed flats.</strong></ins>" +
                    $"\nYou need to do this: {GetLastAvailableFlatLink}";

@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Timers;
+using Application.Interfaces;
 using Application.Converters;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -60,6 +61,7 @@ public class UpdateHandler : IUpdateHandler
             "/AdjaraSearch" => FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/ImeretiSearch" => FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/LookFlat" => GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/AutoFlatSendingEveryHour" => AutoFlatSendingEveryHour(_botClient, _flatService, _configuration, message, cancellationToken),
             "/throw" => FailingHandler(message, cancellationToken),
             _ => OnTextResponse(_botClient, message, cancellationToken),
         };
@@ -117,7 +119,7 @@ public class UpdateHandler : IUpdateHandler
                     cancellationToken: cancellationToken);
             }
 
-            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ?? throw new InvalidOperationException()));
+            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -142,7 +144,7 @@ public class UpdateHandler : IUpdateHandler
                     cancellationToken: cancellationToken);
             }
 
-            flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ?? throw new InvalidOperationException()));
+            flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"]));
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -150,6 +152,43 @@ public class UpdateHandler : IUpdateHandler
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
+        }
+
+        static async Task<Message> AutoFlatSendingEveryHour(ITelegramBotClient botClient, IFlatService flatService,
+            IConfiguration configuration, Message message, CancellationToken cancellationToken)
+        {
+            if (flatService.GetCountNotViewedFlats() != 0) throw new NotSupportedException();
+
+            await botClient.SendTextMessageAsync(
+                chatId: message.Chat.Id,
+                text: BotMessageManager.GetMessageForStartAutoFlatSendingEveryHour(),
+                parseMode: ParseMode.Html,
+                cancellationToken: cancellationToken);
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                long countProcessedFlats = 0;
+
+                flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"]));
+                var countNotViewedFlats = flatService.GetCountNotViewedFlats();
+                countProcessedFlats += countNotViewedFlats;
+                await SendFlatsWhileExistAvailableFlat(countNotViewedFlats, flatService, botClient, configuration, cancellationToken);
+
+                flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"]));
+                countNotViewedFlats = flatService.GetCountNotViewedFlats();
+                countProcessedFlats += countNotViewedFlats;
+                await SendFlatsWhileExistAvailableFlat(countNotViewedFlats, flatService, botClient, configuration, cancellationToken);
+
+                await botClient.SendTextMessageAsync(
+                    chatId: message.Chat.Id,
+                    text: BotMessageManager.GetMessageCountOfProcessedFlats(countProcessedFlats),
+                    parseMode: ParseMode.Html,
+                    cancellationToken: cancellationToken);
+
+                await Task.Delay(60 * 60 * 1000, cancellationToken);
+            }
+
+            return message;
         }
 
         static async Task<Message> OnTextResponse(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
@@ -164,6 +203,32 @@ public class UpdateHandler : IUpdateHandler
         static Task<Message> FailingHandler(Message message, CancellationToken cancellationToken)
         {
             throw new IndexOutOfRangeException();
+        }
+    }
+
+    private static async Task SendFlatsWhileExistAvailableFlat(long countNotViewedFlats, IFlatService flatService,
+        ITelegramBotClient botClient, IConfiguration configuration, CancellationToken cancellationToken)
+    {
+        while (countNotViewedFlats != 0)
+        {
+            var flat = flatService.GetAvailableFlat();
+
+            var channelName = flatService.GetIdChannelWithLastCheckDate();
+
+            if (flat.LinksOfImages.Count > 2)
+            {
+                await Task.Delay(60 * 1000, cancellationToken);
+                await SendContentToTelegramWithTranslateText(botClient, channelName, flat, configuration,
+                    cancellationToken, false);
+                _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
+            }
+            else
+            {
+                _flatService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
+            }
+
+
+            countNotViewedFlats = flatService.GetCountNotViewedFlats();
         }
     }
 
@@ -193,33 +258,10 @@ public class UpdateHandler : IUpdateHandler
         {
             await botClient.SendMediaGroupAsync(chatId, photos, cancellationToken: cancellationToken);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            if (flat.LinksOfImages.Count == 0)
-            {
-                await botClient.SendTextMessageAsync(
-                    chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
-                    text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
-                    parseMode: ParseMode.Html,
-                    replyMarkup: new ReplyKeyboardRemove(),
-                    cancellationToken: cancellationToken);
-
-                _flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
-                throw;
-            }
-
-            await botClient.SendTextMessageAsync(
-                chatId: long.Parse(configuration.GetSection("BotConfiguration")["BotId"]),
-                text: $"Problem with photo in flat with ID - {flat.Id}.\n{e.Message}",
-                parseMode: ParseMode.Html,
-                replyMarkup: new ReplyKeyboardRemove(),
-                cancellationToken: cancellationToken);
-
-            flat.LinksOfImages.RemoveAt(0);
-
-            await SendContentToTelegramWithTranslateText(botClient, chatId, flat, configuration, cancellationToken, isForAdmin);
+            _flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
         }
-
     }
 
     private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
