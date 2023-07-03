@@ -38,6 +38,8 @@ namespace Application.Converters
         {
             var describe = "";
 
+            if (comfortStuff == null) return describe;
+
             if (comfortStuff.BedRooms != "No bedrooms") describe += $"\n🛏<strong>Спален:</strong> {comfortStuff.BedRooms}";
 
             if (comfortStuff.Floor != "No floors") describe += $"\n🏢<strong>Этаж:</strong> {comfortStuff.Floor}";
