@@ -14,23 +14,19 @@ namespace TelegramBotApi
                                     "\n  _____________" +
                                     "\n/AutoFlatSendingEveryHour";
 
-        private const string GetLastAvailableFlatLink = "/LookFlat";
+        public const string ForStartAutoFlatSendingEveryHour = "Program is working in auto mode";
 
+        public const string AfterOnlyTextSending = "Sorry, only commands";
+
+        public const string GetLastAvailableFlatLink = "/LookFlat";
+
+        public const string ForNoAdmin = "Sorry, you are not an admin to use this bot.";
+        
         public static string GetMessageCountOfProcessedFlats(long count)
         {
             return $"{count} flats were processed";
         }
-
-        public static string GetMessageForStartAutoFlatSendingEveryHour()
-        {
-            return "Program is working in auto mode";
-        }
-
-        public static string GetMessageAfterOnlyTextSending()
-        {
-            return "Sorry, only commands";
-        }
-
+        
         public static string GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(long flatId)
         {
             return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>" +
