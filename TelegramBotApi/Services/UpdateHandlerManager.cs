@@ -5,6 +5,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using Application.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace TelegramBotApi.Services
 {
@@ -172,7 +173,7 @@ namespace TelegramBotApi.Services
             catch
             {
                 await botClient.SendTextMessageAsync(
-                    chatId: chatId,
+                    chatId: configuration.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
                     text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
                     parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
