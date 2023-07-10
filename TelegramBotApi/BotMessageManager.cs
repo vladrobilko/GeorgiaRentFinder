@@ -12,15 +12,21 @@ namespace TelegramBotApi
                                     "\n  _____________" +
                                     "\n/AdjaraSearch" +
                                     "\n  _____________" +
-                                    "\n/AutoFlatSendingEveryHour";
+                                    "\n/AutoFlatSendingEveryTwoHours";
 
-        public const string ForStartAutoFlatSendingEveryHour = "Program is working in auto mode";
+        public const string GetMessageForStartAutoFlatSendingEveryTwoHour = "Program is working in auto mode";
 
-        public const string AfterOnlyTextSending = "Sorry, only commands";
+        public const string GetMessageForAfterOnlyTextSending = "Sorry, only commands";
 
-        public const string GetLastAvailableFlatLink = "/LookFlat";
+        public const string GetMessageForGetLastAvailableFlatLink = "/LookFlat";
 
-        public const string ForNoAdmin = "Sorry, you are not an admin to use this bot.";
+        public const string GetMessageForNoAdmin = "Sorry, you are not an admin to use this bot.";
+
+        public static string GetMessageForTimerStopIfException(long notViewedFlatsCount, bool isTimerStart)
+        {
+            return $"There is a mistake with timer for these reasons: count no viewed flats: {notViewedFlatsCount} or timer is started equal {isTimerStart}" +
+                   $"\nTimer will be stopped!!!";
+        }
         
         public static string GetMessageCountOfProcessedFlats(long count)
         {
@@ -30,7 +36,7 @@ namespace TelegramBotApi
         public static string GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(long flatId)
         {
             return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>" +
-                   $"\n{GetLastAvailableFlatLink}";
+                   $"\n{GetMessageForGetLastAvailableFlatLink}";
         }
 
         public static string GetStartMessage()
@@ -52,10 +58,10 @@ namespace TelegramBotApi
                        "\n  _____________" +
                        "\n/AdjaraSearch" +
                        "\n  _____________" + 
-                       "\n/AutoFlatSendingEveryHour"; 
+                       "\n/AutoFlatSendingEveryTwoHours"; 
             }
             return $"There are <ins><strong>{countFlats} NOT distributed flats.</strong></ins>" +
-                   $"\nYou need to do this: {GetLastAvailableFlatLink}";
+                   $"\nYou need to do this: {GetMessageForGetLastAvailableFlatLink}";
         }
 
         public static string GetMessageAfterPost(long flatsKeep)
@@ -64,7 +70,7 @@ namespace TelegramBotApi
             {
                 return $"<ins><strong>The post has been sent!</strong></ins>" +
                        $"\nThere are <ins><strong>{flatsKeep} NOT distributed flats.</strong></ins>" +
-                       $"\nYou need to do this: {GetLastAvailableFlatLink}";
+                       $"\nYou need to do this: {GetMessageForGetLastAvailableFlatLink}";
             }
             return $"<ins><strong>The post has been sent!</strong></ins>" +
                    $"\n<ins><strong>There are no free flats</strong></ins>" +
@@ -77,7 +83,7 @@ namespace TelegramBotApi
             {
                 return $"<ins><strong>The post has NOT been sent!</strong></ins>" +
                        $"\nThere are <ins><strong>{flatsKeep} NOT distributed flats.</strong></ins>" +
-                       $"\nYou need to do this: {GetLastAvailableFlatLink}";
+                       $"\nYou need to do this: {GetMessageForGetLastAvailableFlatLink}";
             }
             return $"<ins><strong>The post has NOT been sent!</strong></ins>" +
                    $"\n<ins><strong>There are no free flats</strong></ins>" +

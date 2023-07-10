@@ -41,7 +41,7 @@ public class UpdateHandler : IUpdateHandler
             if (update.Message == null) throw new FormatException();
             
             await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id,
-                BotMessageManager.ForNoAdmin,
+                BotMessageManager.GetMessageForNoAdmin,
                 cancellationToken: cancellationToken);
         }
     }
@@ -58,7 +58,7 @@ public class UpdateHandler : IUpdateHandler
             "/AdjaraSearch" => UpdateHandlerManager.FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/ImeretiSearch" => UpdateHandlerManager.FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
             "/LookFlat" => UpdateHandlerManager.GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/AutoFlatSendingEveryHour" => UpdateHandlerManager.AutoFlatSendingEveryHour(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/AutoFlatSendingEveryTwoHours" => UpdateHandlerManager.AutoFlatSendingEveryTwoHours(_botClient, _flatService, _configuration, message, cancellationToken),
             _ => UpdateHandlerManager.OnTextResponse(_botClient, message, cancellationToken),
         };
 
