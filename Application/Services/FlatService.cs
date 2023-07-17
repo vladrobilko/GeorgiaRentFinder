@@ -30,7 +30,7 @@ namespace Application.Services
 
             var countPagesForScrap = 5;
 
-            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 100, 510);
+            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 100, 460);
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
@@ -45,7 +45,7 @@ namespace Application.Services
             }
             
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), 20, 100, 510);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), 20, 100, 460);
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
@@ -72,7 +72,7 @@ namespace Application.Services
 
             var countPagesForScrap = 5;
 
-            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 100, 360);
+            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 100, 410);
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
@@ -80,7 +80,7 @@ namespace Application.Services
                 imeretiFlats.AddRange(imeretiMyHomeDotGeFlats);
             }
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 100, 360);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(),20, 100, 410);
 
             for (var i = 1; i < countPagesForScrap; i++)
             {
