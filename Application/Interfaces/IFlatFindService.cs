@@ -2,7 +2,7 @@
 
 namespace Application.Interfaces
 {
-    public interface IFlatService
+    public interface IFlatFindService
     {
         void FindAndSaveSuitAdjaraFlats(long channelId);
 

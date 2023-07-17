@@ -12,7 +12,7 @@ namespace TelegramBotApi
                                     "\n  _____________" +
                                     "\n/AdjaraSearch" +
                                     "\n  _____________" +
-                                    "\n/AutoFlatSendingEveryTwoHours";
+                                    "\n/AutoFlatSendingEveryHour";
 
         public const string GetMessageForStartAutoFlatSendingEveryTwoHour = "Program is working in auto mode";
 
@@ -58,7 +58,7 @@ namespace TelegramBotApi
                        "\n  _____________" +
                        "\n/AdjaraSearch" +
                        "\n  _____________" + 
-                       "\n/AutoFlatSendingEveryTwoHours"; 
+                       "\n/AutoFlatSendingEveryHour"; 
             }
             return $"There are <ins><strong>{countFlats} NOT distributed flats.</strong></ins>" +
                    $"\nYou need to do this: {GetMessageForGetLastAvailableFlatLink}";

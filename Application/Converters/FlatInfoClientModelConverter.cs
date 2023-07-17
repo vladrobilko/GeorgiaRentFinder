@@ -47,9 +47,7 @@ namespace Application.Converters
             if (comfortStuff.TotalArea != "No total area") describe += $"\n📌<strong>Площадь:</strong> {comfortStuff.TotalArea}";
 
             if (comfortStuff.IsThereGas != null) describe += comfortStuff.IsThereGas == true ? $"\n✅Газ" : $"\n❌Газ";
-
-            if (comfortStuff.IsThereHotWater != null) describe += comfortStuff.IsThereHotWater == true ? $"\n✅Горячая вода" : $"\n❌Горячая вода";
-
+            
             if (comfortStuff.IsThereConditioner != null) describe += comfortStuff.IsThereConditioner == true ? $"\n✅Кондиционер" : $"\n❌Кондиционер";
 
             return describe;

@@ -13,14 +13,14 @@ public class UpdateHandler : IUpdateHandler
     private readonly ITelegramBotClient _botClient;
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _configuration;
-    private readonly IFlatService _flatService;
+    private readonly IFlatFindService _flatFindService;
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatService flatService)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatFindService flatFindService)
     {
         _botClient = botClient;
         _logger = logger;
         _configuration = configuration;
-        _flatService = flatService;
+        _flatFindService = flatFindService;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ public class UpdateHandler : IUpdateHandler
         {
             var handler = update switch
             {
-                { Message: { } message } => BotOnMessageReceived(message, cancellationToken),
+                { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancellationToken),
                 { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),
                 _ => UnknownUpdateHandlerAsync(update)
             };
@@ -46,7 +46,7 @@ public class UpdateHandler : IUpdateHandler
         }
     }
 
-    private async Task BotOnMessageReceived(Message message, CancellationToken cancellationToken)
+    private async Task BotOnMessageReceivedFromAdmin(Message message, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Receive message type: {MessageType}", message.Type);
         if (message.Text is not { } messageText)
@@ -54,11 +54,11 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => UpdateHandlerManager.BotStart(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/AdjaraSearch" => UpdateHandlerManager.FindSuitAdjaraFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/ImeretiSearch" => UpdateHandlerManager.FindSuitImeretiFlats(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/LookFlat" => UpdateHandlerManager.GetLastAvailableFlat(_botClient, _flatService, _configuration, message, cancellationToken),
-            "/AutoFlatSendingEveryTwoHours" => UpdateHandlerManager.AutoFlatSendingEveryTwoHours(_botClient, _flatService, _configuration, message, cancellationToken),
+            "/start" => UpdateHandlerManager.BotStart(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/AdjaraSearch" => UpdateHandlerManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/ImeretiSearch" => UpdateHandlerManager.FindSuitImeretiFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/LookFlat" => UpdateHandlerManager.GetLastAvailableFlat(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/AutoFlatSendingEveryHour" => UpdateHandlerManager.AutoFlatSendingEveryHour(_botClient, _flatFindService, _configuration, message, cancellationToken),
             _ => UpdateHandlerManager.OnTextResponse(_botClient, message, cancellationToken),
         };
 
@@ -80,22 +80,22 @@ public class UpdateHandler : IUpdateHandler
 
         string textResponseToBot = "Default";
 
-        var flat = _flatService.GetFlatById(long.Parse(flatId));
+        var flat = _flatFindService.GetFlatById(long.Parse(flatId));
 
         if (infoData == "post")
         {
-            await UpdateHandlerManager.SendContentToTelegramWithTranslateText(_botClient,_flatService, channelName, flat, _configuration, cancellationToken, false);
+            await UpdateHandlerManager.SendContentToTelegramWithTranslateText(_botClient,_flatFindService, channelName, flat, _configuration, cancellationToken, false);
 
-            _flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
+            _flatFindService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-            textResponseToBot = BotMessageManager.GetMessageAfterPost(_flatService.GetCountNotViewedFlats());
+            textResponseToBot = BotMessageManager.GetMessageAfterPost(_flatFindService.GetCountNotViewedFlats());
         }
 
         else if (infoData == "no post")
         {
-            _flatService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
+            _flatFindService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
 
-            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(_flatService.GetCountNotViewedFlats());
+            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(_flatFindService.GetCountNotViewedFlats());
         }
 
         await _botClient.SendTextMessageAsync(

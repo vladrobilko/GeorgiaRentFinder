@@ -26,7 +26,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<ReceiverService>();
         services.AddHostedService<PollingService>();
 
-        services.AddScoped<IFlatService, FlatService>();
+        services.AddScoped<IFlatFindService, FlatFindFindService>();
         services.AddScoped<IFlatRepository, FlatRepository>();
         services.AddScoped<IChannelInfoRepository, ChannelInfoRepository>();
 

@@ -17,20 +17,20 @@ namespace TelegramBotApi.Services
 
         protected UpdateHandlerManager() { }
 
-        public static async Task<Message> BotStart(ITelegramBotClient botClient, IFlatService flatService,
+        public static async Task<Message> BotStart(ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: BotMessageManager.GetMessageFlatCountInfo(flatService.GetCountNotViewedFlats()),
+                text: BotMessageManager.GetMessageFlatCountInfo(flatFindService.GetCountNotViewedFlats()),
                 parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
         }
 
-        public static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatService flatService,
+        public static async Task<Message> GetLastAvailableFlat(ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            var flat = flatService.GetAvailableFlat();
+            var flat = flatFindService.GetAvailableFlat();
 
             if (flat == null)
             {
@@ -41,9 +41,9 @@ namespace TelegramBotApi.Services
                     cancellationToken: cancellationToken);
             }
 
-            var channelName = flatService.GetIdChannelWithLastCheckDate();
+            var channelName = flatFindService.GetIdChannelWithLastCheckDate();
 
-            await SendContentToTelegramWithTranslateText(botClient, flatService, message.Chat.Id, flat, configuration, cancellationToken, true);
+            await SendContentToTelegramWithTranslateText(botClient, flatFindService, message.Chat.Id, flat, configuration, cancellationToken, true);
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
@@ -52,10 +52,10 @@ namespace TelegramBotApi.Services
                 cancellationToken: cancellationToken);
         }
 
-        public static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatService flatService,
+        public static async Task<Message> FindSuitAdjaraFlats(ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            var countNotViewedFlats = flatService.GetCountNotViewedFlats();
+            var countNotViewedFlats = flatFindService.GetCountNotViewedFlats();
 
             if (countNotViewedFlats != 0)
             {
@@ -67,20 +67,20 @@ namespace TelegramBotApi.Services
                     cancellationToken: cancellationToken);
             }
 
-            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ?? throw new NotImplementedException()));
+            flatFindService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ?? throw new NotImplementedException()));
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: BotMessageManager.GetMessageFlatCountInfo(flatService.GetCountNotViewedFlats()),
+                text: BotMessageManager.GetMessageFlatCountInfo(flatFindService.GetCountNotViewedFlats()),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
 
-        public static async Task<Message> FindSuitImeretiFlats(ITelegramBotClient botClient, IFlatService flatService,
+        public static async Task<Message> FindSuitImeretiFlats(ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            var countNotViewedFlats = flatService.GetCountNotViewedFlats();
+            var countNotViewedFlats = flatFindService.GetCountNotViewedFlats();
 
             if (countNotViewedFlats != 0)
             {
@@ -92,24 +92,24 @@ namespace TelegramBotApi.Services
                     cancellationToken: cancellationToken);
             }
 
-            flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ?? throw new NotImplementedException()));
+            flatFindService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ?? throw new NotImplementedException()));
 
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
-                text: BotMessageManager.GetMessageFlatCountInfo(flatService.GetCountNotViewedFlats()),
+                text: BotMessageManager.GetMessageFlatCountInfo(flatFindService.GetCountNotViewedFlats()),
                 parseMode: ParseMode.Html,
                 replyMarkup: new ReplyKeyboardRemove(),
                 cancellationToken: cancellationToken);
         }
 
-        public static async Task<Message> AutoFlatSendingEveryTwoHours(ITelegramBotClient botClient, IFlatService flatService,
+        public static async Task<Message> AutoFlatSendingEveryHour(ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            if (flatService.GetCountNotViewedFlats() != 0 || IsAutoSendingModeStarted)
+            if (flatFindService.GetCountNotViewedFlats() != 0 || IsAutoSendingModeStarted)
             {
                 await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: BotMessageManager.GetMessageForTimerStopIfException(flatService.GetCountNotViewedFlats(), IsAutoSendingModeStarted),
+                    text: BotMessageManager.GetMessageForTimerStopIfException(flatFindService.GetCountNotViewedFlats(), IsAutoSendingModeStarted),
                     parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
 
@@ -118,10 +118,10 @@ namespace TelegramBotApi.Services
                 throw new NotSupportedException();
             }
 
-            await AutoFlatSendingWithoutChecking(botClient, flatService, configuration, message, cancellationToken);
-            var twoHoursInMilliseconds = 2 * 60 * 60 * 1000;
+            await AutoFlatSendingWithoutChecking(botClient, flatFindService, configuration, message, cancellationToken);
+            var twoHoursInMilliseconds = 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
-            _timer.Elapsed += async (source, e) => await AutoFlatSendingWithoutCheckingOnTimedEvent(source, e, botClient, flatService, configuration, message, cancellationToken);
+            _timer.Elapsed += async (source, e) => await AutoFlatSendingWithoutCheckingOnTimedEvent(source, e, botClient, flatFindService, configuration, message, cancellationToken);
             _timer.Start();
             IsAutoSendingModeStarted = true;
 
@@ -132,14 +132,14 @@ namespace TelegramBotApi.Services
                 cancellationToken: cancellationToken);
         }
 
-        private static async Task AutoFlatSendingWithoutCheckingOnTimedEvent(object source, ElapsedEventArgs e, ITelegramBotClient botClient, IFlatService flatService,
+        private static async Task AutoFlatSendingWithoutCheckingOnTimedEvent(object source, ElapsedEventArgs e, ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
-            if (flatService.GetCountNotViewedFlats() != 0 || !IsAutoSendingModeStarted)
+            if (flatFindService.GetCountNotViewedFlats() != 0 || !IsAutoSendingModeStarted)
             {
                 await botClient.SendTextMessageAsync(
                     chatId: message.Chat.Id,
-                    text: BotMessageManager.GetMessageForTimerStopIfException(flatService.GetCountNotViewedFlats(), IsAutoSendingModeStarted),
+                    text: BotMessageManager.GetMessageForTimerStopIfException(flatFindService.GetCountNotViewedFlats(), IsAutoSendingModeStarted),
                     parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
 
@@ -148,26 +148,26 @@ namespace TelegramBotApi.Services
                 throw new NotSupportedException();
             }
 
-            await AutoFlatSendingWithoutChecking(botClient, flatService, configuration, message, cancellationToken);
+            await AutoFlatSendingWithoutChecking(botClient, flatFindService, configuration, message, cancellationToken);
         }
 
-        private static async Task AutoFlatSendingWithoutChecking(ITelegramBotClient botClient, IFlatService flatService,
+        private static async Task AutoFlatSendingWithoutChecking(ITelegramBotClient botClient, IFlatFindService flatFindService,
             IConfiguration configuration, Message message, CancellationToken cancellationToken)
         {
             long countProcessedFlats = 0;
 
-            flatService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ??
+            flatFindService.FindAndSaveSuitAdjaraFlats(long.Parse(configuration.GetSection("AdjaraChannel")["ChannelId"] ??
                                                               throw new NotImplementedException()));
-            var countNotViewedFlats = flatService.GetCountNotViewedFlats();
+            var countNotViewedFlats = flatFindService.GetCountNotViewedFlats();
             countProcessedFlats += countNotViewedFlats;
-            await SendFlatsWhileExistAvailableFlat(countNotViewedFlats, flatService, botClient, configuration,
+            await SendFlatsWhileExistAvailableFlat(countNotViewedFlats, flatFindService, botClient, configuration,
                 cancellationToken);
 
-            flatService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ??
+            flatFindService.FindAndSaveSuitImeretiFlats(long.Parse(configuration.GetSection("ImeretiChannel")["ChannelId"] ??
                                                                throw new NotImplementedException()));
-            countNotViewedFlats = flatService.GetCountNotViewedFlats();
+            countNotViewedFlats = flatFindService.GetCountNotViewedFlats();
             countProcessedFlats += countNotViewedFlats;
-            await SendFlatsWhileExistAvailableFlat(countNotViewedFlats, flatService, botClient, configuration,
+            await SendFlatsWhileExistAvailableFlat(countNotViewedFlats, flatFindService, botClient, configuration,
                 cancellationToken);
 
             await botClient.SendTextMessageAsync(
@@ -186,7 +186,7 @@ namespace TelegramBotApi.Services
                 cancellationToken: cancellationToken);
         }
 
-        public static async Task SendContentToTelegramWithTranslateText(ITelegramBotClient botClient, IFlatService flatService, ChatId chatId,
+        public static async Task SendContentToTelegramWithTranslateText(ITelegramBotClient botClient, IFlatFindService flatFindService, ChatId chatId,
             FlatInfoClientModel flat, IConfiguration configuration, CancellationToken cancellationToken, bool isForAdmin)
         {
             var photos = new IAlbumInputMedia[flat.LinksOfImages.Count];
@@ -220,7 +220,7 @@ namespace TelegramBotApi.Services
                     parseMode: ParseMode.Html,
                     cancellationToken: cancellationToken);
 
-                flatService.AddDatesForTelegramException(flat.Id, DateTime.Now);
+                flatFindService.AddDatesForTelegramException(flat.Id, DateTime.Now);
             }
         }
 
@@ -237,28 +237,28 @@ namespace TelegramBotApi.Services
                 });
         }
 
-        private static async Task SendFlatsWhileExistAvailableFlat(long countNotViewedFlats, IFlatService flatService,
+        private static async Task SendFlatsWhileExistAvailableFlat(long countNotViewedFlats, IFlatFindService flatFindService,
             ITelegramBotClient botClient, IConfiguration configuration, CancellationToken cancellationToken)
         {
             while (countNotViewedFlats != 0)
             {
-                var flat = flatService.GetAvailableFlat();
+                var flat = flatFindService.GetAvailableFlat();
 
-                var channelName = flatService.GetIdChannelWithLastCheckDate();
+                var channelName = flatFindService.GetIdChannelWithLastCheckDate();
 
                 if (flat.LinksOfImages.Count > 2)
                 {
                     await Task.Delay(60 * 1000, cancellationToken);
-                    await SendContentToTelegramWithTranslateText(botClient, flatService, channelName, flat, configuration,
+                    await SendContentToTelegramWithTranslateText(botClient, flatFindService, channelName, flat, configuration,
                         cancellationToken, false);
-                    flatService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
+                    flatFindService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
                 }
                 else
                 {
-                    flatService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
+                    flatFindService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
                 }
 
-                countNotViewedFlats = flatService.GetCountNotViewedFlats();
+                countNotViewedFlats = flatFindService.GetCountNotViewedFlats();
             }
         }
     }
