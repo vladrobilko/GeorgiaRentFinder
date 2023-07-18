@@ -11,7 +11,7 @@ namespace TelegramBotApi.Services
         protected OnCallbackQueryManager() { }
 
         public static async Task ChoosePostingFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
-            IConfiguration configuration, IFlatFindService findService, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
+            IConfiguration configuration, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
 

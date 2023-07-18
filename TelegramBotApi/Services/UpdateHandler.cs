@@ -8,32 +8,32 @@ namespace TelegramBotApi.Services;
 
 public class UpdateHandler : IUpdateHandler
 {
-    private readonly ITelegramBotClient _botClient;
+    private readonly ITelegramBotClient _bot;
     private readonly ILogger<UpdateHandler> _logger;
-    private readonly IConfiguration _configuration;
-    private readonly IFlatFindService _flatFindService;
-    private readonly IFlatPublicationService _flatPublicationService;
-    private readonly IFlatInfoService _flatInfoService;
+    private readonly IConfiguration _conf;
+    private readonly IFlatFindService _finder;
+    private readonly IFlatPublicationService _publisher;
+    private readonly IFlatInfoService _informer;
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration,
-        IFlatFindService flatFindService, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
+    public UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger, IConfiguration conf,
+        IFlatFindService finder, IFlatPublicationService publisher, IFlatInfoService informer)
     {
-        _botClient = botClient;
+        _bot = bot;
         _logger = logger;
-        _configuration = configuration;
-        _flatFindService = flatFindService;
-        _flatPublicationService = flatPublicationService;
-        _flatInfoService = flatInfoService;
+        _conf = conf;
+        _finder = finder;
+        _publisher = publisher;
+        _informer = informer;
     }
 
-    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+    public async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken cancel)
     {
         if (IsAdmin(update))
         {
             var handler = update switch
             {
-                { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancellationToken),
-                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceivedFromAdmin(callbackQuery, cancellationToken),
+                { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancel),
+                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceivedFromAdmin(callbackQuery, cancel),
                 _ => UnknownUpdateHandlerAsync(update)
             };
 
@@ -43,37 +43,37 @@ public class UpdateHandler : IUpdateHandler
         {
             if (update.Message == null) throw new FormatException();
 
-            await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id,
+            await bot.SendTextMessageAsync(chatId: update.Message.Chat.Id,
                 BotMessageManager.GetMessageForNoAdmin,
-                cancellationToken: cancellationToken);
+                cancellationToken: cancel);
         }
     }
 
-    private async Task BotOnMessageReceivedFromAdmin(Message message, CancellationToken cancellationToken)
+    private async Task BotOnMessageReceivedFromAdmin(Message mes, CancellationToken cancel)
     {
-        _logger.LogInformation("Receive message type: {MessageType}", message.Type);
-        if (message.Text is not { } messageText)
+        _logger.LogInformation("Receive mes type: {MessageType}", mes.Type);
+        if (mes.Text is not { } messageText)
             return;
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnMassageManager.BotStart(_botClient, _flatFindService, _flatInfoService, message, cancellationToken),
-            "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _flatInfoService, _configuration, message, cancellationToken),
-            "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_botClient, _flatFindService, _flatInfoService, _configuration, message, cancellationToken),
-            "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_botClient, _flatFindService, _flatInfoService, _flatPublicationService, _configuration, message, cancellationToken),
-            "/AutoFlatSendingEveryHour" => OnMassageManager.AutoFlatSendingEveryHour(_botClient, _flatFindService, _flatInfoService, _flatPublicationService, _configuration, message, cancellationToken),
-            _ => OnMassageManager.OnTextResponse(_botClient, message, cancellationToken),
+            "/start" => OnMassageManager.BotStart(_bot, _informer, mes, cancel),
+            "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_bot, _finder, _informer, _conf, mes, cancel),
+            "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_bot, _finder, _informer, _conf, mes, cancel),
+            "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_bot, _informer, _publisher, _conf, mes, cancel),
+            "/AutoFlatSendingEveryHour" => OnMassageManager.AutoFlatSendingEveryHour(_bot, _finder, _informer, _publisher, _conf, mes, cancel),
+            _ => OnMassageManager.OnTextResponse(_bot, mes, cancel),
         };
 
         Message sentMessage = await action;
-        _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
+        _logger.LogInformation("The mes was sent with Id: {SentMessageId}", sentMessage.MessageId);
     }
 
-    private async Task BotOnCallbackQueryReceivedFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    private async Task BotOnCallbackQueryReceivedFromAdmin(CallbackQuery callback, CancellationToken cancel)
     {
-        _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
+        _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callback.Id);
         // logic with switch if consist <==
-        await OnCallbackQueryManager.ChoosePostingFromAdmin(callbackQuery, cancellationToken, _botClient, _configuration, _flatFindService, _flatPublicationService, _flatInfoService);
+        await OnCallbackQueryManager.ChoosePostingFromAdmin(callback, cancel, _bot, _conf, _publisher, _informer);
     }
 
     private Task UnknownUpdateHandlerAsync(Update update)
@@ -101,10 +101,10 @@ public class UpdateHandler : IUpdateHandler
     {
         if (update.CallbackQuery != null)
         {
-            return update.CallbackQuery.From.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"];
+            return update.CallbackQuery.From.Username == _conf.GetSection("BotConfiguration")["AdminUserName"];
         }
         return update.Message != null
-               && update.Message.Chat.Username == _configuration.GetSection("BotConfiguration")["AdminUserName"]
-               && update.Message.Chat.Id.ToString() == _configuration.GetSection("BotConfiguration")["BotId"];
+               && update.Message.Chat.Username == _conf.GetSection("BotConfiguration")["AdminUserName"]
+               && update.Message.Chat.Id.ToString() == _conf.GetSection("BotConfiguration")["BotId"];
     }
 }
