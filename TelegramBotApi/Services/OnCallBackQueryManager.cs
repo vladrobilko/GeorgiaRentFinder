@@ -11,7 +11,7 @@ namespace TelegramBotApi.Services
         protected OnCallbackQueryManager() { }
 
         public static async Task ChoosePostingFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
-            IConfiguration configuration, IFlatFindService findService, IFlatPublicationService flatPublicationService)
+            IConfiguration configuration, IFlatFindService findService, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
 
@@ -21,7 +21,7 @@ namespace TelegramBotApi.Services
             var flatId = callBackInfo[1];
             var channelName = callBackInfo[2];
             string textResponseToBot = "Default";
-            var flat = findService.GetFlatById(long.Parse(flatId));
+            var flat = flatInfoService.GetFlatById(long.Parse(flatId));
 
             if (infoData == "post")
             {
@@ -29,14 +29,14 @@ namespace TelegramBotApi.Services
 
                 flatPublicationService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-                textResponseToBot = BotMessageManager.GetMessageAfterPost(findService.GetCountNotViewedFlats());
+                textResponseToBot = BotMessageManager.GetMessageAfterPost(flatInfoService.GetCountNotViewedFlats());
             }
 
             else if (infoData == "no post")
             {
                 flatPublicationService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
 
-                textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(findService.GetCountNotViewedFlats());
+                textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(flatInfoService.GetCountNotViewedFlats());
             }
 
             await botClient.SendTextMessageAsync(

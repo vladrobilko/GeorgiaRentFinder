@@ -13,14 +13,17 @@ public class UpdateHandler : IUpdateHandler
     private readonly IConfiguration _configuration;
     private readonly IFlatFindService _flatFindService;
     private readonly IFlatPublicationService _flatPublicationService;
+    private readonly IFlatInfoService _flatInfoService;
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatFindService flatFindService, IFlatPublicationService flatPublicationService)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration,
+        IFlatFindService flatFindService, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
     {
         _botClient = botClient;
         _logger = logger;
         _configuration = configuration;
         _flatFindService = flatFindService;
         _flatPublicationService = flatPublicationService;
+        _flatInfoService = flatInfoService;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -39,7 +42,7 @@ public class UpdateHandler : IUpdateHandler
         else
         {
             if (update.Message == null) throw new FormatException();
-            
+
             await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id,
                 BotMessageManager.GetMessageForNoAdmin,
                 cancellationToken: cancellationToken);
@@ -54,11 +57,11 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnMassageManager.BotStart(_botClient, _flatFindService, message, cancellationToken),
-            "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_botClient, _flatFindService,_flatPublicationService, _configuration, message, cancellationToken),
-            "/AutoFlatSendingEveryHour" => OnMassageManager.AutoFlatSendingEveryHour(_botClient, _flatFindService,_flatPublicationService, _configuration, message, cancellationToken),
+            "/start" => OnMassageManager.BotStart(_botClient, _flatFindService, _flatInfoService, message, cancellationToken),
+            "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _flatInfoService, _configuration, message, cancellationToken),
+            "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_botClient, _flatFindService, _flatInfoService, _configuration, message, cancellationToken),
+            "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_botClient, _flatFindService, _flatInfoService, _flatPublicationService, _configuration, message, cancellationToken),
+            "/AutoFlatSendingEveryHour" => OnMassageManager.AutoFlatSendingEveryHour(_botClient, _flatFindService, _flatInfoService, _flatPublicationService, _configuration, message, cancellationToken),
             _ => OnMassageManager.OnTextResponse(_botClient, message, cancellationToken),
         };
 
@@ -70,7 +73,7 @@ public class UpdateHandler : IUpdateHandler
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
         // logic with switch if consist <==
-        await OnCallbackQueryManager.ChoosePostingFromAdmin(callbackQuery, cancellationToken, _botClient, _configuration, _flatFindService, _flatPublicationService);
+        await OnCallbackQueryManager.ChoosePostingFromAdmin(callbackQuery, cancellationToken, _botClient, _configuration, _flatFindService, _flatPublicationService, _flatInfoService);
     }
 
     private Task UnknownUpdateHandlerAsync(Update update)

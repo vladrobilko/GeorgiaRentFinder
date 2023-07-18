@@ -7,13 +7,5 @@ namespace Application.Interfaces
         void FindAndSaveSuitAdjaraFlats(long channelId);
 
         void FindAndSaveSuitImeretiFlats(long channelId);
-        
-        FlatInfoClientModel GetAvailableFlat();
-
-        FlatInfoClientModel GetFlatById(long flatId);
-
-        long GetCountNotViewedFlats();
-
-        string GetIdChannelWithLastCheckDate();
     }
 }

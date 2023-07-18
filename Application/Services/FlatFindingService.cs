@@ -64,26 +64,6 @@ namespace Application.Services
             _channelInfoRepository.UpdateLastCheckDate(channelId, DateTime.Now);
         }
 
-        public FlatInfoClientModel GetAvailableFlat()
-        {
-            return _flatRepository.ReadOldestNotViewedFlat();
-        }
-
-        public FlatInfoClientModel GetFlatById(long flatId)
-        {
-            return _flatRepository.ReadFlatById(flatId);
-        }
-
-        public long GetCountNotViewedFlats()
-        {
-            return _flatRepository.ReadCountNotViewedFlats();
-        }
-
-        public string GetIdChannelWithLastCheckDate()
-        {
-            return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
-        }
-        
         private static void FindSsDotGeAdjaraFLats(int countPagesForScrap, FlatsScraper scraperSsDotGe, DateTime lastCheckDate,
             List<FlatInfoModel> newAdjaraFlats)
         {

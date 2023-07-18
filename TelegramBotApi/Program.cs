@@ -30,6 +30,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IFlatRepository, FlatRepository>();
         services.AddScoped<IChannelInfoRepository, ChannelInfoRepository>();
         services.AddScoped<IFlatPublicationService, FlatPublicationService>();
+        services.AddScoped<IFlatInfoService, FlatInfoService>();
 
         services.AddDbContext<RentFinderDbContext>(options =>
         options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));

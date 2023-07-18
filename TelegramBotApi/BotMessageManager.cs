@@ -27,12 +27,12 @@ namespace TelegramBotApi
             return $"There is a mistake with timer for these reasons: count no viewed flats: {notViewedFlatsCount} or timer is started equal {isTimerStart}" +
                    $"\nTimer will be stopped!!!";
         }
-        
+
         public static string GetMessageCountOfProcessedFlats(long count)
         {
             return $"{count} flats were processed";
         }
-        
+
         public static string GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(long flatId)
         {
             return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>" +
@@ -57,8 +57,8 @@ namespace TelegramBotApi
                        "\n/ImeretiSearch" +
                        "\n  _____________" +
                        "\n/AdjaraSearch" +
-                       "\n  _____________" + 
-                       "\n/AutoFlatSendingEveryHour"; 
+                       "\n  _____________" +
+                       "\n/AutoFlatSendingEveryHour";
             }
             return $"There are <ins><strong>{countFlats} NOT distributed flats.</strong></ins>" +
                    $"\nYou need to do this: {GetMessageForGetLastAvailableFlatLink}";
