@@ -11,14 +11,13 @@ namespace TelegramBotApi.Services
 {
     public class OnMassageManager
     {
-        private static System.Timers.Timer _timer;
+        private static System.Timers.Timer? _timer;
 
-        public static bool IsAutoSendingModeStarted { get; set; } = false;
+        public static bool IsAutoSendingModeStarted { get; set; }
 
         protected OnMassageManager() { }
 
-        public static async Task<Message> BotStart(ITelegramBotClient botClient, IFlatFindService flatFindService,
-            IConfiguration configuration, Message message, CancellationToken cancellationToken)
+        public static async Task<Message> BotStart(ITelegramBotClient botClient, IFlatFindService flatFindService, Message message, CancellationToken cancellationToken)
         {
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,

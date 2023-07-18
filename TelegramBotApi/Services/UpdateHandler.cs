@@ -54,7 +54,7 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnMassageManager.BotStart(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/start" => OnMassageManager.BotStart(_botClient, _flatFindService, message, cancellationToken),
             "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
             "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
             "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_botClient, _flatFindService,_flatPublicationService, _configuration, message, cancellationToken),
