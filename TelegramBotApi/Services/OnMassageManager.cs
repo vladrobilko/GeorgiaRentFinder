@@ -235,6 +235,7 @@ namespace TelegramBotApi.Services
                 parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
         }
+
         private static async Task<Message> SendTextMessageAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken, string text, IReplyMarkup replyMarkup)
         {
             return await botClient.SendTextMessageAsync(
