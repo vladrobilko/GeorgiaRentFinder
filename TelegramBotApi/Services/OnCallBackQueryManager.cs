@@ -1,11 +1,4 @@
 ﻿using Application.Interfaces;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -17,7 +10,7 @@ namespace TelegramBotApi.Services
     {
         protected OnCallbackQueryManager() { }
 
-        public static async Task ChoosePostingFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken,ITelegramBotClient botClient,
+        public static async Task ChoosePostingFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
             IConfiguration configuration, IFlatFindService findService, IFlatPublicationService flatPublicationService)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
