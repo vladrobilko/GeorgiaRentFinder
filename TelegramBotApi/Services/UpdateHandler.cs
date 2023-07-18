@@ -14,13 +14,15 @@ public class UpdateHandler : IUpdateHandler
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _configuration;
     private readonly IFlatFindService _flatFindService;
+    private readonly IFlatPublicationService _flatPublicationService;
 
-    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatFindService flatFindService)
+    public UpdateHandler(ITelegramBotClient botClient, ILogger<UpdateHandler> logger, IConfiguration configuration, IFlatFindService flatFindService, IFlatPublicationService flatPublicationService)
     {
         _botClient = botClient;
         _logger = logger;
         _configuration = configuration;
         _flatFindService = flatFindService;
+        _flatPublicationService = flatPublicationService;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -30,7 +32,7 @@ public class UpdateHandler : IUpdateHandler
             var handler = update switch
             {
                 { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancellationToken),
-                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceived(callbackQuery, cancellationToken),
+                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceivedFromAdmin(callbackQuery, cancellationToken),
                 _ => UnknownUpdateHandlerAsync(update)
             };
 
@@ -54,56 +56,23 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => UpdateHandlerManager.BotStart(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            "/AdjaraSearch" => UpdateHandlerManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            "/ImeretiSearch" => UpdateHandlerManager.FindSuitImeretiFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            "/LookFlat" => UpdateHandlerManager.GetLastAvailableFlat(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            "/AutoFlatSendingEveryHour" => UpdateHandlerManager.AutoFlatSendingEveryHour(_botClient, _flatFindService, _configuration, message, cancellationToken),
-            _ => UpdateHandlerManager.OnTextResponse(_botClient, message, cancellationToken),
+            "/start" => OnMassageManager.BotStart(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_botClient, _flatFindService, _configuration, message, cancellationToken),
+            "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_botClient, _flatFindService,_flatPublicationService, _configuration, message, cancellationToken),
+            "/AutoFlatSendingEveryHour" => OnMassageManager.AutoFlatSendingEveryHour(_botClient, _flatFindService,_flatPublicationService, _configuration, message, cancellationToken),
+            _ => OnMassageManager.OnTextResponse(_botClient, message, cancellationToken),
         };
 
         Message sentMessage = await action;
         _logger.LogInformation("The message was sent with Id: {SentMessageId}", sentMessage.MessageId);
     }
 
-    private async Task BotOnCallbackQueryReceived(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+    private async Task BotOnCallbackQueryReceivedFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callbackQuery.Id);
-
-        if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
-
-        var callBackInfo = callbackQuery.Data.Split("_");
-
-        var infoData = callBackInfo[0];
-        var flatId = callBackInfo[1];
-        var channelName = callBackInfo[2];
-
-        string textResponseToBot = "Default";
-
-        var flat = _flatFindService.GetFlatById(long.Parse(flatId));
-
-        if (infoData == "post")
-        {
-            await UpdateHandlerManager.SendContentToTelegramWithTranslateText(_botClient,_flatFindService, channelName, flat, _configuration, cancellationToken, false);
-
-            _flatFindService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
-
-            textResponseToBot = BotMessageManager.GetMessageAfterPost(_flatFindService.GetCountNotViewedFlats());
-        }
-
-        else if (infoData == "no post")
-        {
-            _flatFindService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
-
-            textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(_flatFindService.GetCountNotViewedFlats());
-        }
-
-        await _botClient.SendTextMessageAsync(
-            chatId: callbackQuery.Message.Chat.Id,
-            text: textResponseToBot,
-            parseMode: ParseMode.Html,
-            replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton[][] { }),
-            cancellationToken: cancellationToken);
+        // logic with switch if consist <==
+        await OnCallbackQueryManager.ChoosePostingFromAdmin(callbackQuery, cancellationToken, _botClient, _configuration, _flatFindService, _flatPublicationService);
     }
 
     private Task UnknownUpdateHandlerAsync(Update update)

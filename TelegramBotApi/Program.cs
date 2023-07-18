@@ -26,9 +26,10 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<ReceiverService>();
         services.AddHostedService<PollingService>();
 
-        services.AddScoped<IFlatFindService, FlatFindFindService>();
+        services.AddScoped<IFlatFindService, FlatFindingService>();
         services.AddScoped<IFlatRepository, FlatRepository>();
         services.AddScoped<IChannelInfoRepository, ChannelInfoRepository>();
+        services.AddScoped<IFlatPublicationService, FlatPublicationService>();
 
         services.AddDbContext<RentFinderDbContext>(options =>
         options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));

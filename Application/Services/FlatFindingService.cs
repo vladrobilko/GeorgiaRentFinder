@@ -10,13 +10,13 @@ using WebScraper.SsDotGe.LInks;
 
 namespace Application.Services
 {
-    public class FlatFindFindService : IFlatFindService
+    public class FlatFindingService : IFlatFindService
     {
         private readonly IFlatRepository _flatRepository;
 
         private readonly IChannelInfoRepository _channelInfoRepository;
 
-        public FlatFindFindService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
+        public FlatFindingService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
         {
             _flatRepository = flatRepository;
             _channelInfoRepository = channelInfoRepository;
@@ -64,16 +64,6 @@ namespace Application.Services
             _channelInfoRepository.UpdateLastCheckDate(channelId, DateTime.Now);
         }
 
-        public void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic)
-        {
-            _flatRepository.UpdateFlatDateInfoTelegramPublication(flatId, timeOfPublic);
-        }
-
-        public void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic)
-        {
-            _flatRepository.UpdateFlatDateInfoRefusePublication(flatId, timeOfPublic);
-        }
-
         public FlatInfoClientModel GetAvailableFlat()
         {
             return _flatRepository.ReadOldestNotViewedFlat();
@@ -93,12 +83,7 @@ namespace Application.Services
         {
             return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }
-
-        public void AddDatesForTelegramException(long flatId, DateTime time)
-        {
-            _flatRepository.UpdateFlatDateInfoTelegramException(flatId, time);
-        }
-
+        
         private static void FindSsDotGeAdjaraFLats(int countPagesForScrap, FlatsScraper scraperSsDotGe, DateTime lastCheckDate,
             List<FlatInfoModel> newAdjaraFlats)
         {

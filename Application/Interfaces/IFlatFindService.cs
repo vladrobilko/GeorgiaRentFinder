@@ -7,11 +7,7 @@ namespace Application.Interfaces
         void FindAndSaveSuitAdjaraFlats(long channelId);
 
         void FindAndSaveSuitImeretiFlats(long channelId);
-
-        void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic);
-
-        void AddDateOfRefusePublication(long flatId, DateTime timeOfPublic);
-
+        
         FlatInfoClientModel GetAvailableFlat();
 
         FlatInfoClientModel GetFlatById(long flatId);
@@ -19,7 +15,5 @@ namespace Application.Interfaces
         long GetCountNotViewedFlats();
 
         string GetIdChannelWithLastCheckDate();
-
-        void AddDatesForTelegramException(long flatId, DateTime time);
     }
 }

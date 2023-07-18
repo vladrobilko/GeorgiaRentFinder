@@ -1,5 +1,4 @@
 using Telegram.Bot;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegramBotApi.Abstract;
 
@@ -11,7 +10,7 @@ public abstract class PollingServiceBase<TReceiverService> : BackgroundService
     private readonly ITelegramBotClient _botClient;
     private readonly IConfiguration _configuration;
 
-    internal PollingServiceBase(
+    protected PollingServiceBase(
         IServiceProvider serviceProvider,
         ILogger<PollingServiceBase<TReceiverService>> logger,
         ITelegramBotClient botClient,
