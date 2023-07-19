@@ -26,14 +26,14 @@ public class UpdateHandler : IUpdateHandler
         _informer = informer;
     }
 
-    public async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, CancellationToken cancel)
+    public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         if (IsAdmin(update))
         {
             var handler = update switch
             {
-                { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancel),
-                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceivedFromAdmin(callbackQuery, cancel),
+                { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancellationToken),
+                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceivedFromAdmin(callbackQuery, cancellationToken),
                 _ => UnknownUpdateHandlerAsync(update)
             };
 
@@ -43,9 +43,9 @@ public class UpdateHandler : IUpdateHandler
         {
             if (update.Message == null) throw new FormatException();
 
-            await bot.SendTextMessageAsync(chatId: update.Message.Chat.Id,
+            await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id,
                 BotMessageManager.GetMessageForNoAdmin,
-                cancellationToken: cancel);
+                cancellationToken: cancellationToken);
         }
     }
 
