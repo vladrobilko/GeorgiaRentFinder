@@ -19,6 +19,7 @@ namespace Application.Converters
                    $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
                    $"{GetPageLinkDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
+                   $"{GetContactToWhatsAppDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" + 
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}" +
                    $"{GetIdDescriptionOrEmptyString(isForAdmin,flat.Id)}";
@@ -89,6 +90,21 @@ namespace Application.Converters
         {
             if (number == "No number") return "";
             return $"\n☎️<strong>Телефон:</strong> {ConvertMobilePhoneToViewGeorgiaFormat(number)}";
+        }
+
+        private static string GetContactToWhatsAppDescribe(string number)
+        {
+            var codeOfGeorgia = "995";
+
+            var result = long.TryParse(number.Replace(" ", ""), out var parseNumber);
+
+            if (result && parseNumber.ToString().Length == 9)
+            {
+                return $"\n📲<strong>Мессенджер:</strong>" +
+                       $"<a href=\"https://wa.me/{codeOfGeorgia}{parseNumber}?text=Hello!%20I'm%20interested%20in%20your%20flat%20for%20rent\"> WhatsApp</a>";
+            }
+
+            return "";
         }
 
         private static string GetRealtorDescribe(FlatInfoClientModel flat, long mentionOnSite)
