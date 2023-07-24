@@ -9,19 +9,19 @@ using System.Timers;
 using Telegram.Bot.Exceptions;
 using System.Text.RegularExpressions;
 
-namespace TelegramBotApi.Services
+namespace TelegramBotApi.Services.Managers
 {
-    public class OnMassageManager
+    public class OnAdminMassageManager
     {
         private static System.Timers.Timer? _timer;
 
         public static bool IsAutoSendingModeStarted { get; set; }
 
-        protected OnMassageManager() { }
+        protected OnAdminMassageManager() { }
 
         public static async Task<Message> BotStart(ITelegramBotClient bot, IFlatInfoService informer, Message message, CancellationToken cancel)
         {
-            var text = BotMessageManager.GetMessageFlatCountInfo(informer.GetCountNotViewedFlats());
+            var text = MessageToAdminManager.GetMessageFlatCountInfo(informer.GetCountNotViewedFlats());
 
             return await SendTextMessageAsync(bot, message, cancel, text);
         }
@@ -33,7 +33,7 @@ namespace TelegramBotApi.Services
 
             if (flat == null)
             {
-                return await SendTextMessageAsync(bot, mes, cancel, BotMessageManager.GetMessageFlatCountInfo(0));
+                return await SendTextMessageAsync(bot, mes, cancel, MessageToAdminManager.GetMessageFlatCountInfo(0));
             }
 
             var channelName = informer.GetIdChannelWithLastCheckDate();
@@ -50,14 +50,14 @@ namespace TelegramBotApi.Services
 
             if (countNotViewedFlats != 0)
             {
-                var textWithCount = BotMessageManager.GetMessageFlatCountInfo(countNotViewedFlats);
+                var textWithCount = MessageToAdminManager.GetMessageFlatCountInfo(countNotViewedFlats);
 
                 return await SendTextMessageAsync(bot, mes, cancel, textWithCount, new ReplyKeyboardRemove());
             }
 
             finder.FindAndSaveSuitAdjaraFlats(long.Parse(conf.GetSection("AdjaraChannel")["ChannelId"] ?? throw new NotImplementedException()));
 
-            var text = BotMessageManager.GetMessageFlatCountInfo(informer.GetCountNotViewedFlats());
+            var text = MessageToAdminManager.GetMessageFlatCountInfo(informer.GetCountNotViewedFlats());
 
             return await SendTextMessageAsync(bot, mes, cancel, text, new ReplyKeyboardRemove());
         }
@@ -71,7 +71,7 @@ namespace TelegramBotApi.Services
             {
                 return await bot.SendTextMessageAsync(
                     chatId: mes.Chat.Id,
-                    text: BotMessageManager.GetMessageFlatCountInfo(countNotViewedFlats),
+                    text: MessageToAdminManager.GetMessageFlatCountInfo(countNotViewedFlats),
                     parseMode: ParseMode.Html,
                     replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: cancel);
@@ -79,7 +79,7 @@ namespace TelegramBotApi.Services
 
             finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"] ?? throw new NotImplementedException()));
 
-            var text = BotMessageManager.GetMessageFlatCountInfo(informer.GetCountNotViewedFlats());
+            var text = MessageToAdminManager.GetMessageFlatCountInfo(informer.GetCountNotViewedFlats());
             return await SendTextMessageAsync(bot, mes, cancel, text, new ReplyKeyboardRemove());
         }
 
@@ -88,7 +88,7 @@ namespace TelegramBotApi.Services
         {
             if (informer.GetCountNotViewedFlats() != 0 || IsAutoSendingModeStarted)
             {
-                var text = BotMessageManager.GetMessageForTimerStopIfException(informer.GetCountNotViewedFlats(), IsAutoSendingModeStarted);
+                var text = MessageToAdminManager.GetMessageForTimerStopIfException(informer.GetCountNotViewedFlats(), IsAutoSendingModeStarted);
 
                 await SendTextMessageAsync(bot, mes, cancel, text);
 
@@ -105,7 +105,7 @@ namespace TelegramBotApi.Services
             _timer.Start();
             IsAutoSendingModeStarted = true;
 
-            return await SendTextMessageAsync(bot, mes, cancel, BotMessageManager.GetMessageForStartAutoFlatSendingEveryTwoHour);
+            return await SendTextMessageAsync(bot, mes, cancel, MessageToAdminManager.GetMessageForStartAutoFlatSendingEveryHour);
         }
 
         private static async Task AutoFlatSendingWithoutCheckingOnTimedEvent(object source, ElapsedEventArgs e, ITelegramBotClient bot, IFlatInfoService informer,
@@ -113,7 +113,7 @@ namespace TelegramBotApi.Services
         {
             if (informer.GetCountNotViewedFlats() != 0 || !IsAutoSendingModeStarted)
             {
-                var text = BotMessageManager.GetMessageForTimerStopIfException(informer.GetCountNotViewedFlats(), IsAutoSendingModeStarted);
+                var text = MessageToAdminManager.GetMessageForTimerStopIfException(informer.GetCountNotViewedFlats(), IsAutoSendingModeStarted);
 
                 await SendTextMessageAsync(bot, mes, cancel, text);
 
@@ -144,12 +144,12 @@ namespace TelegramBotApi.Services
             await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, informer, publisher, bot, conf,
                 cancel);
 
-            await SendTextMessageAsync(bot, mes, cancel, BotMessageManager.GetMessageCountOfProcessedFlats(countProcessedFlats));
+            await SendTextMessageAsync(bot, mes, cancel, MessageToAdminManager.GetMessageCountOfProcessedFlats(countProcessedFlats));
         }
 
         public static async Task<Message> OnTextResponse(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
         {
-            return await SendTextMessageAsync(botClient, message, cancellationToken, BotMessageManager.GetMessageForAfterOnlyTextSending, new ReplyKeyboardRemove());
+            return await SendTextMessageAsync(botClient, message, cancellationToken, MessageToAdminManager.GetMessageForAfterOnlyTextSending, new ReplyKeyboardRemove());
         }
 
         public static async Task SendContentToTelegramWithTranslateText(ITelegramBotClient bot, IFlatPublicationService publisher, ChatId chatId,
@@ -203,7 +203,7 @@ namespace TelegramBotApi.Services
         {
             await bot.SendTextMessageAsync(
                 chatId: conf.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
-                text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
+                text: MessageToAdminManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
                 parseMode: ParseMode.Html,
                 cancellationToken: cancel);
 

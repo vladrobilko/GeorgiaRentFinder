@@ -3,6 +3,7 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using TelegramBotApi.Services.Managers;
 
 namespace TelegramBotApi.Services;
 
@@ -32,8 +33,8 @@ public class UpdateHandler : IUpdateHandler
         {
             var handler = update switch
             {
-                { Message: { } message } => BotOnMessageReceivedFromAdmin(message, cancellationToken),
-                { CallbackQuery: { } callbackQuery } => BotOnCallbackQueryReceivedFromAdmin(callbackQuery, cancellationToken),
+                { Message: { } message } => BotOnAdminMessageReceived(message, cancellationToken),
+                { CallbackQuery: { } callbackQuery } => BotOnAdminCallbackQueryReceived(callbackQuery, cancellationToken),
                 _ => UnknownUpdateHandlerAsync(update)
             };
 
@@ -41,15 +42,18 @@ public class UpdateHandler : IUpdateHandler
         }
         else
         {
-            if (update.Message == null) throw new FormatException();
+            var handler = update switch
+            {
+                { Message: { } message } => BotOnUserMessageReceived(message, cancellationToken),
+                { CallbackQuery: { } callbackQuery } => BotOnUserCallbackQueryReceived(callbackQuery, cancellationToken),
+                _ => UnknownUpdateHandlerAsync(update)
+            };
 
-            await botClient.SendTextMessageAsync(chatId: update.Message.Chat.Id,
-                BotMessageManager.GetMessageForNoAdmin,
-                cancellationToken: cancellationToken);
+            await handler;
         }
     }
 
-    private async Task BotOnMessageReceivedFromAdmin(Message mes, CancellationToken cancel)
+    private async Task BotOnAdminMessageReceived(Message mes, CancellationToken cancel)
     {
         _logger.LogInformation("Receive mes type: {MessageType}", mes.Type);
         if (mes.Text is not { } messageText)
@@ -57,23 +61,46 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnMassageManager.BotStart(_bot, _informer, mes, cancel),
-            "/AdjaraSearch" => OnMassageManager.FindSuitAdjaraFlats(_bot, _finder, _informer, _conf, mes, cancel),
-            "/ImeretiSearch" => OnMassageManager.FindSuitImeretiFlats(_bot, _finder, _informer, _conf, mes, cancel),
-            "/LookFlat" => OnMassageManager.GetLastAvailableFlat(_bot, _informer, _publisher, _conf, mes, cancel),
-            "/AutoFlatSendingEveryHour" => OnMassageManager.AutoFlatSendingEveryHour(_bot, _finder, _informer, _publisher, _conf, mes, cancel),
-            _ => OnMassageManager.OnTextResponse(_bot, mes, cancel),
+            "/start" => OnAdminMassageManager.BotStart(_bot, _informer, mes, cancel),
+            "/AdjaraSearch" => OnAdminMassageManager.FindSuitAdjaraFlats(_bot, _finder, _informer, _conf, mes, cancel),
+            "/ImeretiSearch" => OnAdminMassageManager.FindSuitImeretiFlats(_bot, _finder, _informer, _conf, mes, cancel),
+            "/LookFlat" => OnAdminMassageManager.GetLastAvailableFlat(_bot, _informer, _publisher, _conf, mes, cancel),
+            "/AutoFlatSendingEveryHour" => OnAdminMassageManager.AutoFlatSendingEveryHour(_bot, _finder, _informer, _publisher, _conf, mes, cancel),
+            _ => OnAdminMassageManager.OnTextResponse(_bot, mes, cancel),
+        };
+
+        Message sentMessage = await action;
+        _logger.LogInformation("The mes was sent with Id: {SentMessageId}", sentMessage.MessageId);
+    }
+    private async Task BotOnUserMessageReceived(Message mes, CancellationToken cancel)
+    {
+        _logger.LogInformation("Receive mes type: {MessageType}", mes.Type);
+        if (mes.Text is not { } messageText)
+            return;
+
+        var action = messageText.Split(' ')[0] switch
+        {
+            "/start" => OnUserMassageManager.BotStart(_bot, _informer, mes, cancel),
+            _ => OnAdminMassageManager.OnTextResponse(_bot, mes, cancel), // change on 
         };
 
         Message sentMessage = await action;
         _logger.LogInformation("The mes was sent with Id: {SentMessageId}", sentMessage.MessageId);
     }
 
-    private async Task BotOnCallbackQueryReceivedFromAdmin(CallbackQuery callback, CancellationToken cancel)
+    private async Task BotOnAdminCallbackQueryReceived(CallbackQuery callback, CancellationToken cancel)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callback.Id);
-        // logic with switch if consist <==
-        await OnCallbackQueryManager.ChoosePostingFromAdmin(callback, cancel, _bot, _conf, _publisher, _informer);
+
+        if (callback.Data != null && callback.Data.Contains("post")) 
+            await OnAdminCallbackQueryManager.ChooseFLatPostFromAdmin(callback, cancel, _bot, _conf, _publisher, _informer);
+    }
+    private async Task BotOnUserCallbackQueryReceived(CallbackQuery callback, CancellationToken cancel)
+    {
+        _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callback.Id);
+
+        if (callback.Data != null && callback.Data.Contains("language"))
+            await OnUserCallbackQueryManager.ChooseLanguage(callback, cancel, _bot, _conf, _publisher, _informer);
     }
 
     private Task UnknownUpdateHandlerAsync(Update update)

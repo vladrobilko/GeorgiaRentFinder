@@ -4,13 +4,13 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 
-namespace TelegramBotApi.Services
+namespace TelegramBotApi.Services.Managers
 {
-    public class OnCallbackQueryManager
+    public class OnAdminCallbackQueryManager
     {
-        protected OnCallbackQueryManager() { }
+        protected OnAdminCallbackQueryManager() { }
 
-        public static async Task ChoosePostingFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
+        public static async Task ChooseFLatPostFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
             IConfiguration configuration, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
@@ -25,18 +25,18 @@ namespace TelegramBotApi.Services
 
             if (infoData == "post")
             {
-                await OnMassageManager.SendContentToTelegramWithTranslateText(botClient, flatPublicationService, channelName, flat, configuration, cancellationToken, false);
+                await OnAdminMassageManager.SendContentToTelegramWithTranslateText(botClient, flatPublicationService, channelName, flat, configuration, cancellationToken, false);
 
                 flatPublicationService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-                textResponseToBot = BotMessageManager.GetMessageAfterPost(flatInfoService.GetCountNotViewedFlats());
+                textResponseToBot = MessageToAdminManager.GetMessageAfterPost(flatInfoService.GetCountNotViewedFlats());
             }
 
             else if (infoData == "no post")
             {
                 flatPublicationService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
 
-                textResponseToBot = BotMessageManager.GetMessageAfterRefusePost(flatInfoService.GetCountNotViewedFlats());
+                textResponseToBot = MessageToAdminManager.GetMessageAfterRefusePost(flatInfoService.GetCountNotViewedFlats());
             }
 
             await botClient.SendTextMessageAsync(

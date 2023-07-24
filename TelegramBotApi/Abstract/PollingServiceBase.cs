@@ -1,4 +1,5 @@
 using Telegram.Bot;
+using TelegramBotApi.Services.Managers;
 
 namespace TelegramBotApi.Abstract;
 
@@ -35,7 +36,7 @@ public abstract class PollingServiceBase<TReceiverService> : BackgroundService
     {
         await _botClient.SendTextMessageAsync(
             chatId: _configuration.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
-            text: BotMessageManager.GetStartMessage(),
+            text: MessageToAdminManager.GetStartMessage(),
             cancellationToken: cancellationToken);
     }
 

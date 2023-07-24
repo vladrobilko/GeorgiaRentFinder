@@ -1,8 +1,8 @@
 ﻿using Application.Converters;
 
-namespace TelegramBotApi
+namespace TelegramBotApi.Services.Managers
 {
-    public static class BotMessageManager
+    public static class MessageToAdminManager
     {
         public const string Usage = "Usage:" +
                                     "\n  _____________" +
@@ -14,17 +14,16 @@ namespace TelegramBotApi
                                     "\n  _____________" +
                                     "\n/AutoFlatSendingEveryHour";
 
-        public const string GetMessageForStartAutoFlatSendingEveryTwoHour = "Program is working in auto mode";
+        public const string GetMessageForStartAutoFlatSendingEveryHour = "Program is working in auto mode";
 
         public const string GetMessageForAfterOnlyTextSending = "Sorry, only commands";
 
         public const string GetMessageForGetLastAvailableFlatLink = "/LookFlat";
 
-        public const string GetMessageForNoAdmin = "Sorry, you are not an admin to use this bot.";
-
         public static string GetMessageForTimerStopIfException(long notViewedFlatsCount, bool isTimerStart)
         {
-            return $"There is a mistake with timer for these reasons: count no viewed flats: {notViewedFlatsCount} or timer is started equal {isTimerStart}" +
+            return $"There is a mistake with timer for these reasons: " +
+                   $"\ncount no viewed flats: {notViewedFlatsCount} or timer is started equal {isTimerStart}" +
                    $"\nTimer will be stopped!!!";
         }
 
@@ -35,13 +34,12 @@ namespace TelegramBotApi
 
         public static string GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(long flatId)
         {
-            return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>" +
-                   $"\n{GetMessageForGetLastAvailableFlatLink}";
+            return $"You have a problem. <ins><strong>Flat id is: {flatId}</strong></ins>";
         }
 
         public static string GetStartMessage()
         {
-            return "Hello, I'm an admin bot of these channels:" +
+            return "Hello, I'm a bot of these channels:" +
                    "\n@AdjaraLowRent" +
                    "\n@ImeretiLowRent" +
                    $"\nMy started time is {DateTime.Now.ToCommonViewString()}" +
