@@ -6,6 +6,8 @@ using Telegram.Bot.Types;
 using Telegram.Bot;
 using Application.Models;
 using System.Timers;
+using Telegram.Bot.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace TelegramBotApi.Services
 {
@@ -176,16 +178,36 @@ namespace TelegramBotApi.Services
             {
                 await bot.SendMediaGroupAsync(chatId, photos, cancellationToken: cancel);
             }
+            catch (ApiRequestException ex)
+            {
+                if (int.TryParse(Regex.Match(ex.Message, @"\b(?:[0-9]|10)\b").Value, out int number) && flat.LinksOfImages.Count > 2)
+                {
+                    flat.LinksOfImages.RemoveAt(number - 1);
+                    await SendContentToTelegramWithTranslateText(bot, publisher, chatId, flat, conf, cancel, isForAdmin);
+                }
+                else
+                {
+                    await OnSendMediaGroupExceptionResponse(bot, publisher, flat, conf, cancel);
+                    throw;
+                }
+            }
             catch
             {
-                await bot.SendTextMessageAsync(
-                    chatId: conf.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
-                    text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
-                    parseMode: ParseMode.Html,
-                    cancellationToken: cancel);
-
-                publisher.AddDatesForTelegramException(flat.Id, DateTime.Now);
+                await OnSendMediaGroupExceptionResponse(bot, publisher, flat, conf, cancel);
+                throw;
             }
+        }
+
+        private static async Task OnSendMediaGroupExceptionResponse(ITelegramBotClient bot, IFlatPublicationService publisher,
+            FlatInfoClientModel flat, IConfiguration conf, CancellationToken cancel)
+        {
+            await bot.SendTextMessageAsync(
+                chatId: conf.GetSection("BotConfiguration")["BotId"] ?? throw new InvalidOperationException(),
+                text: BotMessageManager.GetMessageAfterExceptionWithSendMediaGroupAsyncToTelegram(flat.Id),
+                parseMode: ParseMode.Html,
+                cancellationToken: cancel);
+
+            publisher.AddDatesForTelegramException(flat.Id, DateTime.Now);
         }
 
         private static async Task SendFlatsWhileExistAvailableFlatWithDelay(long countNotViewedFlats, IFlatInfoService informer,

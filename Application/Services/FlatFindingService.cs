@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Repository;
-using Application.Models;
 using WebScraper;
 using WebScraper.Models;
 using WebScraper.MyHomeDotGe;
@@ -16,6 +15,14 @@ namespace Application.Services
 
         private readonly IChannelInfoRepository _channelInfoRepository;
 
+        private const int FlatsOnPageSsGe = 20;
+        private const int CountPagesForScrap = 10;
+        private const int FlatsOnPageMyHomeGe = 24;
+        private const int FlatLowestPriceAdjara = 100;
+        private const int FlatHighestPriceAdjara = 460;
+        private const int FlatLowestPriceImereti = 100;
+        private const int FlatHighestPriceImereti = 410;
+        
         public FlatFindingService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
         {
             _flatRepository = flatRepository;
@@ -28,15 +35,13 @@ namespace Application.Services
 
             var newAdjaraFlats = new List<FlatInfoModel>();
 
-            var countPagesForScrap = 5;
+            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPriceAdjara, FlatHighestPriceAdjara);
 
-            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 100, 460);
+            FindMyHomeDotGeAdjaraFLats(CountPagesForScrap, scraperMyHomeGe, lastCheckDate, newAdjaraFlats);
 
-            FindMyHomeDotGeAdjaraFLats(countPagesForScrap, scraperMyHomeGe, lastCheckDate, newAdjaraFlats);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPriceAdjara, FlatHighestPriceAdjara);
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), 20, 100, 460);
-
-            FindSsDotGeAdjaraFLats(countPagesForScrap, scraperSsDotGe, lastCheckDate, newAdjaraFlats);
+            FindSsDotGeAdjaraFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, newAdjaraFlats);
 
             _flatRepository.CreateFlats(newAdjaraFlats);
 
@@ -49,15 +54,13 @@ namespace Application.Services
 
             var imeretiFlats = new List<FlatInfoModel>();
 
-            var countPagesForScrap = 5;
+            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPriceImereti, FlatHighestPriceImereti);
 
-            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), 24, 100, 410);
+            FindMyHomeDotGeImeretiFLats(CountPagesForScrap, scraperMyHomeDotGe, lastCheckDate, imeretiFlats);
 
-            FindMyHomeDotGeImeretiFLats(countPagesForScrap, scraperMyHomeDotGe, lastCheckDate, imeretiFlats);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPriceImereti, FlatHighestPriceImereti);
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), 20, 100, 410);
-
-            FindSsDotGeImeretiFLats(countPagesForScrap, scraperSsDotGe, lastCheckDate, imeretiFlats);
+            FindSsDotGeImeretiFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, imeretiFlats);
 
             _flatRepository.CreateFlats(imeretiFlats);
 
