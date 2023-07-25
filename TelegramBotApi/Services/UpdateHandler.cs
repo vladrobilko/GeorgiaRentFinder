@@ -80,8 +80,11 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnUserMassageManager.BotStart(_bot, _informer, mes, cancel),
-            _ => OnAdminMassageManager.OnTextResponse(_bot, mes, cancel), // change on 
+            "/start" => OnUserMassageManager.BotStart(_bot, mes, cancel),
+            "/rent" => OnUserMassageManager.Rent(_bot, mes, cancel),
+            "/rentOut" => OnUserMassageManager.RentOut(_bot,mes, cancel),
+            "/admin" => OnUserMassageManager.Admin(_bot,mes, cancel),
+            _ => OnUserMassageManager.OnTextResponse(_bot, mes, cancel)
         };
 
         Message sentMessage = await action;
@@ -100,7 +103,10 @@ public class UpdateHandler : IUpdateHandler
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callback.Id);
 
         if (callback.Data != null && callback.Data.Contains("language"))
-            await OnUserCallbackQueryManager.ChooseLanguage(callback, cancel, _bot, _conf, _publisher, _informer);
+            await OnUserCallbackQueryManager.ChooseLanguageAndGiveChoiceForCity(callback, cancel, _bot, _conf, _publisher, _informer);
+        else if (callback.Data != null && callback.Data.Contains("cityChoice"))
+            await OnUserCallbackQueryManager.ChooseCityAndGiveChoiceForAction(callback, cancel, _bot);
+        
     }
 
     private Task UnknownUpdateHandlerAsync(Update update)

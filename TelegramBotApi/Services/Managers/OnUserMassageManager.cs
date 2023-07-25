@@ -3,7 +3,8 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using Application.Interfaces;
-using Application.Models;
+using static System.Net.Mime.MediaTypeNames;
+using System.Threading;
 
 namespace TelegramBotApi.Services.Managers
 {
@@ -11,12 +12,50 @@ namespace TelegramBotApi.Services.Managers
     {
         protected OnUserMassageManager() { }
 
-        public static async Task<Message> BotStart(ITelegramBotClient bot, IFlatInfoService informer, Message message, CancellationToken cancel)
+        public static async Task<Message> BotStart(ITelegramBotClient bot, Message message, CancellationToken cancel)
         {
-            return await SendTextMessageAsync(bot, message, cancel, MessageToUserManager.GetStartMessage(), GetKeyboardWithChoice(message));
+            await bot.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancel);
+
+            //make logic if user exist
+
+            // save user to db
+
+            return await SendTextMessageAsync(bot, message, cancel, MessageToUserManager.GetStartMessage(), GetKeyboardWithLanguageChoice(message));
         }
 
-        private static InlineKeyboardMarkup GetKeyboardWithChoice(Message message)
+        public static async Task<Message> OnTextResponse(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken)
+        {
+            // get language from db and give answer with this language
+            var language = "ru";
+
+            return await SendTextMessageAsync(botClient, message, cancellationToken, MessageToUserManager.GetMessageForAfterOnlyTextSending(language), new ReplyKeyboardRemove());
+        }
+
+        public static async Task<Message> Rent(ITelegramBotClient bot, Message mes, CancellationToken cancel)
+        {
+            // find city and language of user
+            var language = "ru";
+            var city = "Batumi";
+            throw new NotImplementedException();
+        }
+
+        public static async Task<Message> RentOut(ITelegramBotClient bot, Message mes, CancellationToken cancel)
+        {
+            // find city and language of user
+            throw new NotImplementedException();
+        }
+
+        public static async Task<Message> Admin(ITelegramBotClient bot, Message mes, CancellationToken cancel)
+        {
+            await bot.DeleteMessageAsync(mes.Chat.Id, mes.MessageId - 1, cancel);
+            await bot.DeleteMessageAsync(mes.Chat.Id, mes.MessageId, cancel);
+            
+            //get user language  
+
+            return await SendTextMessageAsync(bot, mes, cancel, MessageToUserManager.GetMessageAdminInfo("ru"));
+        }
+
+        private static InlineKeyboardMarkup GetKeyboardWithLanguageChoice(Message message)
         {
             return new(
                 new[]
@@ -34,7 +73,6 @@ namespace TelegramBotApi.Services.Managers
             return await botClient.SendTextMessageAsync(
                 chatId: message.Chat.Id,
                 text: text,
-                parseMode: ParseMode.Html,
                 cancellationToken: cancellationToken);
         }
 
@@ -47,5 +85,6 @@ namespace TelegramBotApi.Services.Managers
                 cancellationToken: cancellationToken,
                 replyMarkup: replyMarkup);
         }
+
     }
 }
