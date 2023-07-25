@@ -96,8 +96,7 @@ namespace TelegramBotApi.Services.Managers
 
                 throw new NotSupportedException();
             }
-
-            await AutoFlatSendingWithoutChecking(bot, finder, informer, publisher, conf, mes, cancel);
+            
             var twoHoursInMilliseconds = 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
             _timer.Elapsed += async (source, e) =>
@@ -122,23 +121,17 @@ namespace TelegramBotApi.Services.Managers
                 throw new NotSupportedException();
             }
 
-            await AutoFlatSendingWithoutChecking(bot, finder, informer, publisher, conf, mes, cancel);
-        }
-
-        private static async Task AutoFlatSendingWithoutChecking(ITelegramBotClient bot, IFlatFindService finder, IFlatInfoService informer,
-            IFlatPublicationService publisher, IConfiguration conf, Message mes, CancellationToken cancel)
-        {
             long countProcessedFlats = 0;
 
             finder.FindAndSaveSuitAdjaraFlats(long.Parse(conf.GetSection("AdjaraChannel")["ChannelId"] ??
-                                                              throw new NotImplementedException()));
+                                                         throw new NotImplementedException()));
             var countNotViewedFlats = informer.GetCountNotViewedFlats();
             countProcessedFlats += countNotViewedFlats;
             await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, informer, publisher, bot, conf,
                 cancel);
 
             finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"] ??
-                                                               throw new NotImplementedException()));
+                                                          throw new NotImplementedException()));
             countNotViewedFlats = informer.GetCountNotViewedFlats();
             countProcessedFlats += countNotViewedFlats;
             await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, informer, publisher, bot, conf,
@@ -188,13 +181,11 @@ namespace TelegramBotApi.Services.Managers
                 else
                 {
                     await OnSendMediaGroupExceptionResponse(bot, publisher, flat, conf, cancel);
-                    throw;
                 }
             }
             catch
             {
                 await OnSendMediaGroupExceptionResponse(bot, publisher, flat, conf, cancel);
-                throw;
             }
         }
 
