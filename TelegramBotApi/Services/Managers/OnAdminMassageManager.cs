@@ -96,7 +96,9 @@ namespace TelegramBotApi.Services.Managers
 
                 throw new NotSupportedException();
             }
-            
+
+            await AutoFlatSendingWithoutChecking(bot, informer, finder, publisher, conf, mes, cancel);
+
             var twoHoursInMilliseconds = 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
             _timer.Elapsed += async (source, e) =>
@@ -121,6 +123,28 @@ namespace TelegramBotApi.Services.Managers
                 throw new NotSupportedException();
             }
 
+            long countProcessedFlats = 0;
+
+            finder.FindAndSaveSuitAdjaraFlats(long.Parse(conf.GetSection("AdjaraChannel")["ChannelId"] ??
+                                                         throw new NotImplementedException()));
+            var countNotViewedFlats = informer.GetCountNotViewedFlats();
+            countProcessedFlats += countNotViewedFlats;
+            await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, informer, publisher, bot, conf,
+                cancel);
+
+            finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"] ??
+                                                          throw new NotImplementedException()));
+            countNotViewedFlats = informer.GetCountNotViewedFlats();
+            countProcessedFlats += countNotViewedFlats;
+            await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, informer, publisher, bot, conf,
+                cancel);
+
+            await SendTextMessageAsync(bot, mes, cancel, MessageToAdminManager.GetMessageCountOfProcessedFlats(countProcessedFlats));
+        }
+
+        private static async Task AutoFlatSendingWithoutChecking(ITelegramBotClient bot, IFlatInfoService informer,
+            IFlatFindService finder, IFlatPublicationService publisher, IConfiguration conf, Message mes, CancellationToken cancel)
+        {
             long countProcessedFlats = 0;
 
             finder.FindAndSaveSuitAdjaraFlats(long.Parse(conf.GetSection("AdjaraChannel")["ChannelId"] ??
@@ -210,7 +234,7 @@ namespace TelegramBotApi.Services.Managers
 
                 var channelName = informer.GetIdChannelWithLastCheckDate();
 
-                if (flat.LinksOfImages.Count > 2)
+                if (flat.LinksOfImages.Count > 2 && !informer.IsPostedSameFlatLastHour(flat))
                 {
                     await Task.Delay(60 * 1000, cancel);
                     await SendContentToTelegramWithTranslateText(bot, publisher, channelName, flat, conf,
