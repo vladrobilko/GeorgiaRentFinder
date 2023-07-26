@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Repository;
+﻿using System.Diagnostics.CodeAnalysis;
+using Application.Interfaces.Repository;
 using Application.Models;
 using DataManagement.Converters;
 using DataManagement.Models;
@@ -6,6 +7,7 @@ using WebScraper.Models;
 
 namespace DataManagement.Repositories
 {
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class FlatRepository : IFlatRepository
     {
         private readonly RentFinderDbContext _context;
@@ -159,6 +161,18 @@ namespace DataManagement.Repositories
             };
         }
 
+        public IEnumerable<(string phoneNumber, long cost)> ReadLastHourPostedFlats(DateTime time)
+        {
+            var phoneNumbers = _context.FlatPhonesDto;
+
+            return _context.FlatDateInfosDto
+                .Where(d => d.TelegramPublication != null && d.TelegramPublication > time)
+                .Select(d => d.FlatInfoId)
+                .Join(_context.FlatInfosDto, id => id, up => up.Id, (id, up) => up)
+                .AsEnumerable()
+                .Select(up => (phoneNumbers.First(x => x.Id == up.FlatPhoneId).Number, up.Cost));
+        }
+        
         private FlatCoordinateClientModel ReadFlatCoordinateOrGetDefaultById(long flatId)
         {
             var flatCoordinateDto = _context.FlatCoordinatesDto.FirstOrDefault(c => c.FlatInfoId == flatId);

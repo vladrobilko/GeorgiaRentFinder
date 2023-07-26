@@ -11,5 +11,7 @@ namespace Application.Interfaces
         long GetCountNotViewedFlats();
 
         string GetIdChannelWithLastCheckDate();
+
+        bool IsPostedSameFlatLastHour(FlatInfoClientModel flat);
     }
 }

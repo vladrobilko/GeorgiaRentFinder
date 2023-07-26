@@ -34,5 +34,16 @@ namespace Application.Services
         {
             return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }
+
+        public bool IsPostedSameFlatLastHour(FlatInfoClientModel flat)
+        {
+            var date = DateTime.Now.AddHours(-1);
+
+            var result = _flatRepository
+                .ReadLastHourPostedFlats(date)
+                .FirstOrDefault(x => x.cost == flat.Cost && x.phoneNumber == flat.FlatPhoneClientModel.PhoneNumber);
+
+            return !result.Equals(default);
+        }
     }
 }

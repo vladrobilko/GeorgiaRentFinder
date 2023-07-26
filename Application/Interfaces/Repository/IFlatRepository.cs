@@ -18,5 +18,7 @@ namespace Application.Interfaces.Repository
         FlatInfoClientModel ReadOldestNotViewedFlat();
 
         FlatInfoClientModel ReadFlatById(long flatId);
+
+        IEnumerable<(string phoneNumber, long cost)> ReadLastHourPostedFlats(DateTime time);
     }
 }
