@@ -234,7 +234,7 @@ namespace TelegramBotApi.Services.Managers
 
                 var channelName = informer.GetIdChannelWithLastCheckDate();
 
-                if (flat.LinksOfImages.Count > 2 && !informer.IsPostedSameFlatLastHour(flat))
+                if (flat.LinksOfImages.Count > 2 && !informer.IsPostedSameFlatLastHourAndIncreaseNumberOfMentionedPhoneIsPosted(flat))
                 {
                     await Task.Delay(60 * 1000, cancel);
                     await SendContentToTelegramWithTranslateText(bot, publisher, channelName, flat, conf,

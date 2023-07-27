@@ -7,7 +7,6 @@ using WebScraper.Models;
 
 namespace DataManagement.Repositories
 {
-    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
     public class FlatRepository : IFlatRepository
     {
         private readonly RentFinderDbContext _context;
@@ -174,7 +173,7 @@ namespace DataManagement.Repositories
                 .Select(up => (phoneNumbers.First(x => x.Id == up.FlatPhoneId).Number, up.Cost))
                 .ToList();
         }
-        
+
         private FlatCoordinateClientModel ReadFlatCoordinateOrGetDefaultById(long flatId)
         {
             var flatCoordinateDto = _context.FlatCoordinatesDto.FirstOrDefault(c => c.FlatInfoId == flatId);
@@ -213,6 +212,13 @@ namespace DataManagement.Repositories
             var flatDateInfoDto = _context.FlatDateInfosDto.First(d => d.FlatInfoId == flatId);
             flatDateInfoDto.RefusePublication = time;
             flatDateInfoDto.TelegramPublication = time;
+            _context.SaveChanges();
+        }
+
+        public void UpdatePhoneNumberWithDecreaseNumberOfMention(string phoneNumber)
+        {
+            var phoneDto = _context.FlatPhonesDto.First(x => x.Number == phoneNumber);
+            phoneDto.NumberMentionsOnSite -= 1;
             _context.SaveChanges();
         }
     }

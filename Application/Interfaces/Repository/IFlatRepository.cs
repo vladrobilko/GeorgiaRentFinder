@@ -20,5 +20,7 @@ namespace Application.Interfaces.Repository
         FlatInfoClientModel ReadFlatById(long flatId);
 
         IEnumerable<(string phoneNumber, long cost)> ReadLastHourPostedFlats(DateTime time);
+
+        void UpdatePhoneNumberWithDecreaseNumberOfMention(string phoneNumber);
     }
 }

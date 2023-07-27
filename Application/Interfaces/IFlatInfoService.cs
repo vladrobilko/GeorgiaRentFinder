@@ -12,6 +12,6 @@ namespace Application.Interfaces
 
         string GetIdChannelWithLastCheckDate();
 
-        bool IsPostedSameFlatLastHour(FlatInfoClientModel flat);
+        bool IsPostedSameFlatLastHourAndIncreaseNumberOfMentionedPhoneIsPosted(FlatInfoClientModel flat);
     }
 }
