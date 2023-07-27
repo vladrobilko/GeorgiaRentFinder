@@ -164,7 +164,6 @@ namespace DataManagement.Repositories
         public IEnumerable<(string phoneNumber, long cost)> ReadLastHourPostedFlats(DateTime time)
         {
             var phoneNumbers = _context.FlatPhonesDto;
-
             var middle = _context.FlatDateInfosDto
                 .Where(d => d.TelegramPublication != null && d.TelegramPublication > time)
                 .Select(d => d.FlatInfoId)
