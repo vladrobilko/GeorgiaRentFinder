@@ -1,6 +1,4 @@
-﻿using Application.Interfaces;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 
@@ -8,28 +6,32 @@ namespace TelegramBotApi.Services.Managers
 {
     public class OnUserCallbackQueryManager
     {
-        protected OnUserCallbackQueryManager() { }
+        private readonly ITelegramBotClient _bot;
 
-        public static async Task ChooseLanguageAndGiveChoiceForCity(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
-            IConfiguration configuration, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
+        public OnUserCallbackQueryManager(ITelegramBotClient bot)
         {
-            if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
+            _bot = bot;
+        }
+
+        public  async Task ChooseLanguageAndGiveChoiceForCity(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+        {
+            if (callbackQuery.Data == null || callbackQuery.Message == null || callbackQuery.Message.From == null) throw new NotImplementedException();
 
             var callBackInfo = callbackQuery.Data.Split("_");
             
             var googleCodeLanguage = callBackInfo[1];
             var userId = callBackInfo[2]; // save info with language here?
 
-            await botClient.DeleteMessageAsync(callbackQuery.Message.Chat.Id, callbackQuery.Message.MessageId, cancellationToken);
+            await _bot.DeleteMessageAsync(callbackQuery.Message.Chat.Id, callbackQuery.Message.MessageId, cancellationToken);
 
-            await botClient.SendTextMessageAsync(
+            await _bot.SendTextMessageAsync(
                 chatId: callbackQuery.Message.Chat.Id,
                 text: MessageToUserManager.GetMessageWithCallBackQueryOnChooseLanguage(googleCodeLanguage),
                 replyMarkup: GetKeyboardWithCityChoice(callbackQuery.Message, googleCodeLanguage),
                 cancellationToken: cancellationToken);
         }
 
-        public static async Task ChooseCityAndGiveChoiceForAction(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient)
+        public  async Task ChooseCityAndGiveChoiceForAction(CallbackQuery callbackQuery, CancellationToken cancellationToken)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
 
@@ -40,15 +42,15 @@ namespace TelegramBotApi.Services.Managers
 
             var googleCodeLanguage = "ru"; // get language from db
 
-            await botClient.DeleteMessageAsync(callbackQuery.Message.Chat.Id, callbackQuery.Message.MessageId, cancellationToken);
+            await _bot.DeleteMessageAsync(callbackQuery.Message.Chat.Id, callbackQuery.Message.MessageId, cancellationToken);
             
-            await botClient.SendTextMessageAsync(
+            await _bot.SendTextMessageAsync(
                 chatId: callbackQuery.Message.Chat.Id,
                 text: MessageToUserManager.GetMessageWithCallBackQueryOnChooseCity(googleCodeLanguage),
                 cancellationToken: cancellationToken);
         }
 
-        private static InlineKeyboardMarkup GetKeyboardWithCityChoice(Message message,string language)
+        private  InlineKeyboardMarkup GetKeyboardWithCityChoice(Message message,string language)
         {
             // Tbilisi Batumi Kutaisi Rustavi Kobuleti
             return new(

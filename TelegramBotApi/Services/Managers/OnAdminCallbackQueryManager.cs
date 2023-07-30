@@ -8,10 +8,21 @@ namespace TelegramBotApi.Services.Managers
 {
     public class OnAdminCallbackQueryManager
     {
-        protected OnAdminCallbackQueryManager() { }
+        private readonly ITelegramBotClient _bot;
+        private readonly IFlatPublicationService _publisher;
+        private readonly IFlatInfoService _informer;
 
-        public static async Task ChooseFLatPostFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken, ITelegramBotClient botClient,
-            IConfiguration configuration, IFlatPublicationService flatPublicationService, IFlatInfoService flatInfoService)
+        private readonly OnAdminMassageManager _onAdminMassageManager;
+
+        public OnAdminCallbackQueryManager(ITelegramBotClient bot, IFlatPublicationService publisher, IFlatInfoService informer, OnAdminMassageManager onAdminMassageManager)
+        {
+            _bot = bot;
+            _publisher = publisher;
+            _informer = informer;
+            _onAdminMassageManager = onAdminMassageManager;
+        }
+
+        public  async Task ChooseFLatPostFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
 
@@ -21,25 +32,25 @@ namespace TelegramBotApi.Services.Managers
             var flatId = callBackInfo[1];
             var channelName = callBackInfo[2];
             string textResponseToBot = "Default";
-            var flat = flatInfoService.GetFlatById(long.Parse(flatId));
+            var flat = _informer.GetFlatById(long.Parse(flatId));
 
             if (infoData == "post")
             {
-                await OnAdminMassageManager.SendContentToTelegramWithTranslateText(botClient, flatPublicationService, channelName, flat, configuration, cancellationToken, false);
+                await _onAdminMassageManager.SendContentToTelegramWithTranslateText(channelName, flat, cancellationToken, false);
 
-                flatPublicationService.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
+                _publisher.AddDateOfTelegramPublication(flat.Id, DateTime.Now);
 
-                textResponseToBot = MessageToAdminManager.GetMessageAfterPost(flatInfoService.GetCountNotViewedFlats());
+                textResponseToBot = MessageToAdminManager.GetMessageAfterPost(_informer.GetCountNotViewedFlats());
             }
 
             else if (infoData == "no post")
             {
-                flatPublicationService.AddDateOfRefusePublication(flat.Id, DateTime.Now);
+                _publisher.AddDateOfRefusePublication(flat.Id, DateTime.Now);
 
-                textResponseToBot = MessageToAdminManager.GetMessageAfterRefusePost(flatInfoService.GetCountNotViewedFlats());
+                textResponseToBot = MessageToAdminManager.GetMessageAfterRefusePost(_informer.GetCountNotViewedFlats());
             }
 
-            await botClient.SendTextMessageAsync(
+            await _bot.SendTextMessageAsync(
                 chatId: callbackQuery.Message.Chat.Id,
                 text: textResponseToBot,
                 parseMode: ParseMode.Html,

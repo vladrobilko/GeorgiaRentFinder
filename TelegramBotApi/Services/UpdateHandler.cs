@@ -1,5 +1,4 @@
-﻿using Application.Interfaces;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
@@ -9,22 +8,24 @@ namespace TelegramBotApi.Services;
 
 public class UpdateHandler : IUpdateHandler
 {
-    private readonly ITelegramBotClient _bot;
+    private readonly OnAdminMassageManager _onAdminMassageManager;
+    private readonly OnUserMassageManager _onUserMassageManager;
+    private readonly OnAdminCallbackQueryManager _onAdminCallbackQueryManager;
+    private readonly OnUserCallbackQueryManager _onUserCallbackQueryManager;
+
     private readonly ILogger<UpdateHandler> _logger;
     private readonly IConfiguration _conf;
-    private readonly IFlatFindService _finder;
-    private readonly IFlatPublicationService _publisher;
-    private readonly IFlatInfoService _informer;
 
-    public UpdateHandler(ITelegramBotClient bot, ILogger<UpdateHandler> logger, IConfiguration conf,
-        IFlatFindService finder, IFlatPublicationService publisher, IFlatInfoService informer)
+    public UpdateHandler(ILogger<UpdateHandler> logger, IConfiguration conf,
+        OnAdminMassageManager onAdminMassageManager, OnUserMassageManager onUserMassageManager, 
+        OnAdminCallbackQueryManager onAdminCallbackQueryManager, OnUserCallbackQueryManager onUserCallbackQueryManager)
     {
-        _bot = bot;
         _logger = logger;
         _conf = conf;
-        _finder = finder;
-        _publisher = publisher;
-        _informer = informer;
+        _onAdminMassageManager = onAdminMassageManager;
+        _onUserMassageManager = onUserMassageManager;
+        _onAdminCallbackQueryManager = onAdminCallbackQueryManager;
+        _onUserCallbackQueryManager = onUserCallbackQueryManager;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
@@ -61,12 +62,12 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnAdminMassageManager.BotStart(_bot, _informer, mes, cancel),
-            "/AdjaraSearch" => OnAdminMassageManager.FindSuitAdjaraFlats(_bot, _finder, _informer, _conf, mes, cancel),
-            "/ImeretiSearch" => OnAdminMassageManager.FindSuitImeretiFlats(_bot, _finder, _informer, _conf, mes, cancel),
-            "/LookFlat" => OnAdminMassageManager.GetLastAvailableFlat(_bot, _informer, _publisher, _conf, mes, cancel),
-            "/AutoFlatSendingEveryHour" => OnAdminMassageManager.AutoFlatSendingEveryHour(_bot, _finder, _informer, _publisher, _conf, mes, cancel),
-            _ => OnAdminMassageManager.OnTextResponse(_bot, mes, cancel),
+            "/start" => _onAdminMassageManager.BotStart(mes, cancel),
+            "/AdjaraSearch" => _onAdminMassageManager.FindSuitAdjaraFlats(mes, cancel),
+            "/ImeretiSearch" => _onAdminMassageManager.FindSuitImeretiFlats(mes, cancel),
+            "/LookFlat" => _onAdminMassageManager.GetLastAvailableFlat(mes, cancel),
+            "/AutoFlatSendingEveryHour" => _onAdminMassageManager.AutoFlatSendingEveryHour(mes, cancel),
+            _ => _onAdminMassageManager.OnTextResponse(mes, cancel),
         };
 
         Message sentMessage = await action;
@@ -80,11 +81,11 @@ public class UpdateHandler : IUpdateHandler
 
         var action = messageText.Split(' ')[0] switch
         {
-            "/start" => OnUserMassageManager.BotStart(_bot, mes, cancel),
-            "/rent" => OnUserMassageManager.Rent(_bot, mes, cancel),
-            "/rentOut" => OnUserMassageManager.RentOut(_bot,mes, cancel),
-            "/admin" => OnUserMassageManager.Admin(_bot,mes, cancel),
-            _ => OnUserMassageManager.OnTextResponse(_bot, mes, cancel)
+            "/start" => _onUserMassageManager.BotStart(mes, cancel),
+            "/rent" => _onUserMassageManager.Rent(mes, cancel),
+            "/rentOut" => _onUserMassageManager.RentOut(mes, cancel),
+            "/admin" => _onUserMassageManager.Admin(mes, cancel),
+            _ => _onUserMassageManager.OnTextResponse(mes, cancel)
         };
 
         Message sentMessage = await action;
@@ -95,18 +96,17 @@ public class UpdateHandler : IUpdateHandler
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callback.Id);
 
-        if (callback.Data != null && callback.Data.Contains("post")) 
-            await OnAdminCallbackQueryManager.ChooseFLatPostFromAdmin(callback, cancel, _bot, _conf, _publisher, _informer);
+        if (callback.Data != null && callback.Data.Contains("post"))
+            await _onAdminCallbackQueryManager.ChooseFLatPostFromAdmin(callback, cancel);
     }
     private async Task BotOnUserCallbackQueryReceived(CallbackQuery callback, CancellationToken cancel)
     {
         _logger.LogInformation("Received inline keyboard callback from: {CallbackQueryId}", callback.Id);
 
         if (callback.Data != null && callback.Data.Contains("language"))
-            await OnUserCallbackQueryManager.ChooseLanguageAndGiveChoiceForCity(callback, cancel, _bot, _conf, _publisher, _informer);
+            await _onUserCallbackQueryManager.ChooseLanguageAndGiveChoiceForCity(callback, cancel);
         else if (callback.Data != null && callback.Data.Contains("cityChoice"))
-            await OnUserCallbackQueryManager.ChooseCityAndGiveChoiceForAction(callback, cancel, _bot);
-        
+            await _onUserCallbackQueryManager.ChooseCityAndGiveChoiceForAction(callback, cancel);
     }
 
     private Task UnknownUpdateHandlerAsync(Update update)

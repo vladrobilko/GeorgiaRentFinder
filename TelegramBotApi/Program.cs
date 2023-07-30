@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using TelegramBotApi.Models;
 using TelegramBotApi.Services;
+using TelegramBotApi.Services.Managers;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -32,8 +33,13 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddScoped<IFlatPublicationService, FlatPublicationService>();
         services.AddScoped<IFlatInfoService, FlatInfoService>();
 
+        services.AddScoped<OnAdminMassageManager>();
+        services.AddScoped<OnUserMassageManager>();
+        services.AddScoped<OnAdminCallbackQueryManager>();
+        services.AddScoped<OnUserCallbackQueryManager>();
+
         services.AddDbContext<RentFinderDbContext>(options =>
-        options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));
+                options.UseNpgsql(context.Configuration.GetSection("ConnectionStrings")["ConnectionString"]));
     })
     .Build();
 
