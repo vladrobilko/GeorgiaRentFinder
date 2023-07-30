@@ -143,8 +143,8 @@ namespace WebScraper.MyHomeDotGe
                 .SelectSingleNode(
                 "//div[contains(@id,'map')]");
 
-            var latitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lat", null));
-            var longitude = Convert.ToDouble(viewsFromPage.GetAttributeValue("data-lng", null));
+            var latitude = Convert.ToDouble(viewsFromPage?.GetAttributeValue("data-lat", null));
+            var longitude = Convert.ToDouble(viewsFromPage?.GetAttributeValue("data-lng", null));
 
             if (latitude == 0 || longitude == 0) return new FlatCoordinateModel().GetDefaultFlatCoordinate();
 
