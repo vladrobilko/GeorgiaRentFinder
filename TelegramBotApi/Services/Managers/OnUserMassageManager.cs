@@ -11,7 +11,7 @@ namespace TelegramBotApi.Services.Managers
 
         public OnUserMassageManager(ITelegramBotClient bot)
         {
-            this._bot = bot;
+            _bot = bot;
         }
 
         public  async Task<Message> BotStart(Message message, CancellationToken cancel)

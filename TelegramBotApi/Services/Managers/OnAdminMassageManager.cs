@@ -20,7 +20,7 @@ namespace TelegramBotApi.Services.Managers
         private readonly IFlatInfoService _informer;
         private readonly IServiceProvider _provider;
 
-        private static System.Timers.Timer? _timer;
+        private System.Timers.Timer? _timer;
 
         public static bool IsAutoSendingModeStarted { get; set; }
 
@@ -74,7 +74,7 @@ namespace TelegramBotApi.Services.Managers
             var text = MessageToAdminManager.GetMessageFlatCountInfo(_informer.GetCountNotViewedFlats());
 
             return await SendTextMessageAsync(mes, cancel, text, new ReplyKeyboardRemove());
-        }
+        }// the same methods (need Enum)
 
         public async Task<Message> FindSuitImeretiFlats(Message mes, CancellationToken cancel)
         {
@@ -82,19 +82,17 @@ namespace TelegramBotApi.Services.Managers
 
             if (countNotViewedFlats != 0)
             {
-                return await _bot.SendTextMessageAsync(
-                    chatId: mes.Chat.Id,
-                    text: MessageToAdminManager.GetMessageFlatCountInfo(countNotViewedFlats),
-                    parseMode: ParseMode.Html,
-                    replyMarkup: new ReplyKeyboardRemove(),
-                    cancellationToken: cancel);
+                var textWithCount = MessageToAdminManager.GetMessageFlatCountInfo(countNotViewedFlats);
+
+                return await SendTextMessageAsync(mes, cancel, textWithCount, new ReplyKeyboardRemove());
             }
 
             _finder.FindAndSaveSuitImeretiFlats(long.Parse(_conf.GetSection("ImeretiChannel")["ChannelId"] ?? throw new NotImplementedException()));
 
             var text = MessageToAdminManager.GetMessageFlatCountInfo(_informer.GetCountNotViewedFlats());
+
             return await SendTextMessageAsync(mes, cancel, text, new ReplyKeyboardRemove());
-        }
+        }// the same methods (need Enum)
 
         public async Task<Message> AutoFlatSendingEveryHour(Message mes, CancellationToken cancel)
         {
