@@ -10,12 +10,19 @@ namespace WebScraper
 
             var web = new HtmlWeb();
 
-            var page = web.Load(urlGeorgiaNationalBank);
+            try
+            {
+                var page = web.Load(urlGeorgiaNationalBank);
 
-            var gelInOneDollar = page.DocumentNode.SelectSingleNode(
-                "//*[@id=\"nbg\"]/div[1]/div[4]/div/div[2]/div[2]/div[4]/div[41]/div/div/div[3]/span")?.InnerText;
+                var gelInOneDollar = page.DocumentNode.SelectSingleNode(
+                    "//*[@id=\"nbg\"]/div[1]/div[4]/div/div[2]/div[2]/div[4]/div[41]/div/div/div[3]/span")?.InnerText;
 
-            return double.TryParse(gelInOneDollar, out var result) ? result : int.MaxValue;
+                return double.TryParse(gelInOneDollar, out var result) ? result : int.MaxValue;
+            }
+            catch
+            {
+                return double.MaxValue;
+            }
         }
     }
 }
