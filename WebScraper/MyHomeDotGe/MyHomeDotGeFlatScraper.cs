@@ -112,6 +112,7 @@ namespace WebScraper.MyHomeDotGe
             var imagesUrl = flatPage.DocumentNode.SelectNodes(
                 "//div[contains(@class,'new-popup-gallery-thumbs')]//p")?
                 .Select(e => e.GetAttributeValue("data-image", null))
+                .Where(x => x != null)
                 .Select(s => Regex.Replace(s, @"(?<!/)/(?!/)", "//"))
                 .ToList() ?? new List<string>();
 

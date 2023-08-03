@@ -18,9 +18,9 @@ namespace Application.Services
         private const int FlatsOnPageSsGe = 20;
         private const int CountPagesForScrap = 10;
         private const int FlatsOnPageMyHomeGe = 24;
-        private const int FlatLowestPriceAdjara = 100;
-        private const int FlatHighestPriceAdjara = 460;
-        private const int FlatLowestPriceImereti = 100;
+        private const int FlatLowestPriceAdjara = 150;
+        private const int FlatHighestPriceAdjara = 410;
+        private const int FlatLowestPriceImereti = 150;
         private const int FlatHighestPriceImereti = 410;
         
         public FlatFindingService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
