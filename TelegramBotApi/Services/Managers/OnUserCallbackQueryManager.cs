@@ -52,7 +52,6 @@ namespace TelegramBotApi.Services.Managers
 
         private  InlineKeyboardMarkup GetKeyboardWithCityChoice(Message message,string language)
         {
-            // Tbilisi Batumi Kutaisi Rustavi Kobuleti
             return new(
                 new[]
                 {

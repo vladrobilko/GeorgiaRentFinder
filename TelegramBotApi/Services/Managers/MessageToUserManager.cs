@@ -25,12 +25,20 @@
             {
                 return "@AdjaraLowRent <= ქირავდება ბათუმი და ქობულეთი" +
                        "\n" +
-                       "\n@ImeretiLowRent <= ქირავდება ქუთაისი";
+                       "\n@ImeretiLowRent <= ქირავდება ქუთაისი" +
+                       "\n" +
+                       "\n@TbilisiRustaviLowRent <= ქირავდება თბილისი და რუსთავი" +
+                       "\n" +
+                       "\n/rentOut <= ქირავდება შენი ბინა";
             }
 
             return "@AdjaraLowRent <= аренда Батуми и Кобулети" +
                    "\n" +
-                   "\n@ImeretiLowRent <= аренда Кутаиси";
+                   "\n@ImeretiLowRent <= аренда Кутаиси" +
+                   "\n" +
+                   "\n@TbilisiRustaviLowRent <= аренда Тбилиси и Рустави" +
+                   "\n" +
+                   "\n/rentOut <= сдать свою квартиру в аренду";
         }
 
         public static string GetStartMessage()
@@ -60,7 +68,7 @@
         }
         public static string GetMessageWithCallBackQueryOnChooseCity(string language)
         {
-            if (language == "ka")// translate it
+            if (language == "ka")
             {
                 return "უძრავი ქონების გაქირავების ბოტი საქართველოში" +
                        "\n" +
