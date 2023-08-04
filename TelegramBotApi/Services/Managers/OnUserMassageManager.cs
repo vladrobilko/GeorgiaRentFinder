@@ -2,6 +2,7 @@
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
 using Telegram.Bot;
+using System.Threading.Channels;
 
 namespace TelegramBotApi.Services.Managers
 {
@@ -25,20 +26,26 @@ namespace TelegramBotApi.Services.Managers
             return await SendTextMessageAsync(message, cancel, MessageToUserManager.GetStartMessage(), GetKeyboardWithLanguageChoice(message));
         }
 
-        public  async Task<Message> OnTextResponse( Message message, CancellationToken cancellationToken)
+        public  async Task<Message> OnTextResponse(Message message, CancellationToken cancellationToken)
         {
             // get language from db and give answer with this language
             var language = "ru";
+            await _bot.DeleteMessageAsync(message.Chat.Id, message.MessageId, cancellationToken);
 
             return await SendTextMessageAsync(message, cancellationToken, MessageToUserManager.GetMessageForAfterOnlyTextSending(language), new ReplyKeyboardRemove());
         }
 
         public  async Task<Message> Rent( Message mes, CancellationToken cancel)
         {
-            // find city and language of user
+            // find  language of user
             var language = "ru";
-            var city = "Batumi";
-            throw new NotImplementedException();
+
+            await _bot.DeleteMessageAsync(mes.Chat.Id, mes.MessageId - 1, cancel);
+            await _bot.DeleteMessageAsync(mes.Chat.Id, mes.MessageId, cancel);
+
+            //get user language  
+
+            return await SendTextMessageAsync(mes, cancel, MessageToUserManager.GetMessageRentInfo("ru"));
         }
 
         public  async Task<Message> RentOut( Message mes, CancellationToken cancel)

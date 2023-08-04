@@ -6,10 +6,31 @@
         {
             if (language == "ka")
             {
-                return "@sakartvelo_rent <= ადმინისტრატორი";
+                return "@sakartvelo_rent <= ადმინისტრატორი" +
+                       "\n" +
+                       "\n/rent <= ქირავდება" +
+                       "\n" +
+                       "\n/rentOut <= გაივლის";
             }
 
-            return "@sakartvelo_rent <= администратор";
+            return "@sakartvelo_rent <= администратор" +
+                   "\n" +
+                   "\n/rent <= арендовать" +
+                   "\n" +
+                   "\n/rentOut <= сдать";
+        }
+        public static string GetMessageRentInfo(string language)
+        {
+            if (language == "ka")
+            {
+                return "@AdjaraLowRent <= ქირავდება ბათუმი და ქობულეთი" +
+                       "\n" +
+                       "\n@ImeretiLowRent <= ქირავდება ქუთაისი";
+            }
+
+            return "@AdjaraLowRent <= аренда Батуми и Кобулети" +
+                   "\n" +
+                   "\n@ImeretiLowRent <= аренда Кутаиси";
         }
 
         public static string GetStartMessage()
