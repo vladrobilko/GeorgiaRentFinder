@@ -160,14 +160,20 @@ namespace TelegramBotApi.Services.Managers
 
                 long countProcessedFlats = 0;
 
-                finder.FindAndSaveSuitAdjaraFlats(long.Parse(conf.GetSection("AdjaraChannel")["ChannelId"] ??
-                                                             throw new NotImplementedException()));
+                finder.FindAndSaveSuitAdjaraFlats(long.Parse(conf.GetSection("AdjaraChannel")["ChannelId"]
+                                                             ?? throw new NotImplementedException()));
                 var countNotViewedFlats = informer.GetCountNotViewedFlats();
                 countProcessedFlats += countNotViewedFlats;
                 await SendFlatsWhileExistAvailableFlatWithDelay(conf, bot, informer, publisher, countNotViewedFlats, cancel);
 
-                finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"] ??
-                                                              throw new NotImplementedException()));
+                finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"] 
+                                                              ?? throw new NotImplementedException()));
+                countNotViewedFlats = informer.GetCountNotViewedFlats();
+                countProcessedFlats += countNotViewedFlats;
+                await SendFlatsWhileExistAvailableFlatWithDelay(conf, bot, informer, publisher, countNotViewedFlats, cancel);
+
+                _finder.FindAndSaveSuitTbilisiRustaviFlats(long.Parse(conf.GetSection("TbilisiRustaviChannel")["ChannelId"] 
+                                                                      ?? throw new NotImplementedException()));
                 countNotViewedFlats = informer.GetCountNotViewedFlats();
                 countProcessedFlats += countNotViewedFlats;
                 await SendFlatsWhileExistAvailableFlatWithDelay(conf, bot, informer, publisher, countNotViewedFlats, cancel);
@@ -187,6 +193,12 @@ namespace TelegramBotApi.Services.Managers
             await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, cancel);
 
             _finder.FindAndSaveSuitImeretiFlats(long.Parse(_conf.GetSection("ImeretiChannel")["ChannelId"] ??
+                                                           throw new NotImplementedException()));
+            countNotViewedFlats = _informer.GetCountNotViewedFlats();
+            countProcessedFlats += countNotViewedFlats;
+            await SendFlatsWhileExistAvailableFlatWithDelay(countNotViewedFlats, cancel);
+
+            _finder.FindAndSaveSuitTbilisiRustaviFlats(long.Parse(_conf.GetSection("TbilisiRustaviChannel")["ChannelId"] ??
                                                            throw new NotImplementedException()));
             countNotViewedFlats = _informer.GetCountNotViewedFlats();
             countProcessedFlats += countNotViewedFlats;
