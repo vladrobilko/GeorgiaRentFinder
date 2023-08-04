@@ -18,10 +18,8 @@ namespace Application.Services
         private const int FlatsOnPageSsGe = 20;
         private const int CountPagesForScrap = 10;
         private const int FlatsOnPageMyHomeGe = 24;
-        private const int FlatLowestPriceAdjara = 150;
-        private const int FlatHighestPriceAdjara = 410;
-        private const int FlatLowestPriceImereti = 150;
-        private const int FlatHighestPriceImereti = 410;
+        private const int FlatLowestPrice = 150;
+        private const int FlatHighestPrice = 410;
         
         public FlatFindingService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
         {
@@ -35,11 +33,11 @@ namespace Application.Services
 
             var newAdjaraFlats = new List<FlatInfoModel>();
 
-            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPriceAdjara, FlatHighestPriceAdjara);
+            var scraperMyHomeGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPrice, FlatHighestPrice);
 
             FindMyHomeDotGeAdjaraFLats(CountPagesForScrap, scraperMyHomeGe, lastCheckDate, newAdjaraFlats);
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPriceAdjara, FlatHighestPriceAdjara);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPrice, FlatHighestPrice);
 
             FindSsDotGeAdjaraFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, newAdjaraFlats);
 
@@ -54,15 +52,34 @@ namespace Application.Services
 
             var imeretiFlats = new List<FlatInfoModel>();
 
-            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPriceImereti, FlatHighestPriceImereti);
+            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPrice, FlatHighestPrice);
 
             FindMyHomeDotGeImeretiFLats(CountPagesForScrap, scraperMyHomeDotGe, lastCheckDate, imeretiFlats);
 
-            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPriceImereti, FlatHighestPriceImereti);
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPrice, FlatHighestPrice);
 
             FindSsDotGeImeretiFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, imeretiFlats);
 
             _flatRepository.CreateFlats(imeretiFlats);
+
+            _channelInfoRepository.UpdateLastCheckDate(channelId, DateTime.Now);
+        }
+
+        public void FindAndSaveSuitTbilisiRustaviFlats(long channelId)
+        {
+            var lastCheckDate = _channelInfoRepository.ReadLastCheckDateById(channelId);
+
+            var tbilisiRustaviFlats = new List<FlatInfoModel>();
+
+            var scraperMyHomeDotGe = new FlatsScraper(new MyHomeDotGeFlatScraper(), FlatsOnPageMyHomeGe, FlatLowestPrice, FlatHighestPrice);
+
+            FindMyHomeDotGeTbilisiRustaviFLats(CountPagesForScrap, scraperMyHomeDotGe, lastCheckDate, tbilisiRustaviFlats);
+
+            var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPrice, FlatHighestPrice);
+
+            FindSsDotGeTbilisiRustaviFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, tbilisiRustaviFlats); 
+
+            _flatRepository.CreateFlats(tbilisiRustaviFlats);
 
             _channelInfoRepository.UpdateLastCheckDate(channelId, DateTime.Now);
         }
@@ -129,6 +146,36 @@ namespace Application.Services
                     scraperMyHomeDotGe.ScrapAllPagesWithAllFlats(ImeretiMunicipallyLinksMyHomeDotGe.GetKutaisiLink(i),
                         lastCheckDate);
                 imeretiFlats.AddRange(imeretiMyHomeDotGeFlats);
+            }
+        }
+        private static void FindMyHomeDotGeTbilisiRustaviFLats(int countPagesForScrap, FlatsScraper scraperMyHomeGe, DateTime lastCheckDate,
+            List<FlatInfoModel> newAdjaraFlats)
+        {
+            for (var i = 1; i < countPagesForScrap; i++)
+            {
+                var tbilisiFlats =
+                    scraperMyHomeGe.ScrapAllPagesWithAllFlats(TbilisiMunicipallyLinksMyHomeDotGe.GetTbilisiLink(i),
+                        lastCheckDate);
+                newAdjaraFlats.AddRange(tbilisiFlats);
+
+                var rustaviFlats =
+                    scraperMyHomeGe.ScrapAllPagesWithAllFlats(TbilisiMunicipallyLinksMyHomeDotGe.GetRustaviLink(i),
+                        lastCheckDate);
+                newAdjaraFlats.AddRange(rustaviFlats);
+            }
+        }
+        private static void FindSsDotGeTbilisiRustaviFLats(int countPagesForScrap, FlatsScraper scraperSsDotGe, DateTime lastCheckDate,
+            List<FlatInfoModel> newAdjaraFlats)
+        {
+            for (var i = 1; i < countPagesForScrap; i++)
+            {
+                var batumiFlats =
+                    scraperSsDotGe.ScrapAllPagesWithAllFlats(TbilisiMunicipallyLinksSsDotGe.GetTbilisiLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(batumiFlats);
+
+                var kobuletiFlats =
+                    scraperSsDotGe.ScrapAllPagesWithAllFlats(TbilisiMunicipallyLinksSsDotGe.GetRustaviLink(i), lastCheckDate);
+                newAdjaraFlats.AddRange(kobuletiFlats);
             }
         }
     }

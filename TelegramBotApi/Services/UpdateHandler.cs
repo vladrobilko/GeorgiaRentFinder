@@ -65,6 +65,7 @@ public class UpdateHandler : IUpdateHandler
             "/start" => _onAdminMassageManager.BotStart(mes, cancel),
             "/AdjaraSearch" => _onAdminMassageManager.FindSuitAdjaraFlats(mes, cancel),
             "/ImeretiSearch" => _onAdminMassageManager.FindSuitImeretiFlats(mes, cancel),
+            "/TbilisiRustaviSearch" => _onAdminMassageManager.FindSuitTbilisiRustaviFlats(mes, cancel),
             "/LookFlat" => _onAdminMassageManager.GetLastAvailableFlat(mes, cancel),
             "/AutoFlatSendingEveryHour" => _onAdminMassageManager.AutoFlatSendingEveryHour(mes, cancel),
             _ => _onAdminMassageManager.OnTextResponse(mes, cancel),

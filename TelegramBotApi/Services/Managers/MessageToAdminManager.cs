@@ -12,6 +12,8 @@ namespace TelegramBotApi.Services.Managers
                                     "\n  _____________" +
                                     "\n/AdjaraSearch" +
                                     "\n  _____________" +
+                                    "\n/TbilisiRustaviSearch" +
+                                    "\n  _____________" +
                                     "\n/AutoFlatSendingEveryHour";
 
         public const string GetMessageForStartAutoFlatSendingEveryHour = "Program is working in auto mode";
@@ -42,6 +44,7 @@ namespace TelegramBotApi.Services.Managers
             return "Hello, I'm a bot of these channels:" +
                    "\n@AdjaraLowRent" +
                    "\n@ImeretiLowRent" +
+                   "\n@TbilisiRustaviLowRent" +
                    $"\nMy started time is {DateTime.Now.ToCommonViewString()}" +
                    "\nPress /start if you're an admin";
         }
@@ -55,6 +58,8 @@ namespace TelegramBotApi.Services.Managers
                        "\n/ImeretiSearch" +
                        "\n  _____________" +
                        "\n/AdjaraSearch" +
+                       "\n  _____________" +
+                       "\n/TbilisiRustaviSearch" +
                        "\n  _____________" +
                        "\n/AutoFlatSendingEveryHour";
             }

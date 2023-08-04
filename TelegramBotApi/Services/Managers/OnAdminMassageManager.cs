@@ -94,6 +94,24 @@ namespace TelegramBotApi.Services.Managers
             return await SendTextMessageAsync(mes, cancel, text, new ReplyKeyboardRemove());
         }// the same methods (need Enum)
 
+        public async Task<Message> FindSuitTbilisiRustaviFlats(Message mes, CancellationToken cancel)
+        {
+            var countNotViewedFlats = _informer.GetCountNotViewedFlats();
+
+            if (countNotViewedFlats != 0)
+            {
+                var textWithCount = MessageToAdminManager.GetMessageFlatCountInfo(countNotViewedFlats);
+
+                return await SendTextMessageAsync(mes, cancel, textWithCount, new ReplyKeyboardRemove());
+            }
+
+            _finder.FindAndSaveSuitTbilisiRustaviFlats(long.Parse(_conf.GetSection("TbilisiRustaviChannel")["ChannelId"] ?? throw new NotImplementedException()));
+
+            var text = MessageToAdminManager.GetMessageFlatCountInfo(_informer.GetCountNotViewedFlats());
+
+            return await SendTextMessageAsync(mes, cancel, text, new ReplyKeyboardRemove());
+        }// the same methods (need Enum)
+
         public async Task<Message> AutoFlatSendingEveryHour(Message mes, CancellationToken cancel)
         {
             if (_informer.GetCountNotViewedFlats() != 0 || IsAutoSendingModeStarted)

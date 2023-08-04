@@ -7,5 +7,7 @@ namespace Application.Interfaces
         void FindAndSaveSuitAdjaraFlats(long channelId);
 
         void FindAndSaveSuitImeretiFlats(long channelId);
+
+        void FindAndSaveSuitTbilisiRustaviFlats(long channelId);
     }
 }
