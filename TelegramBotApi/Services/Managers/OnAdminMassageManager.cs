@@ -125,7 +125,7 @@ namespace TelegramBotApi.Services.Managers
                 throw new NotSupportedException();
             }
 
-            await AutoFlatSendingWithoutChecking(mes, cancel);
+            //await AutoFlatSendingWithoutChecking(mes, cancel);
 
             var twoHoursInMilliseconds = 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
