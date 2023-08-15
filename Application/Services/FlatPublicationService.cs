@@ -11,7 +11,7 @@ public class FlatPublicationService : IFlatPublicationService
     {
         _flatRepository = flatRepository;
     }
-    
+
     public void AddDateOfTelegramPublication(long flatId, DateTime timeOfPublic)
     {
         _flatRepository.UpdateFlatDateInfoTelegramPublication(flatId, timeOfPublic);

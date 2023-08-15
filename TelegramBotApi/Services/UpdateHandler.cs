@@ -17,7 +17,7 @@ public class UpdateHandler : IUpdateHandler
     private readonly IConfiguration _conf;
 
     public UpdateHandler(ILogger<UpdateHandler> logger, IConfiguration conf,
-        OnAdminMassageManager onAdminMassageManager, OnUserMassageManager onUserMassageManager, 
+        OnAdminMassageManager onAdminMassageManager, OnUserMassageManager onUserMassageManager,
         OnAdminCallbackQueryManager onAdminCallbackQueryManager, OnUserCallbackQueryManager onUserCallbackQueryManager)
     {
         _logger = logger;

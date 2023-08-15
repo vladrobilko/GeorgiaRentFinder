@@ -9,7 +9,7 @@ public abstract class ReceiverServiceBase<TUpdateHandler> : IReceiverService
 {
     private readonly ITelegramBotClient _botClient;
     private readonly IUpdateHandler _updateHandler;
-    private readonly ILogger<ReceiverServiceBase<TUpdateHandler>> _logger; 
+    private readonly ILogger<ReceiverServiceBase<TUpdateHandler>> _logger;
 
     internal ReceiverServiceBase(ITelegramBotClient botClient, TUpdateHandler updateHandler, ILogger<ReceiverServiceBase<TUpdateHandler>> logger)
     {

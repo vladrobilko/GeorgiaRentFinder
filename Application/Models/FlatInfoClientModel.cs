@@ -12,7 +12,7 @@
 
         public string Description { get; set; }
 
-        public FlatPhoneClientModel FlatPhoneClientModel { get; set; }  
+        public FlatPhoneClientModel FlatPhoneClientModel { get; set; }
 
         public List<string> LinksOfImages { get; set; }
 

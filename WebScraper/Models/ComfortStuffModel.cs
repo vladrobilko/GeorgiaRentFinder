@@ -14,7 +14,7 @@
 
         public bool? IsThereConditioner { get; set; } = null;
 
-        public ComfortStuffModel(string bedRooms,string floor, string totalArea, bool? isThereGas, bool? isThereHotWater, bool? isThereConditioner)
+        public ComfortStuffModel(string bedRooms, string floor, string totalArea, bool? isThereGas, bool? isThereHotWater, bool? isThereConditioner)
         {
             BedRooms = bedRooms;
             Floor = floor;

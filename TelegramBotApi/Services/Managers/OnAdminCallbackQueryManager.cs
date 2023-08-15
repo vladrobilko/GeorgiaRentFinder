@@ -22,7 +22,7 @@ namespace TelegramBotApi.Services.Managers
             _onAdminMassageManager = onAdminMassageManager;
         }
 
-        public  async Task ChooseFLatPostFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken)
+        public async Task ChooseFLatPostFromAdmin(CallbackQuery callbackQuery, CancellationToken cancellationToken)
         {
             if (callbackQuery.Data == null || callbackQuery.Message == null) throw new NotImplementedException();
 

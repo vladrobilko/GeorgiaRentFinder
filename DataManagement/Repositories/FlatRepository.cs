@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Application.Interfaces.Repository;
+﻿using Application.Interfaces.Repository;
 using Application.Models;
 using DataManagement.Converters;
 using DataManagement.Models;
@@ -57,7 +56,7 @@ namespace DataManagement.Repositories
             if (flat.FlatCoordinateModel.Latitude != 0 && flat.FlatCoordinateModel.Longitude != 0) CreateFlatCoordinate(flat, flatInfoId);
 
             _context.FlatDateInfosDto.Add(new FlatDateInfoDto()
-                { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication });
+            { FlatInfoId = flatInfoId, SitePublication = flat.SitePublication });
             _context.SaveChanges();
         }
 
@@ -68,7 +67,7 @@ namespace DataManagement.Repositories
             _context.FlatCoordinatesDto.Add(flatCoordinateDto);
             _context.SaveChanges();
         }
-        
+
         private long CreateFlatInfoAndGetHisId(FlatInfoModel flatInfoModel, long phoneId)
         {
             var flatDto = new FlatInfoDto()
@@ -123,7 +122,7 @@ namespace DataManagement.Repositories
         {
             return _context.FlatDateInfosDto.Count(f => f.RefusePublication == null && f.TelegramPublication == null);
         }
-        
+
         public FlatInfoClientModel ReadOldestNotViewedFlat()
         {
             var noViewedFlatDateInfoDto = _context.FlatDateInfosDto

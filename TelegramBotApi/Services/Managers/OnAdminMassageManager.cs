@@ -166,13 +166,13 @@ namespace TelegramBotApi.Services.Managers
                 countProcessedFlats += countNotViewedFlats;
                 await SendFlatsWhileExistAvailableFlatWithDelay(conf, bot, informer, publisher, countNotViewedFlats, cancel);
 
-                finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"] 
+                finder.FindAndSaveSuitImeretiFlats(long.Parse(conf.GetSection("ImeretiChannel")["ChannelId"]
                                                               ?? throw new NotImplementedException()));
                 countNotViewedFlats = informer.GetCountNotViewedFlats();
                 countProcessedFlats += countNotViewedFlats;
                 await SendFlatsWhileExistAvailableFlatWithDelay(conf, bot, informer, publisher, countNotViewedFlats, cancel);
 
-                _finder.FindAndSaveSuitTbilisiRustaviFlats(long.Parse(conf.GetSection("TbilisiRustaviChannel")["ChannelId"] 
+                _finder.FindAndSaveSuitTbilisiRustaviFlats(long.Parse(conf.GetSection("TbilisiRustaviChannel")["ChannelId"]
                                                                       ?? throw new NotImplementedException()));
                 countNotViewedFlats = informer.GetCountNotViewedFlats();
                 countProcessedFlats += countNotViewedFlats;

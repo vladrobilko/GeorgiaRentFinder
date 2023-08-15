@@ -61,7 +61,7 @@ namespace WebScraper.SsDotGe
             if (string.IsNullOrWhiteSpace(input)) return "No description";
 
             var removeWhitespace = Regex.Replace(input, @"\s{2,}", " ");
-            
+
             if (removeWhitespace.Length <= descriptionLength) return removeWhitespace;
 
             var description = removeWhitespace.Substring(0, descriptionLength - 3) + "...";
@@ -83,7 +83,7 @@ namespace WebScraper.SsDotGe
                     .FirstOrDefault()?.InnerText.Replace("\r\n", "") ?? "No number";
             }
 
-            return number.Replace(" ","");
+            return number.Replace(" ", "");
         }
 
         public List<string> GetFlatImages(HtmlDocument flatPage)

@@ -104,7 +104,7 @@ namespace WebScraper.MyHomeDotGe
                 .Where(p => p.InnerText.Contains("Phone") && p.InnerText.Length < 20)
                 .Select(p => Regex.Replace(p.InnerText, @"[^\d\s]+", string.Empty))?
                 .FirstOrDefault()?
-                .Replace(" ","") ?? "No number";
+                .Replace(" ", "") ?? "No number";
         }
 
         public List<string> GetFlatImages(HtmlDocument flatPage)

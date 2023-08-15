@@ -1,6 +1,4 @@
-﻿using Application.Models;
-
-namespace Application.Interfaces
+﻿namespace Application.Interfaces
 {
     public interface IFlatFindService
     {

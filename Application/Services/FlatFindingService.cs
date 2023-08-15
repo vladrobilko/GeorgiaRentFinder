@@ -20,7 +20,7 @@ namespace Application.Services
         private const int FlatsOnPageMyHomeGe = 24;
         private const int FlatLowestPrice = 150;
         private const int FlatHighestPrice = 410;
-        
+
         public FlatFindingService(IFlatRepository flatRepository, IChannelInfoRepository channelInfoRepository)
         {
             _flatRepository = flatRepository;
@@ -77,7 +77,7 @@ namespace Application.Services
 
             var scraperSsDotGe = new FlatsScraper(new SsDotGeFlatScraper(), FlatsOnPageSsGe, FlatLowestPrice, FlatHighestPrice);
 
-            FindSsDotGeTbilisiRustaviFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, tbilisiRustaviFlats); 
+            FindSsDotGeTbilisiRustaviFLats(CountPagesForScrap, scraperSsDotGe, lastCheckDate, tbilisiRustaviFlats);
 
             _flatRepository.CreateFlats(tbilisiRustaviFlats);
 

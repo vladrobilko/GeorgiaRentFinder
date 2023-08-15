@@ -6,7 +6,7 @@ namespace WebScraper
 {
     public static class GoogleTranslator
     {
-        public static string Translate(this string textToTranslate,string toLanguage, string apiToken)
+        public static string Translate(this string textToTranslate, string toLanguage, string apiToken)
         {
             var service = new TranslateService(new BaseClientService.Initializer { ApiKey = apiToken });
 

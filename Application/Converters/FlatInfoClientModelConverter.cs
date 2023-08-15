@@ -7,7 +7,7 @@ namespace Application.Converters
 {
     public static class FlatInfoClientModelConverter
     {
-        private const long CountForRealtorDetection = 20;
+        private const byte CountForRealtorDetection = 20;
 
         public static string ToTelegramCaptionWithRussianLanguage(this FlatInfoClientModel flat, bool isForAdmin, string language, string apiToken)
         {
@@ -19,10 +19,10 @@ namespace Application.Converters
                    $"{GetDescriptionOrEmptyString(flat.Description, language, apiToken)}" +
                    $"{GetPageLinkDescribe(flat)}" +
                    $"{GetNumberDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
-                   $"{GetContactToWhatsAppDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" + 
+                   $"{GetContactToWhatsAppDescribe(flat.FlatPhoneClientModel.PhoneNumber)}" +
                    $"{GetCoordinateOrEmptyDescribe(flat)}" +
                    $"{GetRealtorDescribe(flat, flat.FlatPhoneClientModel.MentionOnSite)}" +
-                   $"{GetIdDescriptionOrEmptyString(isForAdmin,flat.Id)}";
+                   $"{GetIdDescriptionOrEmptyString(isForAdmin, flat.Id)}";
         }
 
         private static string GetTitleDescribe(FlatInfoClientModel flat, string language, string apiToken)
@@ -48,7 +48,7 @@ namespace Application.Converters
             if (comfortStuff.TotalArea != "No total area") describe += $"\n📌<strong>Площадь:</strong> {comfortStuff.TotalArea}";
 
             if (comfortStuff.IsThereGas != null) describe += comfortStuff.IsThereGas == true ? $"\n✅Газ" : $"\n❌Газ";
-            
+
             if (comfortStuff.IsThereConditioner != null) describe += comfortStuff.IsThereConditioner == true ? $"\n✅Кондиционер" : $"\n❌Кондиционер";
 
             return describe;

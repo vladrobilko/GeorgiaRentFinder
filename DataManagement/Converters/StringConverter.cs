@@ -24,6 +24,7 @@ namespace DataManagement.Converters
                     IsThereConditioner = defaultComfortStuff.IsThereConditioner
                 };
             }
+
             return comfortStuffDto;
         }
     }

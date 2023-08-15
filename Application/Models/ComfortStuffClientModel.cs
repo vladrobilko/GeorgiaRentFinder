@@ -12,6 +12,6 @@
 
         public bool? IsThereHotWater { get; set; }
 
-        public bool? IsThereConditioner { get; set; } 
+        public bool? IsThereConditioner { get; set; }
     }
 }
