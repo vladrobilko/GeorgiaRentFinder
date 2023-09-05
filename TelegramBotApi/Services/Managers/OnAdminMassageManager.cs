@@ -317,7 +317,7 @@ namespace TelegramBotApi.Services.Managers
 
                 var channelName = _informer.GetIdChannelWithLastCheckDate();
 
-                if (flat.LinksOfImages.Count > 2 && !_informer.IsPostedSameFlatLastHourAndIncreaseNumberOfMentionedPhoneIsPosted(flat))
+                if (flat.LinksOfImages.Count > 2 && !_informer.IsPostedSameFlatLastTenHoursAndIncreaseNumberOfMentionedPhoneIsPosted(flat))
                 {
                     await Task.Delay(60 * 1000, cancel);
                     await SendContentToTelegramWithTranslateText(channelName, flat, cancel, false);
@@ -340,7 +340,7 @@ namespace TelegramBotApi.Services.Managers
 
                 var channelName = informer.GetIdChannelWithLastCheckDate();
 
-                if (flat.LinksOfImages.Count > 2 && !informer.IsPostedSameFlatLastHourAndIncreaseNumberOfMentionedPhoneIsPosted(flat))
+                if (flat.LinksOfImages.Count > 2 && !informer.IsPostedSameFlatLastTenHoursAndIncreaseNumberOfMentionedPhoneIsPosted(flat))
                 {
                     await Task.Delay(60 * 1000, cancel);
                     await SendContentToTelegramWithTranslateText(conf, bot, channelName, flat, cancel, false);

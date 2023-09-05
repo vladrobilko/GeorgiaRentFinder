@@ -159,7 +159,7 @@ namespace DataManagement.Repositories
             };
         }
 
-        public IEnumerable<(string phoneNumber, long cost)> ReadLastHourPostedFlats(DateTime time)
+        public IEnumerable<(string phoneNumber, long cost)> ReadLastPostedFlatsFromDate(DateTime time)
         {
             var phoneNumbers = _context.FlatPhonesDto;
             var middle = _context.FlatDateInfosDto

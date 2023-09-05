@@ -35,12 +35,12 @@ namespace Application.Services
             return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }
 
-        public bool IsPostedSameFlatLastHourAndIncreaseNumberOfMentionedPhoneIsPosted(FlatInfoClientModel flat)
+        public bool IsPostedSameFlatLastTenHoursAndIncreaseNumberOfMentionedPhoneIsPosted(FlatInfoClientModel flat)
         {
-            var date = DateTime.Now.AddHours(-1);
+            var date = DateTime.Now.AddHours(-10);
 
             var result = _flatRepository
-                .ReadLastHourPostedFlats(date)
+                .ReadLastPostedFlatsFromDate(date)
                 .FirstOrDefault(x => x.cost == flat.Cost && x.phoneNumber == flat.FlatPhoneClientModel.PhoneNumber);
 
             if (!result.Equals(default))
