@@ -48,7 +48,7 @@ namespace WebScraper.SsDotGe
         {
             HtmlNode nextPage = mainPage.DocumentNode.SelectSingleNode($"//*[@id=\"list\"]/div[{htmlDivNumber}]/div[1]/div[1]/div[1]/div[2]/div[1]/a");
             var uri = new Uri(url);
-            return uri.Scheme + "://" + uri.Authority + nextPage.GetAttributeValue<string>("href", null);
+            return nextPage.GetAttributeValue<string>("href", null);
         }
 
         public string GetFlatDescription(HtmlDocument flatPage, int descriptionLength)
