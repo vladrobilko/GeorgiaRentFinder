@@ -35,9 +35,9 @@ namespace Application.Services
             return _channelInfoRepository.ReadIdChannelWithLastCheckDate();
         }
 
-        public bool IsPostedSameFlatLastTenHoursAndIncreaseNumberOfMentionedPhoneIsPosted(FlatInfoClientModel flat)
+        public bool IsPostedSameFlatLastWeekAndIncreaseNumberOfMentionedPhoneIsPosted(FlatInfoClientModel flat)
         {
-            var date = DateTime.Now.AddHours(-10);
+            var date = DateTime.Now.AddDays(-7);
 
             var result = _flatRepository
                 .ReadLastPostedFlatsFromDate(date)
