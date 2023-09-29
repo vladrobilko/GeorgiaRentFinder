@@ -14,7 +14,7 @@ namespace TelegramBotApi.Services.Managers
                                     "\n  _____________" +
                                     "\n/TbilisiRustaviSearch" +
                                     "\n  _____________" +
-                                    "\n/AutoFlatSendingEveryHour";
+                                    "\n/AutoFlatSendingEveryTwoHour";
 
         public const string GetMessageForStartAutoFlatSendingEveryHour = "Program is working in auto mode";
 
@@ -61,7 +61,7 @@ namespace TelegramBotApi.Services.Managers
                        "\n  _____________" +
                        "\n/TbilisiRustaviSearch" +
                        "\n  _____________" +
-                       "\n/AutoFlatSendingEveryHour";
+                       "\n/AutoFlatSendingEveryTwoHour";
             }
             return $"There are <ins><strong>{countFlats} NOT distributed flats.</strong></ins>" +
                    $"\nYou need to do this: {GetMessageForGetLastAvailableFlatLink}";

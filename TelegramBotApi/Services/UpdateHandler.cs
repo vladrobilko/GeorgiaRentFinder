@@ -67,7 +67,7 @@ public class UpdateHandler : IUpdateHandler
             "/ImeretiSearch" => _onAdminMassageManager.FindSuitImeretiFlats(mes, cancel),
             "/TbilisiRustaviSearch" => _onAdminMassageManager.FindSuitTbilisiRustaviFlats(mes, cancel),
             "/LookFlat" => _onAdminMassageManager.GetLastAvailableFlat(mes, cancel),
-            "/AutoFlatSendingEveryHour" => _onAdminMassageManager.AutoFlatSendingEveryHour(mes, cancel),
+            "/AutoFlatSendingEveryTwoHour" => _onAdminMassageManager.AutoFlatSendingEveryTwoHour(mes, cancel),
             _ => _onAdminMassageManager.OnTextResponse(mes, cancel),
         };
 

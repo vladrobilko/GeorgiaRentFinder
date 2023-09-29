@@ -112,7 +112,7 @@ namespace TelegramBotApi.Services.Managers
             return await SendTextMessageAsync(mes, cancel, text, new ReplyKeyboardRemove());
         }// the same methods (need Enum)
 
-        public async Task<Message> AutoFlatSendingEveryHour(Message mes, CancellationToken cancel)
+        public async Task<Message> AutoFlatSendingEveryTwoHour(Message mes, CancellationToken cancel)
         {
             if (_informer.GetCountNotViewedFlats() != 0 || IsAutoSendingModeStarted)
             {
@@ -125,9 +125,7 @@ namespace TelegramBotApi.Services.Managers
                 throw new NotSupportedException();
             }
 
-            //await AutoFlatSendingWithoutChecking(mes, cancel);
-
-            var twoHoursInMilliseconds = 60 * 60 * 1000;
+            var twoHoursInMilliseconds = 2 * 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
             _timer.Elapsed += async (source, e) =>
                 await AutoFlatSendingWithoutCheckingOnTimedEvent(source, e, mes, cancel);
