@@ -125,7 +125,9 @@ namespace TelegramBotApi.Services.Managers
                 throw new NotSupportedException();
             }
 
-            var twoHoursInMilliseconds = 2 * 60 * 60 * 1000;
+            await AutoFlatSendingWithoutChecking(mes, cancel);
+
+            var twoHoursInMilliseconds = 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
             _timer.Elapsed += async (source, e) =>
                 await AutoFlatSendingWithoutCheckingOnTimedEvent(source, e, mes, cancel);
@@ -315,7 +317,7 @@ namespace TelegramBotApi.Services.Managers
 
                 var channelName = _informer.GetIdChannelWithLastCheckDate();
 
-                if (flat.LinksOfImages.Count > 2 && !_informer.IsPostedSameFlatLastWeekAndIncreaseNumberOfMentionedPhoneIsPosted(flat))
+                if (flat.LinksOfImages.Count > 2 && !_informer.IsPostedSameFlatLastWeekAndIncreaseNumberOfMentionedPhoneIsPosted(flat) && flat.ViewsOnSite < 20)
                 {
                     await Task.Delay(60 * 1000, cancel);
                     await SendContentToTelegramWithTranslateText(channelName, flat, cancel, false);
