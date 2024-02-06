@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /TelegramBotApi/appsettings.json
 /TelegramBotApi/appsettings.Development.json
 /DataManagement/Models/RentfinderdbContext.cs
+/WebScraper/SsDotGe/LInks/AdjaraMunicipallyLinksSsDotGe.cs
+/WebScraper/SsDotGe/LInks/ImeretiMunicipallyLinksSsDotGe.cs
+/WebScraper/SsDotGe/LInks/TbilisiMunicipallyLinksSsDotGe.cs

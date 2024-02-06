@@ -127,7 +127,7 @@ namespace TelegramBotApi.Services.Managers
 
             await AutoFlatSendingWithoutChecking(mes, cancel);
 
-            var twoHoursInMilliseconds = 60 * 60 * 1000;
+            var twoHoursInMilliseconds = 2 * 60 * 60 * 1000;
             _timer = new System.Timers.Timer(twoHoursInMilliseconds);
             _timer.Elapsed += async (source, e) =>
                 await AutoFlatSendingWithoutCheckingOnTimedEvent(source, e, mes, cancel);
@@ -317,7 +317,7 @@ namespace TelegramBotApi.Services.Managers
 
                 var channelName = _informer.GetIdChannelWithLastCheckDate();
 
-                if (flat.LinksOfImages.Count > 2 && !_informer.IsPostedSameFlatLastWeekAndIncreaseNumberOfMentionedPhoneIsPosted(flat) && flat.ViewsOnSite < 20)
+                if (flat.LinksOfImages.Count > 2 && !_informer.IsPostedSameFlatLastWeekAndIncreaseNumberOfMentionedPhoneIsPosted(flat) && !IsALotViewsInTbilisi(channelName, flat.ViewsOnSite))
                 {
                     await Task.Delay(60 * 1000, cancel);
                     await SendContentToTelegramWithTranslateText(channelName, flat, cancel, false);
@@ -330,6 +330,11 @@ namespace TelegramBotApi.Services.Managers
 
                 countNotViewedFlats = _informer.GetCountNotViewedFlats();
             }
+        }
+
+        private bool IsALotViewsInTbilisi(string channelName, long views)
+        {
+            return channelName == "@TbilisiRustaviLowRent" && views > 20;
         }
 
         private async Task SendFlatsWhileExistAvailableFlatWithDelay(IConfiguration conf, ITelegramBotClient bot, IFlatInfoService informer, IFlatPublicationService publisher, long countNotViewedFlats, CancellationToken cancel)

@@ -4,7 +4,7 @@
     {
         public static string ToCommonViewString(this DateTime dateTime)
         {
-            return $"{dateTime:dd/MM/yyyy HH:mm}";
+            return $"{dateTime:dd/MM/yyyy}";
         }
     }
 }

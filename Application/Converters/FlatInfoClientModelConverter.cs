@@ -27,7 +27,18 @@ namespace Application.Converters
 
         private static string GetTitleDescribe(FlatInfoClientModel flat, string language, string apiToken)
         {
-            return $"🏠{flat.Title.Translate(language, apiToken)}";
+            return $"🏠{RemoveDuplicates(flat.Title)}";
+        }
+
+        private static string RemoveDuplicates(string input)
+        {
+            string[] words = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            string[] uniqueWords = words.Distinct().ToArray();
+
+            string result = string.Join(" ", uniqueWords);
+
+            return result;
         }
 
         private static string GetCostDescribe(FlatInfoClientModel flat)
